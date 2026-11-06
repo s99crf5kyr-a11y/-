@@ -182,18 +182,18 @@ body:not(.stick) #rDevName{bottom:calc(100% + 80px)}
     <div class="card">
       <h1>後腹膜鏡下 左腎尿管全摘（腎の処理） ― 両手トレーナー</h1>
       <p>参考動画（5分49秒）の流れを11場面に分け、イラストの術野で両手を動かして進めます。左手はバイポーラ、右手はモノポーラ（ハサミ）・LigaSure・メリーランド・直角鉗子・Hem-o-lokを切り替えます。</p>
-      <h2>操作（タッチ・マウス）</h2>
-      <div class="keys">
-        <div><b>右手</b>　右下の丸ボタンで器械を選び、術野を<b>指でなぞる</b>。押している間だけ切る・剥離する・シールする。光っている器械がおすすめ<br>マウスはカーソルで動かし、クリック長押し</div>
-        <div><b>左手</b>　左の器械の<b>先端に触れてドラッグ</b>すると動く（押している間つかむ）<br>青い手の印を<b>押したまま引っぱる</b>と牽引。出血点や凝固点を<b>タップ</b>すると左手バイポーラで止血</div>
-      </div>
-      <p style="margin:6px 0 0">2本指で左右を同時に動かせます。右上の「操作」でスティック操作（キーボード対応）に切り替えられます。</p>
-      <h2>スティック操作</h2>
+      <h2>操作</h2>
       <div class="keys">
         <div><b>左手</b>　スティック or <b>WASD</b><br>つかむ（押すたびに切替）<b>F</b>　バイポーラ通電 <b>G</b></div>
         <div><b>ペダル（左側）</b>　右手がモノポーラのとき<br>モノ通電 <b>E</b>　ハサミ <b>Q</b></div>
         <div><b>右手</b>　スティック or <b>矢印キー</b><br>アクション <b>K</b>　器械 <b>1〜5</b><br>LigaSureは長押しでシール＆カット</div>
       </div>
+      <h2>タッチ操作（右上の「操作」で切替）</h2>
+      <div class="keys">
+        <div><b>右手</b>　右下の丸ボタンで器械を選び、術野を<b>指でなぞる</b>。押している間だけ切る・剥離する・シールする。光っている器械がおすすめ<br>マウスはカーソルで動かし、クリック長押し</div>
+        <div><b>左手</b>　左の器械の<b>先端に触れてドラッグ</b>すると動く（押している間つかむ）<br>青い手の印を<b>押したまま引っぱる</b>と牽引。出血点や凝固点を<b>タップ</b>すると左手バイポーラで止血</div>
+      </div>
+      <p style="margin:6px 0 0">2本指で左右を同時に動かせます。右上の「操作」でスティック操作に戻せます。</p>
       <h2>コツ</h2>
       <ul>
         <li>スティック操作では、左手の「つかむ」を押すとつかんだままになり、親指をペダル（モノ通電・ハサミ）に移せます。</li>
@@ -409,7 +409,7 @@ function joy(el,hand){
 }
 const U={L:{ux:0,uy:0,act:false,en:false,mono:false,sc:false},R:{ux:0,uy:0,act:false}};
 // タッチ・マウスで術野を直接操作：ポインタごとに役割（右手／左手で牽引／左手で凝固）を決める
-let ctrl='touch';try{ctrl=localStorage.getItem('rlt-ctrl')||'touch'}catch(_){}
+let ctrl='stick';try{ctrl=localStorage.getItem('rlt-ctrl2')||'stick'}catch(_){}
 const TP=new Map(),TA={R:false,Lg:false,Lc:false,Lm:false};
 function recalcTA(){TA.R=TA.Lg=TA.Lc=TA.Lm=false;for(const v of TP.values())TA[v.role]=true}
 function ptrPos(e){const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]}
@@ -431,7 +431,7 @@ cv.addEventListener('pointermove',e=>{const t=TP.get(e.pointerId),[x,y]=ptrPos(e
 const pEnd=e=>{if(TP.delete(e.pointerId))recalcTA()};
 cv.addEventListener('pointerup',pEnd);cv.addEventListener('pointercancel',pEnd);
 cv.addEventListener('contextmenu',e=>e.preventDefault());
-function applyCtrl(){lastPanel='';document.body.classList.toggle('stick',ctrl==='stick');$('#bCtrl').textContent=ctrl==='touch'?'操作：タッチ':'操作：スティック';try{localStorage.setItem('rlt-ctrl',ctrl)}catch(_){}}
+function applyCtrl(){lastPanel='';document.body.classList.toggle('stick',ctrl==='stick');$('#bCtrl').textContent=ctrl==='touch'?'操作：タッチ':'操作：スティック';try{localStorage.setItem('rlt-ctrl2',ctrl)}catch(_){}}
 $('#bCtrl').onclick=()=>{ctrl=ctrl==='touch'?'stick':'touch';applyCtrl();toast(ctrl==='touch'?'タッチ操作：術野を指でなぞる・青い印を押して引く':'スティック操作：左右のスティックとボタン（キーボード可）','','ctrl')};
 joy($('#joyL'),U.L);joy($('#joyR'),U.R);
 function hold(el,o,k){
@@ -504,9 +504,10 @@ function step(dt){
  // 入力 → 手
  if(demo){demoStep(dt);L.grip=L.close}
  else{
-  const sp=.42*Math.min(W,H);
-  const lx=(U.L.ux||0)+((kb.KeyD?1:0)-(kb.KeyA?1:0)),ly=(U.L.uy||0)+((kb.KeyS?1:0)-(kb.KeyW?1:0));
-  const rx=(U.R.ux||0)+((kb.ArrowRight?1:0)-(kb.ArrowLeft?1:0)),ry=(U.R.uy||0)+((kb.ArrowDown?1:0)-(kb.ArrowUp?1:0));
+  const sp=.36*Math.min(W,H);
+  const [jlx,jly]=curve(U.L.ux||0,U.L.uy||0),[jrx,jry]=curve(U.R.ux||0,U.R.uy||0);
+  const lx=jlx+((kb.KeyD?1:0)-(kb.KeyA?1:0)),ly=jly+((kb.KeyS?1:0)-(kb.KeyW?1:0));
+  const rx=jrx+((kb.ArrowRight?1:0)-(kb.ArrowLeft?1:0)),ry=jry+((kb.ArrowDown?1:0)-(kb.ArrowUp?1:0));
   L.x+=clamp(lx,-1,1)*sp*dt;L.y+=clamp(ly,-1,1)*sp*dt;R.x+=clamp(rx,-1,1)*sp*dt;R.y+=clamp(ry,-1,1)*sp*dt;
   const la=U.L.act||!!kb.KeyF;if(la&&!L.pa)L.grip=!L.grip;L.pa=la;L.close=L.grip||TA.Lg||TA.Lm;
   L.energy=U.L.en||!!kb.KeyG||TA.Lc||(TA.Lm&&lOver());
@@ -583,6 +584,7 @@ function step(dt){
 // 左手の先端が出血点・凝固点の上にあるか（タッチで左手を動かしているときは自動で通電）
 function lOver(){const [wx,wy]=toW(L.x,L.y);if(bleeds.some(b=>Math.hypot(wx-b.x,wy-b.y)<b.r+16))return true;
  const tk=curTask();return !!(tk&&tk.type==='coag'&&tk.items.some(it=>{const q=ipos(tk,it);return it.p<1&&Math.hypot(wx-q.x,wy-q.y)<26}))}
+function curve(x,y){const m=Math.hypot(x,y);if(m<.12)return[0,0];const k=Math.pow(Math.min(1,(m-.12)/.88),1.8)/m;return[x*k,y*k]}
 let hzCd=0;
 function hazards(dt,rx,ry,tk){
  hzCd-=dt;
