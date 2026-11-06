@@ -185,7 +185,7 @@ body:not(.stick) #rDevName{bottom:calc(100% + 80px)}
       <h2>操作（タッチ・マウス）</h2>
       <div class="keys">
         <div><b>右手</b>　右下の丸ボタンで器械を選び、術野を<b>指でなぞる</b>。押している間だけ切る・剥離する・シールする。光っている器械がおすすめ<br>マウスはカーソルで動かし、クリック長押し</div>
-        <div><b>左手</b>　青い手の印を<b>押したまま引っぱる</b>と牽引。離すと放す<br>出血点や凝固点を<b>タップ</b>すると左手バイポーラで止血</div>
+        <div><b>左手</b>　左の器械の<b>先端に触れてドラッグ</b>すると動く（押している間つかむ）<br>青い手の印を<b>押したまま引っぱる</b>と牽引。出血点や凝固点を<b>タップ</b>すると左手バイポーラで止血</div>
       </div>
       <p style="margin:6px 0 0">2本指で左右を同時に動かせます。右上の「操作」でスティック操作（キーボード対応）に切り替えられます。</p>
       <h2>スティック操作</h2>
@@ -410,8 +410,8 @@ function joy(el,hand){
 const U={L:{ux:0,uy:0,act:false,en:false,mono:false,sc:false},R:{ux:0,uy:0,act:false}};
 // タッチ・マウスで術野を直接操作：ポインタごとに役割（右手／左手で牽引／左手で凝固）を決める
 let ctrl='touch';try{ctrl=localStorage.getItem('rlt-ctrl')||'touch'}catch(_){}
-const TP=new Map(),TA={R:false,Lg:false,Lc:false};
-function recalcTA(){TA.R=TA.Lg=TA.Lc=false;for(const v of TP.values())TA[v.role]=true}
+const TP=new Map(),TA={R:false,Lg:false,Lc:false,Lm:false};
+function recalcTA(){TA.R=TA.Lg=TA.Lc=TA.Lm=false;for(const v of TP.values())TA[v.role]=true}
 function ptrPos(e){const r=cv.getBoundingClientRect();return[e.clientX-r.left,e.clientY-r.top]}
 function movePtr(role,x,y){const h=role==='R'?R:L;h.x=x;h.y=y}
 cv.addEventListener('pointerdown',e=>{
@@ -421,6 +421,7 @@ cv.addEventListener('pointerdown',e=>{
  const ph=PH[pi],tk=curTask();let role='R';
  if(bleeds.some(b=>near(b.x,b.y,b.r*scale()+40))||(tk&&tk.type==='coag'&&tk.items.some(it=>{const q=ipos(tk,it);return it.p<1&&near(q.x,q.y,60)})))role='Lc';
  else if(ph&&ph.grab&&tk&&tk.type!=='coag'&&!grab.on&&near(ph.grab[0],ph.grab[1],80))role='Lg';
+ else{const ld=Math.hypot(L.x-x,L.y-y-oy),rd=Math.hypot(R.x-x,R.y-y-oy);if(ld<55||(ld<90&&(ld<rd||e.pointerType==='mouse')))role='Lm'} // 左の器械の先端に触れたら左手を動かす
  TP.set(e.pointerId,{role,oy});try{cv.setPointerCapture(e.pointerId)}catch(_){}
  movePtr(role,x,y+oy);recalcTA();
 });
@@ -507,8 +508,8 @@ function step(dt){
   const lx=(U.L.ux||0)+((kb.KeyD?1:0)-(kb.KeyA?1:0)),ly=(U.L.uy||0)+((kb.KeyS?1:0)-(kb.KeyW?1:0));
   const rx=(U.R.ux||0)+((kb.ArrowRight?1:0)-(kb.ArrowLeft?1:0)),ry=(U.R.uy||0)+((kb.ArrowDown?1:0)-(kb.ArrowUp?1:0));
   L.x+=clamp(lx,-1,1)*sp*dt;L.y+=clamp(ly,-1,1)*sp*dt;R.x+=clamp(rx,-1,1)*sp*dt;R.y+=clamp(ry,-1,1)*sp*dt;
-  const la=U.L.act||!!kb.KeyF;if(la&&!L.pa)L.grip=!L.grip;L.pa=la;L.close=L.grip||TA.Lg;
-  L.energy=U.L.en||!!kb.KeyG||TA.Lc;
+  const la=U.L.act||!!kb.KeyF;if(la&&!L.pa)L.grip=!L.grip;L.pa=la;L.close=L.grip||TA.Lg||TA.Lm;
+  L.energy=U.L.en||!!kb.KeyG||TA.Lc||(TA.Lm&&lOver());
   const pedal=U.L.mono||!!kb.KeyE, scis=U.L.sc||!!kb.KeyQ;
   R.close=U.R.act||!!kb.KeyK||TA.R||(R.dev==='mono'&&scis);
   R.energy=(R.dev==='mono'&&pedal)||(R.dev==='lig'&&R.close);
@@ -521,9 +522,9 @@ function step(dt){
  const pressR=R.close&&!R.pc, pressRE=R.energy&&!R.pe;
 
  // 左手の牽引
- if(ph&&ph.grab&&L.close&&!L.pc&&!grab.on){
-  if(Math.hypot(lx-ph.grab[0],ly-ph.grab[1])<95){grab.on=true;grab.sx=lx;grab.sy=ly}
-  else toast('青い手の印の場所をつかむと張力がかかります','','grabhint');
+ if(ph&&ph.grab&&L.close&&(!L.pc||TA.Lm)&&!grab.on){ // タッチでは、つかんだまま印の上に運んでも牽引できる
+  if(Math.hypot(lx-ph.grab[0],ly-ph.grab[1])<(TA.Lm?60:95)){grab.on=true;grab.sx=lx;grab.sy=ly}
+  else if(!L.pc)toast('青い手の印の場所をつかむと張力がかかります','','grabhint');
  }
  if(!L.close||!ph||!ph.grab)grab.on=false;
  tension=false;
@@ -579,6 +580,9 @@ function step(dt){
  }
  updPanel();
 }
+// 左手の先端が出血点・凝固点の上にあるか（タッチで左手を動かしているときは自動で通電）
+function lOver(){const [wx,wy]=toW(L.x,L.y);if(bleeds.some(b=>Math.hypot(wx-b.x,wy-b.y)<b.r+16))return true;
+ const tk=curTask();return !!(tk&&tk.type==='coag'&&tk.items.some(it=>{const q=ipos(tk,it);return it.p<1&&Math.hypot(wx-q.x,wy-q.y)<26}))}
 let hzCd=0;
 function hazards(dt,rx,ry,tk){
  hzCd-=dt;
@@ -808,9 +812,12 @@ function frame(now){
  step(dt);
  g.setTransform(DPR,0,0,DPR,0,0);g.fillStyle='#0b0e12';g.fillRect(0,0,W,H);
  drawWorld(now/1000);drawTool(L,-1);drawTool(R,1);drawParts();vignette();
+ if(ctrl==='touch'&&started&&!ended&&!demo){tipTag(L,TA.Lm||TA.Lg||TA.Lc?'':'左手：先端をドラッグ','#9fc3ff');tipTag(R,TA.R?'':'右手：術野をなぞる',DEV[R.dev].c)}
  $('#clock').textContent=fmt(elapsed);
  requestAnimationFrame(frame);
 }
+function tipTag(h,t,c){if(!t)return;g.font=`800 11px ${FF}`;g.textAlign='center';g.textBaseline='middle';const w=g.measureText(t).width+12,x=clamp(h.x,w/2+4,W-w/2-4),y=h.y+30;
+ g.fillStyle='rgba(10,14,18,.75)';rr(x-w/2,y-9,w,18,6);g.fill();g.lineWidth=1.5;g.strokeStyle=c;g.stroke();g.fillStyle='#fff';g.fillText(t,x,y+.5)}
 function fmt(s){s=Math.floor(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
 function resize(){DPR=Math.min(2,devicePixelRatio||1);const oW=W,oH=H;W=cv.clientWidth||1;H=cv.clientHeight||1;cv.width=W*DPR;cv.height=H*DPR;
  if(oW>1){L.x*=W/oW;L.y*=H/oH;R.x*=W/oW;R.y*=H/oH}}
