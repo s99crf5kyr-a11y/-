@@ -183,6 +183,7 @@ kbd{font-family:ui-monospace,Menlo,monospace;font-size:9px;opacity:.55;display:b
       <ul>
         <li>左手で「つかむ」を押すとつかんだままになり、親指をペダル（モノ通電・ハサミ）に移せます。</li>
         <li>青い手の印の場所をつかんで引くと張力がかかり、右手の操作が速く進みます。</li>
+        <li>フランクパッドは外側円錐筋膜とは別の脂肪の層。最初の場面では脂肪を取り除くだけで、筋膜は次の場面で切ります。</li>
         <li>腎動静脈にモノポーラを当てると出血します。左手バイポーラで止血するまで先へ進めません。</li>
       </ul>
       <p class="src">手順は参考動画を約5秒おきの静止画で確認し、指導医のコメントで解剖を修正して作成。音声なしのため、構造名には映像からの推定を含みます。スマホは横向き推奨。</p>
@@ -246,8 +247,9 @@ const PSO=x=>{const t=x/1600;return(1-t)**3*800+3*(1-t)**2*t*792+3*(1-t)*t*t*762
 /* ---------- 場面（参考動画の流れ） ---------- */
 const PH=[
 {k:'flank',vt:'0:00–0:15',ti:'フランクパッドの除去',cam:[820,470,1.0],grab:[820,400],pull:[0,-45],
- tip:'後腹膜腔に入ると、外側円錐筋膜の上にフランクパッド（腹膜外脂肪）が乗っている。これを外すと筋膜がきれいに見える。',
- tasks:[{type:'line',dev:['mono','lig'],poly:[[440,560],[640,640],[900,655],[1180,585]],n:8,txt:'左手でフランクパッドを持ち上げ、付着部を右手で切って外す'}]},
+ tip:'フランクパッドは外側円錐筋膜の上に乗っている腹膜外脂肪で、筋膜とは別の層。腹側・頭側から脂肪を少しずつ取り除いて、下の外側円錐筋膜を出す（筋膜はまだ切らない）。',
+ tasks:[{type:'fat',dev:['mono','lig'],pts:[[1090,340],[920,320],[740,330],[1150,470],[960,460],[770,470],[580,400],[600,540],[1010,580],[800,590]],
+   txt:'左手で脂肪を持ち上げ、右手でフランクパッドの脂肪を少しずつ取り除く（腹側・頭側から）'}]},
 {k:'cone',vt:'0:15–0:30',ti:'外側円錐筋膜の切開（腸腰筋寄り）',cam:[840,640,1.15],
  tip:'切開は腸腰筋のすぐ腹側で、筋に平行に。腹膜側（画面上）に寄りすぎない。',
  tasks:[{type:'line',dev:['mono'],poly:[[380,758],[700,746],[1000,728],[1300,710]],n:9,txt:'腸腰筋に沿って外側円錐筋膜を切開する（左のペダルで通電 or ハサミ）'}]},
@@ -317,6 +319,7 @@ function initTasks(){
 function vp(name){const v=VS[name];if(!v.att||(!kOff.x&&!kOff.y))return v.pts;const n=v.pts.length;return v.pts.map((q,i)=>{const w=name==='ureter'?(i?0:1):1-i/(n-1);return[q[0]+kOff.x*w,q[1]+kOff.y*w]})}
 function ipos(tk,it){
  if(tk.type==='line'){const q=at(tk.poly,(it.t0+it.t1)/2);return{x:q.x,y:q.y,tx:q.tx,ty:q.ty}}
+ if(tk.type==='fat'){const o=pi===0?kOff:{x:0,y:0};return{x:it.x+o.x,y:it.y+o.y,tx:1,ty:0}}
  if(tk.vessel){const v=VS[tk.vessel],q=at(vp(tk.vessel),it.t),o=it.off*(v.w/2+13);return{x:q.x-q.ty*o,y:q.y+q.tx*o,tx:q.tx,ty:q.ty}}
  return{x:it.x,y:it.y,tx:1,ty:0};
 }
@@ -442,8 +445,8 @@ function updPanel(){
 }
 
 /* ---------- 判定 ---------- */
-function reqDev(tk){return tk.type==='line'?tk.dev[0]:tk.type==='nodes'?tk.dev:tk.type==='clip'?'clip':tk.type==='divide'?'mono':tk.type==='seal'?'lig':'bip'}
-function okDev(tk,d){return tk.type==='line'?tk.dev.includes(d):reqDev(tk)===d}
+function reqDev(tk){return Array.isArray(tk.dev)?tk.dev[0]:tk.type==='nodes'?tk.dev:tk.type==='clip'?'clip':tk.type==='divide'?'mono':tk.type==='seal'?'lig':'bip'}
+function okDev(tk,d){return Array.isArray(tk.dev)?tk.dev.includes(d):reqDev(tk)===d}
 function active(h){const d=h.dev;if(d==='mono')return h.close||h.energy;if(d==='lig'||d==='mary'||d==='ra')return h.close;return false}
 function spark(x,y,col,n,type){for(let i=0;i<n;i++)parts.push({x,y,vx:(Math.random()-.5)*90,vy:-30-Math.random()*70,life:.5+Math.random()*.6,max:1,col,r:2+Math.random()*3,type})}
 
@@ -499,7 +502,7 @@ function step(dt){
    if((pressR||pressRE)&&tk.items.some(it=>{const p=ipos(tk,it);return it.p<1&&Math.hypot(rx-p.x,ry-p.y)<40}))toast('止血は左手のバイポーラで（通電 G）','');
   }else{
    const near=it=>{const p=ipos(tk,it);return Math.hypot(rx-p.x,ry-p.y)};
-   const rad=tk.type==='line'?34:tk.type==='nodes'?24:22;
+   const rad=tk.type==='line'?34:tk.type==='fat'?42:tk.type==='nodes'?24:22;
    const cand=tk.items.filter(it=>it.p<1&&near(it)<rad).sort((a,b)=>near(a)-near(b))[0];
    if(cand&&!okDev(tk,R.dev)&&(pressR||pressRE))toast('ここは「'+DEV[reqDev(tk)].n+'」で','');
    if(blocked&&cand&&(pressR||pressRE))toast('先に左手バイポーラで止血を','warn','blk');
@@ -507,6 +510,7 @@ function step(dt){
     const rate=(tension?1.9:1);
     if(tk.type==='line'&&active(R)){cand.p+=dt*1.5*rate;if(Math.random()<.5)spark(R.x,R.y,R.energy&&R.dev==='mono'?'#ffe27a':'#ffffff',1,R.energy?'spark':'bit')}
     if(tk.type==='nodes'&&R.close){cand.p+=dt*1.3*rate}
+    if(tk.type==='fat'&&active(R)){cand.p+=dt*1.1*rate;if(Math.random()<.5)spark(R.x,R.y,R.energy&&R.dev==='mono'?'#ffe27a':'#f6d27a',1,R.energy?'spark':'bit');if(cand.p>=1)toast('脂肪を取り除いた '+tk.items.filter(i=>i.p>=1).length+'/'+tk.items.length,'','fat')}
     if(tk.type==='seal'&&R.close){cand.p+=dt/1.3;if(Math.random()<.4)spark(R.x,R.y,'rgba(255,255,255,.8)',1,'steam');if(cand.p>=1)toast('シール完了 → カット','')}
     if(tk.type==='divide'&&R.close){cand.p+=dt*1.6;if(R.energy)toast('クリップの近くでは通電しない（熱でクリップが外れる・断端損傷）','warn','divEn')}
     if(tk.type==='clip'&&pressR&&R.fire<=0){cand.p=1;R.fire=.6;placed.push({v:tk.vessel,t:cand.t});toast('クリップ '+tk.items.filter(i=>i.p>=1).length+'/'+tk.items.length,'')}
@@ -572,7 +576,7 @@ function demoStep(dt){
   const ready=!wantTension||(grab.on&&Math.hypot(kOff.x,kOff.y)>8);
   const arrived=moveTo(R,s[0],s[1],dt,.5);
   if(arrived&&ready){
-   if(tk.type==='line'||tk.type==='divide'||tk.type==='nodes'||tk.type==='seal')R.close=true;
+   if(tk.type==='line'||tk.type==='fat'||tk.type==='divide'||tk.type==='nodes'||tk.type==='seal')R.close=true;
    if(tk.type==='clip'&&dm.cd<=0){R.close=true;dm.cd=.8}
    if(R.dev==='lig'&&R.close)R.energy=true;
   }
@@ -670,8 +674,10 @@ function drawWorld(t){
   g.beginPath();g.moveTo(a.x,a.y);g.lineTo(a.x+(b.x-a.x)*f,a.y+(b.y-a.y)*f);g.lineCap='round';g.lineWidth=w;g.strokeStyle='rgba(227,167,68,.95)';g.stroke();g.lineWidth=2;g.strokeStyle='rgba(120,90,50,.8)';g.stroke()}
  // フランクパッド
  const fp=prog('flank');
- if(fp<1){g.save();g.globalAlpha=1-fp*.55;g.drawImage(pad,820-PAD.rx-20+(pi===0?kOff.x:0),440-PAD.ry-20-fp*90+(pi===0?kOff.y:0),PAD.rx*2+40,PAD.ry*2+40);g.restore();
-  strands(T('flank',0))}
+ if(fp<1){const tf=T('flank',0);g.save();g.beginPath();g.rect(-1e4,-1e4,2e4,2e4);
+  for(const it of tf.items){if(it.p<=0)continue;const q=ipos(tf,it),r=125*Math.min(1,it.p);g.moveTo(q.x+r,q.y);g.arc(q.x,q.y,r,0,7)}
+  g.clip('evenodd');g.drawImage(pad,820-PAD.rx-20+(pi===0?kOff.x:0),440-PAD.ry-20+(pi===0?kOff.y:0),PAD.rx*2+40,PAD.ry*2+40);g.restore();
+  for(const it of tf.items){if(it.p<=0||it.p>=1)continue;const q=ipos(tf,it);g.beginPath();g.arc(q.x,q.y,125*it.p,0,7);g.lineWidth=3;g.strokeStyle='rgba(154,106,20,.8)';g.stroke()}}
  // クリップ
  for(const c of placed){const v=VS[c.v],q=at(vp(c.v),c.t);drawClip(q.x,q.y,q.tx,q.ty,v.w,1)}
  // 出血
@@ -689,7 +695,7 @@ function drawWorld(t){
    if(tk.type==='coag'){g.beginPath();g.arc(p.x,p.y,10+2*Math.sin(t*5),0,7);g.fillStyle=C.blood;g.fill()}
    if(tk.type==='clip'){drawClip(p.x,p.y,p.tx,p.ty,VS[tk.vessel].w,.4)}
    if(tk.type==='divide'){const w=VS[tk.vessel].w/2+12;g.setLineDash([5/s,4/s]);g.beginPath();g.moveTo(p.x-p.ty*w,p.y+p.tx*w);g.lineTo(p.x+p.ty*w,p.y-p.tx*w);g.lineWidth=3/s;g.strokeStyle=C.tgt;g.stroke();g.setLineDash([])}
-   ring(p.x,p.y,tk.type==='nodes'?12:17,it.p,t)}
+   ring(p.x,p.y,tk.type==='nodes'?12:tk.type==='fat'?22:17,it.p,t)}
  }
  if(grab.on){const [lx,ly]=toW(L.x,L.y);g.beginPath();g.moveTo(lx,ly);g.lineTo(grab.sx-26+kOff.x,grab.sy+18+kOff.y);g.lineTo(grab.sx+26+kOff.x,grab.sy+18+kOff.y);g.closePath();g.fillStyle='rgba(248,227,162,.75)';g.fill();g.lineWidth=1.5;g.strokeStyle=C.gerL;g.stroke()}
  if(labels)drawLabels();
@@ -699,7 +705,8 @@ function drawLabels(){
  const s=scale(),A=[];
  A.push(['腸腰筋',300,895]);A.push(['腹膜',700,110]);
  if(pi===0)A.push(['フランクパッド',820,500+kOff.y]);
- if(pi<=1)A.push(['外側円錐筋膜',640,700]);
+ if(pi===1)A.push(['外側円錐筋膜',640,700]);
+ if(pi===0&&prog('flank')>.25)A.push(['外側円錐筋膜（パッドの下）',1000,300]);
  if(pi>=2){A.push(['腎（Gerota筋膜内）',820+kOff.x,420+kOff.y]);A.push(['尿管（温存）',430,630])}
  if(pi>=2&&pi<=4)A.push(['大血管側の脂肪',1050,735]);
  if(prog('window')>.5)A.push(['psoas window',585,770]);
