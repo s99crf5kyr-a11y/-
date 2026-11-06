@@ -1,0 +1,791 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>後腹膜鏡 左腎摘トレーナー</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;800&display=swap">
+<style>
+/* 全画面の術野（スコープ視野）＋ 左右の手のコントローラ。単一のダーク基調（手術室モニタ） */
+:root{
+  --bg:#0b0e12; --panel:rgba(14,18,24,.82); --line:rgba(255,255,255,.14);
+  --fg:#eef2f5; --mute:#9ba8b5; --accent:#2ee6d6; --warn:#ffb020; --bad:#ff4d5e;
+  --bip:#3d7bf0; --mono:#f2c230; --lig:#8a63f0; --mary:#7fb08a; --ra:#3fb7b0; --clip:#b36ad8;
+  --ui:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN","Hiragino Sans","Yu Gothic",system-ui,sans-serif;
+  --js:clamp(100px,23vmin,150px); --bt:clamp(52px,11.5vmin,68px);
+  color-scheme:dark;
+}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--ui);overflow:hidden;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+#app{position:fixed;inset:0;overflow:hidden}
+#cv{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none}
+button{font-family:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+kbd{font-family:ui-monospace,Menlo,monospace;font-size:9px;opacity:.55;display:block;margin-top:1px}
+
+#hud{position:absolute;left:0;right:0;top:0;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap;
+  padding:calc(8px + env(safe-area-inset-top,0px)) max(12px,env(safe-area-inset-right,0px)) 0 max(12px,env(safe-area-inset-left,0px));pointer-events:none}
+#hud>*{pointer-events:auto}
+.hl{display:flex;gap:10px;align-items:center;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 12px 6px 6px;min-width:0}
+.chip{background:var(--accent);color:#04201d;font-weight:800;border-radius:8px;padding:4px 8px;font-variant-numeric:tabular-nums;font-size:13px}
+#phTi{font-weight:800;font-size:15px;line-height:1.2}
+#vlink{font-size:11px;color:var(--mute);text-decoration:none}
+#vlink:hover{color:var(--accent)}
+.hr{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.hr button{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 11px;font-size:13px;font-weight:800}
+.hr button.on{border-color:var(--accent);color:var(--accent)}
+#clock{font-variant-numeric:tabular-nums;font-size:13px;color:var(--mute);background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:7px 10px}
+
+#task{position:absolute;left:50%;transform:translateX(-50%);top:calc(64px + env(safe-area-inset-top,0px));width:min(620px,calc(100% - 24px));
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px;pointer-events:none}
+#tkTxt{font-size:14px;font-weight:800;line-height:1.45}
+#tkTip{font-size:12px;color:var(--mute);margin-top:2px;line-height:1.45}
+#tkBar{height:4px;background:rgba(255,255,255,.1);border-radius:3px;margin-top:6px;overflow:hidden}
+#tkBar i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+#badges{position:absolute;right:8px;top:-10px;display:flex;gap:4px}
+#badges span{font-size:11px;font-weight:800;border-radius:6px;padding:2px 7px}
+#bgTen{background:var(--accent);color:#04201d}
+#bgBleed{background:var(--bad);color:#fff}
+#orient{position:absolute;left:50%;transform:translateX(-50%);bottom:calc(8px + env(safe-area-inset-bottom,0px));font-size:11px;color:var(--mute);background:var(--panel);border-radius:8px;padding:3px 9px;pointer-events:none;white-space:nowrap}
+
+#toast{position:absolute;left:50%;top:calc(150px + env(safe-area-inset-top,0px));transform:translateX(-50%);pointer-events:none;display:flex;flex-direction:column;gap:6px;align-items:center;width:min(520px,70%)}
+.tst{opacity:.95}
+.tst{background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:8px 14px;font-size:14px;font-weight:800;animation:tin .25s ease-out;text-align:center}
+.tst.warn{border-left-color:var(--warn)} .tst.bad{border-left-color:var(--bad)}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.ctl{position:absolute;bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;align-items:flex-end;gap:10px;touch-action:none}
+#ctlL{left:max(14px,env(safe-area-inset-left,0px))}
+#ctlR{right:max(14px,env(safe-area-inset-right,0px))}
+.joy{width:var(--js);height:var(--js);border-radius:50%;position:relative;touch-action:none;flex:none;
+  background:radial-gradient(circle,rgba(255,255,255,.05) 0 55%,rgba(255,255,255,.1) 56% 100%);border:2px solid rgba(255,255,255,.28)}
+.joy::after{content:"";position:absolute;inset:30%;border-radius:50%;border:1px dashed rgba(255,255,255,.18)}
+.knob{position:absolute;left:50%;top:50%;width:42%;height:42%;margin:-21% 0 0 -21%;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#7d8894,#3b434c 70%);border:2px solid rgba(255,255,255,.35);box-shadow:0 4px 10px rgba(0,0,0,.5)}
+.bts{display:flex;flex-direction:column;gap:9px;align-items:center}
+.bt{width:var(--bt);height:var(--bt);border-radius:50%;border:2px solid rgba(255,255,255,.35);background:rgba(30,36,44,.85);font-weight:800;font-size:12px;line-height:1.1;touch-action:none;padding:0}
+.bt.big{width:calc(var(--bt)*1.22);height:calc(var(--bt)*1.22);font-size:14px}
+.bt.on{background:var(--hc,var(--accent));color:#111;border-color:#fff;transform:scale(.95)}
+.bt.lock{background:var(--accent);color:#04201d;border-color:#fff}
+.bt.en{--hc:var(--dc,var(--bip));border-color:var(--dc,var(--bip))}
+.bt.pedal{border-style:dashed;border-color:var(--mono);--hc:var(--mono)}
+.bt.dim{opacity:.28}
+.pcap{font-size:10px;color:var(--mute);margin-bottom:-4px;white-space:nowrap}
+.dname{position:absolute;bottom:calc(100% + 10px);font-size:12px;font-weight:800;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px 12px;white-space:nowrap}
+#ctlL .dname{left:0}
+#devbar{position:absolute;right:0;bottom:calc(100% + 10px);display:flex;gap:6px}
+.dv{width:48px;height:48px;border-radius:50%;background:rgba(30,36,44,.9);border:2px solid rgba(255,255,255,.22);font-size:11px;font-weight:800;line-height:1.05;padding:0;touch-action:none;position:relative}
+.dv.on{border-color:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 45%,transparent);background:color-mix(in srgb,var(--c) 30%,#1b2027)}
+.dv kbd{position:absolute;bottom:2px;left:0;right:0;margin:0}
+#rDevName{right:0;bottom:calc(100% + 66px)}
+
+.ov{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(5,7,10,.62);padding:16px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px))}
+.card{background:#141a21;border:1px solid var(--line);border-radius:16px;padding:20px 22px;width:min(660px,100%);max-height:100%;overflow:auto}
+.card h1{font-size:22px;margin:0 0 4px;text-wrap:balance}
+.card h2{font-size:14px;margin:16px 0 6px;color:var(--accent)}
+.card p,.card li{font-size:13px;line-height:1.65;color:#cfd8e0}
+.card ul{margin:0;padding-left:18px}
+.card .src{font-size:11px;color:var(--mute);margin-top:12px;line-height:1.5}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.cta{background:var(--accent);color:#04201d;border:0;border-radius:10px;padding:10px 18px;font-weight:800;font-size:15px}
+.cta.sub{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.keys{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:8px}
+.keys div{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;line-height:1.6}
+.keys b{color:var(--fg)}
+.mlist{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.mlist button{display:flex;justify-content:space-between;gap:10px;text-align:left;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:14px;font-weight:800}
+.mlist button span{color:var(--mute);font-weight:500;font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.mlist button.cur{border-color:var(--accent)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.stats div{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
+.stats b{display:block;font-size:22px;font-variant-numeric:tabular-nums}
+.stats small{font-size:11px;color:var(--mute)}
+@media (max-width:640px){
+  #task{top:calc(104px + env(safe-area-inset-top,0px))}
+  #phTi{font-size:13px}
+  .stats{grid-template-columns:repeat(2,1fr)}
+  .dv{width:42px;height:42px;font-size:10px}
+}
+@media (orientation:portrait) and (max-width:640px){
+  :root{--js:92px;--bt:46px}
+  .ctl{flex-direction:column-reverse;align-items:flex-start;gap:8px}
+  #ctlR{align-items:flex-end}
+  .bts{flex-direction:row}
+  .pcap{display:none}
+  #rDevName{bottom:calc(100% + 60px)}
+  #toast{top:calc(222px + env(safe-area-inset-top,0px));width:90%}
+  .tst{font-size:13px}
+}
+@media (prefers-reduced-motion:reduce){.tst{animation:none}}
+</style>
+
+<div id="app">
+  <canvas id="cv" aria-label="後腹膜鏡の術野"></canvas>
+
+  <div id="hud">
+    <div class="hl">
+      <span class="chip" id="phNo">1/11</span>
+      <div style="min-width:0">
+        <div id="phTi">フランクパッドの除去</div>
+        <a id="vlink" href="https://www.medicalview.co.jp/movies/12745/14.html" target="_blank" rel="noopener">参考動画 0:00–0:15 ↗</a>
+      </div>
+    </div>
+    <div class="hr">
+      <span id="clock">0:00</span>
+      <button id="bDemo" title="見本の操作を自動で再生">デモ</button>
+      <button id="bLab" class="on" title="構造の名前を表示">名前</button>
+      <button id="bMenu">場面</button>
+      <button id="bPause">停止</button>
+    </div>
+  </div>
+
+  <div id="task">
+    <div id="badges"><span id="bgTen" hidden>牽引 ✓ 速く進む</span><span id="bgBleed" hidden>出血中</span></div>
+    <div id="tkTxt"></div>
+    <div id="tkTip"></div>
+    <div id="tkBar"><i></i></div>
+  </div>
+  <div id="orient">画面↑ 腹側　画面→ 頭側　｜　左腎・後腹膜アプローチ</div>
+  <div id="toast"></div>
+
+  <div id="ctlL" class="ctl">
+    <div class="dname" id="lDevName" style="border-color:var(--bip)">左手：バイポーラ</div>
+    <div class="joy" id="joyL"><div class="knob"></div></div>
+    <div class="bts">
+      <span class="pcap">右手モノポーラ用ペダル</span>
+      <button class="bt pedal" id="lMono">モノ<br>通電<kbd>E</kbd></button>
+      <button class="bt pedal" id="lSc">ハサミ<kbd>Q</kbd></button>
+    </div>
+    <div class="bts">
+      <button class="bt en" id="lEn" style="--dc:var(--bip)">バイポ<br>通電<kbd>G</kbd></button>
+      <button class="bt big" id="lAct">つかむ<kbd>F</kbd></button>
+    </div>
+  </div>
+
+  <div id="ctlR" class="ctl">
+    <div class="dname" id="rDevName">右手：モノポーラ</div>
+    <div id="devbar"></div>
+    <div class="bts">
+      <button class="bt big" id="rAct">ハサミ<kbd>K</kbd></button>
+    </div>
+    <div class="joy" id="joyR"><div class="knob"></div></div>
+  </div>
+
+  <div class="ov" id="ovStart">
+    <div class="card">
+      <h1>後腹膜鏡下 左腎尿管全摘（腎の処理） ― 両手トレーナー</h1>
+      <p>参考動画（5分49秒）の流れを11場面に分け、イラストの術野で両手を動かして進めます。左手はバイポーラ、右手はモノポーラ（ハサミ）・LigaSure・メリーランド・直角鉗子・Hem-o-lokを切り替えます。</p>
+      <h2>操作</h2>
+      <div class="keys">
+        <div><b>左手</b>　スティック or <b>WASD</b><br>つかむ（押すたびに切替）<b>F</b>　バイポーラ通電 <b>G</b></div>
+        <div><b>ペダル（左側）</b>　右手がモノポーラのとき<br>モノ通電 <b>E</b>　ハサミ <b>Q</b></div>
+        <div><b>右手</b>　スティック or <b>矢印キー</b><br>アクション <b>K</b>　器械 <b>1〜5</b><br>LigaSureは長押しでシール＆カット</div>
+      </div>
+      <h2>コツ</h2>
+      <ul>
+        <li>左手で「つかむ」を押すとつかんだままになり、親指をペダル（モノ通電・ハサミ）に移せます。</li>
+        <li>青い手の印の場所をつかんで引くと張力がかかり、右手の操作が速く進みます。</li>
+        <li>腎動静脈にモノポーラを当てると出血します。左手バイポーラで止血するまで先へ進めません。</li>
+      </ul>
+      <p class="src">手順は参考動画を約5秒おきの静止画で確認し、指導医のコメントで解剖を修正して作成。音声なしのため、構造名には映像からの推定を含みます。スマホは横向き推奨。</p>
+      <div class="row"><button class="cta" id="bStart">はじめる</button><button class="cta sub" id="bStartDemo">デモを見る</button></div>
+    </div>
+  </div>
+
+  <div class="ov" id="ovMenu" hidden>
+    <div class="card">
+      <h1>場面を選ぶ</h1>
+      <p>選んだ場面より前の処理は済んだ状態から始まります。</p>
+      <div class="mlist" id="mlist"></div>
+      <div class="row"><button class="cta sub" id="bMenuClose">閉じる</button></div>
+    </div>
+  </div>
+
+  <div class="ov" id="ovEnd" hidden>
+    <div class="card">
+      <h1>腎の授動が完了しました</h1>
+      <p id="endMsg"></p>
+      <div class="stats" id="stats"></div>
+      <p class="src">尿管は切らずに残しています。このあと腎を収納し、体位変換して下部尿管の処理（Part 2）へ進みます。</p>
+      <div class="row"><button class="cta" id="bAgain">もう一度</button><button class="cta sub" id="bEndDemo">デモを見る</button><button class="cta sub" id="bEndMenu">場面を選ぶ</button></div>
+    </div>
+  </div>
+</div>
+
+<script>
+(()=>{
+const $=s=>document.querySelector(s);
+const cv=$('#cv'), g=cv.getContext('2d');
+let W=1,H=1,DPR=1;
+
+/* ---------- 色（術野イラスト） ---------- */
+const C={fat:'#efc865',lob:'#f6da8a',lob2:'#f1cf74',lobL:'rgba(170,122,36,.5)',
+ pfat:'#e3a744',plob:'#eab45a',plobL:'rgba(150,90,20,.55)',pad:'#f0bd55',
+ psoas:'#c65a55',psoasL:'#6f211d',psoasS:'rgba(110,25,25,.33)',ger:'#f8e3a2',gerL:'#a98426',kid:'rgba(150,60,45,.16)',
+ art:'#e2463c',artL:'#6e140f',artH:'#ff9e92',vein:'#5a5ec6',veinL:'#1f2160',veinH:'#a6a9f2',
+ ure:'#f4efe4',ureL:'#7d705a',adr:'#f0a02e',adrL:'#8a4f0c',tgt:'#2ee6d6',hand:'#5aa0ff',blood:'#b0101a',bloodH:'#ff5a5a',char:'#4d2a14',peri:'rgba(214,232,244,.72)',periL:'#7f9cb0'};
+const FF='"M PLUS Rounded 1c","Hiragino Sans",sans-serif';
+
+/* ---------- 器械 ---------- */
+const DEV={
+ bip:{n:'バイポーラ',s:'バイ\nポーラ',c:'#3d7bf0',act:'つかむ'},
+ mono:{n:'モノポーラ（ハサミ）',s:'モノ\nハサミ',c:'#f2c230',act:'ハサミ'},
+ lig:{n:'LigaSure（長押し）',s:'Liga\nSure',c:'#8a63f0',act:'シール\n長押し'},
+ mary:{n:'メリーランド',s:'メリー\nランド',c:'#7fb08a',act:'剥離'},
+ ra:{n:'直角鉗子',s:'直角',c:'#3fb7b0',act:'剥離'},
+ clip:{n:'Hem-o-lok（10mmポート）',s:'Hem-\no-lok',c:'#b36ad8',act:'クリップ'}};
+const RDEV=['mono','lig','mary','ra','clip'];
+
+/* ---------- 解剖（世界座標 1600×1000、画面↑腹側 →頭側） ---------- */
+const VS={
+ artery:{pts:[[805,596],[797,650],[780,715]],w:22,c:C.art,l:C.artL,h:C.artH,main:1,att:1,n:'腎動脈'},
+ vein:{pts:[[878,594],[887,650],[900,715]],w:36,c:C.vein,l:C.veinL,h:C.veinH,main:1,att:1,n:'腎静脈'},
+ lumbar:{pts:[[893,670],[935,722],[955,790]],w:10,c:C.vein,l:C.veinL,h:C.veinH,n:'腰静脈'},
+ ureter:{pts:[[700,600],[560,628],[380,648],[0,662]],w:18,c:C.ure,l:C.ureL,h:'#ffffff',att:1,n:'尿管'}};
+const GER={x:820,y:420,rx:340,ry:190};
+const PSO=x=>{const t=x/1600;return(1-t)**3*800+3*(1-t)**2*t*792+3*(1-t)*t*t*762+t**3*735}; // 腸腰筋の上縁（近似）
+
+/* ---------- 場面（参考動画の流れ） ---------- */
+const PH=[
+{k:'flank',vt:'0:00–0:15',ti:'フランクパッドの除去',cam:[820,470,1.0],grab:[820,400],pull:[0,-45],
+ tip:'後腹膜腔に入ると、外側円錐筋膜の上にフランクパッド（腹膜外脂肪）が乗っている。これを外すと筋膜がきれいに見える。',
+ tasks:[{type:'line',dev:['mono','lig'],poly:[[440,560],[640,640],[900,655],[1180,585]],n:8,txt:'左手でフランクパッドを持ち上げ、付着部を右手で切って外す'}]},
+{k:'cone',vt:'0:15–0:30',ti:'外側円錐筋膜の切開（腸腰筋寄り）',cam:[840,640,1.15],
+ tip:'切開は腸腰筋のすぐ腹側で、筋に平行に。腹膜側（画面上）に寄りすぎない。',
+ tasks:[{type:'line',dev:['mono'],poly:[[380,758],[700,746],[1000,728],[1300,710]],n:9,txt:'腸腰筋に沿って外側円錐筋膜を切開する（左のペダルで通電 or ハサミ）'}]},
+{k:'border',vt:'0:30–0:45',ti:'腎周囲脂肪と大血管側脂肪の境界へ',cam:[540,650,1.4],grab:[560,590],pull:[0,-45],
+ tip:'左手で腎側の脂肪を持ち上げると、腎周囲脂肪（明るい黄色）と大血管側の脂肪（濃い黄色）の境界が見えてくる。',
+ tasks:[{type:'line',dev:['mono','mary'],poly:[[330,716],[520,702],[700,690]],n:6,txt:'左手で腎側の脂肪を持ち上げ、2つの脂肪の境界に入る'}]},
+{k:'window',vt:'0:45–0:55',ti:'Psoas windowを出す',cam:[560,715,1.5],grab:[560,590],pull:[0,-45],
+ tip:'きれいな層に入ると腸腰筋の筋膜が見えてくる（psoas window）。この面を頭側（画面右）の腎門部へ進める。',
+ tasks:[{type:'line',dev:['mary','mono'],poly:[[400,750],[520,744],[640,738],[760,730]],n:6,txt:'疎な結合組織を剥離して腸腰筋を見せ、腎門部の方向へ進める'}]},
+{k:'art',vt:'0:55–1:20',ti:'腎動脈の露出',cam:[800,645,1.8],grab:[738,628],pull:[-35,-5],
+ tip:'後腹膜到達法では腎動脈が先に見える。血管に沿った層で剥離するほうが分かりやすい。',
+ tasks:[{type:'nodes',dev:'mary',vessel:'artery',ts:[.3,.3,.75,.75],off:[-1,1,-1,1],txt:'左手で膜を保持し、メリーランドで動脈の両脇を剥離する（アクション長押しで先端を開く）'},
+        {type:'nodes',dev:'ra',vessel:'artery',ts:[.52],off:[0],txt:'直角鉗子で動脈の背側を確認し、裏を通す'}]},
+{k:'aclip',vt:'1:20–1:50',ti:'腎動脈のクリップと切離',cam:[800,655,1.8],
+ tip:'動画では中枢側2個・腎側1個のHem-o-lok。切る位置は中枢側のクリップから離す。',
+ tasks:[{type:'clip',vessel:'artery',ts:[.92,.76,.2],txt:'Hem-o-lokを中枢側（画面下）に2個、腎側に1個かける'},
+        {type:'divide',vessel:'artery',ts:[.48],txt:'クリップの間をハサミで切る（左のハサミ Q でも可。通電しない）'}]},
+{k:'vein',vt:'1:50–2:40',ti:'腎静脈の剥離と分枝の処理',cam:[885,665,1.6],grab:[940,622],pull:[30,-20],
+ tip:'動脈の奥（画面上寄り）に腎静脈。背側から入る腰静脈をHem-o-lokで処理してから本幹を処理する。腰静脈は見落としやすいので注意。',
+ tasks:[{type:'nodes',dev:'mary',vessel:'vein',ts:[.25,.25],off:[-1,1],txt:'メリーランドで腎静脈の両脇を剥離する'},
+        {type:'clip',vessel:'lumbar',ts:[.22,.68],txt:'腰静脈にHem-o-lokを2個かける'},
+        {type:'divide',vessel:'lumbar',ts:[.45],txt:'枝をハサミで切る'},
+        {type:'nodes',dev:'ra',vessel:'vein',ts:[.45],off:[0],txt:'直角鉗子で腎静脈の裏を通す'}]},
+{k:'vclip',vt:'2:40–3:00',ti:'腎静脈のクリップと切離',cam:[890,655,1.7],
+ tip:'動脈が切れていることを確認してから静脈を処理する（動脈→静脈の順）。',
+ tasks:[{type:'clip',vessel:'vein',ts:[.93,.81,.18],txt:'Hem-o-lok（大）を中枢側2個・腎側1個かける'},
+        {type:'divide',vessel:'vein',ts:[.5],txt:'ハサミで、通電せずに切る'}]},
+{k:'upper',vt:'3:00–3:40',ti:'腎門内側〜上極側の処理',cam:[1080,560,1.5],grab:[975,470],pull:[-25,-35],
+ tip:'静脈を切った後、腎門の内側から上極側の脂肪をシーリングで切る。副腎は温存し、副腎側の脂肪は残して腎側に沿って切る。',
+ tasks:[{type:'seal',pts:[[995,612],[1055,588],[1108,556],[1150,515]],txt:'LigaSureを長押しして、副腎を残しながら腎側に沿って脂肪を順にシールする'}]},
+{k:'ant',vt:'3:40–5:30',ti:'腎の腹膜側を落とす',cam:[880,275,1.15],grab:[850,360],pull:[0,45],
+ tip:'腹膜は血管の透ける薄い膜。左手で腎を背側（画面下）へ引き、Gerota側に寄ってハサミで剥がす。上極の外側では腹膜越しに脾臓が見える。',
+ tasks:[{type:'line',dev:['mono','lig'],poly:[[480,262],[650,228],[900,218],[1120,240],[1235,330]],n:10,txt:'左手で腎を下へ引き、腹膜とGerotaの間をハサミで剥がす'}]},
+{k:'hemo',vt:'5:30–5:49',ti:'止血確認',cam:[850,665,1.4],
+ tip:'気腹圧を下げて静脈性の出血がないか確認し、クリップ断端も見る。尿管は切らずに残す（Part 2で下部尿管とともに摘出）。',
+ tasks:[{type:'coag',pts:[[760,700],[965,690]],txt:'腎床の出血点を左手バイポーラで凝固する'}]}
+];
+const IDX=k=>PH.findIndex(p=>p.k===k);
+
+/* ---------- 幾何 ---------- */
+function cum(p){const a=[0];for(let i=1;i<p.length;i++)a.push(a[i-1]+Math.hypot(p[i][0]-p[i-1][0],p[i][1]-p[i-1][1]));return a}
+function at(p,t){const a=cum(p),L=a[a.length-1],d=Math.max(0,Math.min(1,t))*L;let i=1;while(i<p.length-1&&a[i]<d)i++;
+ const sl=(a[i]-a[i-1])||1,s=(d-a[i-1])/sl,x0=p[i-1],x1=p[i];return{x:x0[0]+(x1[0]-x0[0])*s,y:x0[1]+(x1[1]-x0[1])*s,tx:(x1[0]-x0[0])/sl,ty:(x1[1]-x0[1])/sl}}
+function sub(p,t0,t1,n=14){const r=[];for(let i=0;i<=n;i++){const q=at(p,t0+(t1-t0)*i/n);r.push([q.x,q.y])}return r}
+function dseg(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay,l=dx*dx+dy*dy||1;let t=((px-ax)*dx+(py-ay)*dy)/l;t=Math.max(0,Math.min(1,t));return Math.hypot(px-ax-dx*t,py-ay-dy*t)}
+function dpoly(x,y,p){let m=1e9;for(let i=1;i<p.length;i++)m=Math.min(m,dseg(x,y,p[i-1][0],p[i-1][1],p[i][0],p[i][1]));return m}
+function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ---------- 状態 ---------- */
+let pi=0,ptimer=0,elapsed=0,paused=false,ended=false,started=false,labels=true,demo=false,tension=false;
+const stats={warn:0,bleed:0,tens:new Set()};
+const kOff={x:0,y:0};
+const grab={on:false,sx:0,sy:0};
+let bleeds=[], parts=[], placed=[];
+const cam={x:820,y:470,z:1};
+const mk=dev=>({x:0,y:0,close:false,energy:false,pc:false,pe:false,jaw:.7,dev,fire:0,grip:false,pa:false});
+const L=mk('bip'), R=mk('mono');
+
+function initTasks(){
+ for(const ph of PH)for(const tk of ph.tasks){
+  if(tk.type==='line'){tk.items=[];for(let i=0;i<tk.n;i++)tk.items.push({t0:i/tk.n,t1:(i+1)/tk.n,p:0})}
+  else if(tk.vessel)tk.items=tk.ts.map((t,i)=>({t,off:tk.off?tk.off[i]:0,p:0}));
+  else tk.items=tk.pts.map(q=>({x:q[0],y:q[1],p:0}));
+ }
+}
+function vp(name){const v=VS[name];if(!v.att||(!kOff.x&&!kOff.y))return v.pts;const n=v.pts.length;return v.pts.map((q,i)=>{const w=name==='ureter'?(i?0:1):1-i/(n-1);return[q[0]+kOff.x*w,q[1]+kOff.y*w]})}
+function ipos(tk,it){
+ if(tk.type==='line'){const q=at(tk.poly,(it.t0+it.t1)/2);return{x:q.x,y:q.y,tx:q.tx,ty:q.ty}}
+ if(tk.vessel){const v=VS[tk.vessel],q=at(vp(tk.vessel),it.t),o=it.off*(v.w/2+13);return{x:q.x-q.ty*o,y:q.y+q.tx*o,tx:q.tx,ty:q.ty}}
+ return{x:it.x,y:it.y,tx:1,ty:0};
+}
+const tdone=tk=>tk.items.every(i=>i.p>=1);
+function curTask(){const ph=PH[pi];if(!ph)return null;return ph.tasks.find(t=>!tdone(t))||null}
+function nextItem(tk){return tk.items.find(i=>i.p<1)}
+function prog(k){const ph=PH[IDX(k)];let a=0,n=0;for(const t of ph.tasks)for(const i of t.items){a+=Math.min(1,i.p);n++}return n?a/n:0}
+function T(k,idx){return PH[IDX(k)].tasks[idx]}
+function divided(v){for(const ph of PH)for(const tk of ph.tasks)if(tk.type==='divide'&&tk.vessel===v&&tdone(tk))return tk.ts[0];return null}
+
+/* ---------- カメラ ---------- */
+function scale(){const portrait=H>W;return Math.min(W/(portrait?760:1100),H/650)*cam.z}
+function cy0(){return H*.5}
+function toS(x,y){const s=scale();return[(x-cam.x)*s+W/2,(y-cam.y)*s+cy0()]}
+function toW(x,y){const s=scale();return[(x-W/2)/s+cam.x,(y-cy0())/s+cam.y]}
+
+/* ---------- 背景（事前描画） ---------- */
+const BS=1.5, base=document.createElement('canvas'); base.width=1600*BS; base.height=1000*BS;
+const ger=document.createElement('canvas'); ger.width=(GER.rx*2+40)*BS; ger.height=(GER.ry*2+40)*BS;
+const PAD={rx:430,ry:235}, pad=document.createElement('canvas'); pad.width=(PAD.rx*2+40)*BS; pad.height=(PAD.ry*2+40)*BS;
+const pvf=document.createElement('canvas'); pvf.width=1600*BS; pvf.height=1000*BS;
+const PVF=[[250,722],[360,714],[520,702],[700,690],[790,712],[950,716],[1150,700],[1350,690],[1600,688],[1600,PSO(1600)],[1300,PSO(1300)],[1000,PSO(1000)],[700,PSO(700)],[400,PSO(400)],[250,PSO(250)]];
+function wig(b,r,x,y,len,ang){b.beginPath();b.moveTo(x,y);for(let i=0;i<6;i++){ang+=(r()-.5)*1.1;x+=Math.cos(ang)*len/6;y+=Math.sin(ang)*len/6;b.lineTo(x,y)}b.stroke()}
+function lobes(b,r,n,x0,y0,w,h,f1,f2,ln){for(let i=0;i<n;i++){const x=x0+r()*w,y=y0+r()*h,rad=9+r()*22;b.beginPath();b.ellipse(x,y,rad,rad*(.65+r()*.35),r()*3,0,7);b.fillStyle=i%3?f1:f2;b.fill();b.lineWidth=1.3;b.strokeStyle=ln;b.stroke()}}
+function psoasPath(b){b.beginPath();b.moveTo(0,800);b.bezierCurveTo(500,792,1100,762,1600,735);b.lineTo(1600,1000);b.lineTo(0,1000);b.closePath()}
+function drawBase(){
+ const b=base.getContext('2d');b.scale(BS,BS);const r=rng(11);
+ b.fillStyle=C.fat;b.fillRect(0,0,1600,1000);lobes(b,r,1100,0,0,1600,1000,C.lob,C.lob2,C.lobL);
+ b.strokeStyle='rgba(196,58,46,.5)';b.lineWidth=1.3;for(let i=0;i<55;i++)wig(b,r,r()*1600,r()*1000,60+r()*80,r()*6.3);
+ psoasPath(b);b.fillStyle=C.psoas;b.fill();b.lineWidth=3.5;b.strokeStyle=C.psoasL;b.stroke();
+ b.save();b.clip();b.strokeStyle=C.psoasS;b.lineWidth=1.6;
+ for(let k=0;k<26;k++){const o=14+k*9+r()*4;b.beginPath();b.moveTo(0,800+o);b.bezierCurveTo(500,792+o,1100,762+o+r()*6,1600,735+o);b.stroke()}
+ b.strokeStyle='rgba(255,190,180,.45)';b.lineWidth=5;b.beginPath();b.moveTo(0,816);b.bezierCurveTo(500,808,1100,778,1600,751);b.stroke();b.restore();
+ // 大血管側の脂肪（濃い黄色）
+ const p=pvf.getContext('2d');p.scale(BS,BS);p.beginPath();PVF.forEach((q,i)=>i?p.lineTo(q[0],q[1]):p.moveTo(q[0],q[1]));p.closePath();
+ p.fillStyle=C.pfat;p.fill();p.save();p.clip();const r3=rng(23);lobes(p,r3,320,240,660,1370,160,C.plob,C.pfat,C.plobL);
+ p.strokeStyle='rgba(176,50,40,.55)';p.lineWidth=1.4;for(let i=0;i<22;i++)wig(p,r3,250+r3()*1350,700+r3()*80,70,r3()*6.3);p.restore();
+ // Gerota（腎）
+ const q=ger.getContext('2d');q.scale(BS,BS);q.translate(GER.rx+20,GER.ry+20);
+ q.beginPath();q.ellipse(0,0,GER.rx,GER.ry,0,0,7);q.fillStyle=C.ger;q.fill();
+ q.save();q.clip();const r2=rng(5);
+ for(let i=0;i<260;i++){const x=(r2()-.5)*GER.rx*2,y=(r2()-.5)*GER.ry*2,rad=12+r2()*22;q.beginPath();q.ellipse(x,y,rad,rad*.8,r2()*3,0,7);q.fillStyle=i%2?'#fbe9b0':'#f3d991';q.fill();q.lineWidth=1.2;q.strokeStyle='rgba(169,132,38,.45)';q.stroke()}
+ q.beginPath();q.moveTo(-250,-20);q.bezierCurveTo(-250,-150,250,-150,250,-20);q.bezierCurveTo(250,110,120,130,60,95);q.bezierCurveTo(20,70,-20,70,-60,95);q.bezierCurveTo(-120,130,-250,110,-250,-20);q.closePath();
+ q.fillStyle=C.kid;q.fill();q.lineWidth=2;q.strokeStyle='rgba(140,50,35,.25)';q.setLineDash([8,7]);q.stroke();q.setLineDash([]);
+ q.strokeStyle='rgba(196,58,46,.35)';q.lineWidth=1.2;for(let i=0;i<14;i++)wig(q,r2,(r2()-.5)*500,(r2()-.5)*280,50,r2()*6.3);
+ q.restore();q.beginPath();q.ellipse(0,0,GER.rx,GER.ry,0,0,7);q.lineWidth=3.5;q.strokeStyle=C.gerL;q.stroke();
+ q.beginPath();q.ellipse(-40,-60,GER.rx*.7,GER.ry*.45,-.1,3.5,5.4);q.lineWidth=6;q.strokeStyle='rgba(255,255,255,.45)';q.stroke();
+ // フランクパッド
+ const f=pad.getContext('2d');f.scale(BS,BS);f.translate(PAD.rx+20,PAD.ry+20);const r4=rng(41);
+ f.beginPath();for(let a=0;a<=64;a++){const t=a/64*6.283,rr=1+.06*Math.sin(t*7)+.04*Math.sin(t*13);f.lineTo(Math.cos(t)*PAD.rx*rr,Math.sin(t)*PAD.ry*rr)}f.closePath();
+ f.fillStyle=C.pad;f.fill();f.save();f.clip();lobes(f,r4,300,-PAD.rx,-PAD.ry,PAD.rx*2,PAD.ry*2,'#f6cd6b','#eab04a','rgba(150,95,20,.5)');
+ f.strokeStyle='rgba(190,50,40,.55)';f.lineWidth=1.5;for(let i=0;i<26;i++)wig(f,r4,(r4()-.5)*PAD.rx*2,(r4()-.5)*PAD.ry*2,60,r4()*6.3);f.restore();
+ f.lineWidth=3.5;f.strokeStyle='#9a6a14';f.stroke();
+}
+
+/* ---------- 入力 ---------- */
+const kb={};
+addEventListener('keydown',e=>{if(e.target.tagName==='INPUT'||!$('#ovMenu').hidden)return;kb[e.code]=true;
+ const d={Digit1:0,Digit2:1,Digit3:2,Digit4:3,Digit5:4}[e.code];if(d!=null){setDev(RDEV[d]);manual()}
+ if(e.code==='KeyP'){togglePause()}
+ if(/^(Arrow|Key[WASDFGKQE]$)/.test(e.code)){e.preventDefault();manual()}});
+addEventListener('keyup',e=>{kb[e.code]=false});
+addEventListener('blur',()=>{for(const k in kb)kb[k]=false});
+function joy(el,hand){
+ const knob=el.querySelector('.knob');let id=null;
+ const upd=e=>{const r=el.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2,rad=r.width/2;let dx=(e.clientX-cx)/rad,dy=(e.clientY-cy)/rad;const m=Math.hypot(dx,dy);if(m>1){dx/=m;dy/=m}
+  hand.ux=dx;hand.uy=dy;knob.style.transform=`translate(${dx*rad*.6}px,${dy*rad*.6}px)`};
+ el.addEventListener('pointerdown',e=>{id=e.pointerId;el.setPointerCapture(id);upd(e);manual();e.preventDefault()});
+ el.addEventListener('pointermove',e=>{if(e.pointerId===id)upd(e)});
+ const end=e=>{if(e.pointerId!==id)return;id=null;hand.ux=0;hand.uy=0;knob.style.transform=''};
+ el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end);
+}
+const U={L:{ux:0,uy:0,act:false,en:false,mono:false,sc:false},R:{ux:0,uy:0,act:false}};
+joy($('#joyL'),U.L);joy($('#joyR'),U.R);
+function hold(el,o,k){
+ const on=e=>{o[k]=true;el.classList.add('on');manual();e.preventDefault();try{el.setPointerCapture(e.pointerId)}catch(_){}};
+ const off=()=>{o[k]=false;el.classList.remove('on')};
+ el.addEventListener('pointerdown',on);el.addEventListener('pointerup',off);el.addEventListener('pointercancel',off);el.addEventListener('lostpointercapture',off);
+ el.addEventListener('contextmenu',e=>e.preventDefault());
+}
+hold($('#lAct'),U.L,'act');hold($('#lEn'),U.L,'en');hold($('#lMono'),U.L,'mono');hold($('#lSc'),U.L,'sc');hold($('#rAct'),U.R,'act');
+
+const devbar=$('#devbar');
+RDEV.forEach((d,i)=>{const b=document.createElement('button');b.className='dv';b.style.setProperty('--c',DEV[d].c);b.title=DEV[d].n;b.setAttribute('aria-label',DEV[d].n);
+ b.innerHTML=DEV[d].s.replace('\n','<br>')+`<kbd>${i+1}</kbd>`;b.dataset.d=d;
+ b.addEventListener('pointerdown',e=>{e.preventDefault();setDev(d);manual()});devbar.appendChild(b)});
+function setDev(d){if(R.dev===d)return;R.dev=d;R.jaw=(d==='mary'||d==='ra')?.12:.7;syncDevUI()}
+function syncDevUI(){
+ const D=DEV[R.dev];
+ devbar.querySelectorAll('.dv').forEach(b=>b.classList.toggle('on',b.dataset.d===R.dev));
+ $('#rDevName').textContent='右手：'+D.n;$('#rDevName').style.borderColor=D.c;
+ $('#rAct').innerHTML=D.act.replace('\n','<br>')+'<kbd>K</kbd>';
+ $('#rAct').style.setProperty('--hc',D.c);
+ const m=R.dev!=='mono';$('#lMono').classList.toggle('dim',m);$('#lSc').classList.toggle('dim',m);
+}
+function manual(){if(demo){demo=false;$('#bDemo').classList.remove('on');toast('手動操作に切り替えました','')}}
+
+/* ---------- トースト ---------- */
+const tlast={};
+function toast(msg,cls,key){const now=performance.now();key=key||msg;if(tlast[key]&&now-tlast[key]<2600)return false;tlast[key]=now;
+ const el=document.createElement('div');el.className='tst '+(cls||'');el.textContent=msg;const box=$('#toast');box.appendChild(el);
+ while(box.children.length>3)box.firstChild.remove();setTimeout(()=>el.remove(),2600);if(cls==='bad'||cls==='warn')stats.warn++;return true}
+
+/* ---------- 進行 ---------- */
+function resetAll(){
+ initTasks();bleeds=[];parts=[];placed=[];grab.on=false;kOff.x=kOff.y=0;elapsed=0;ended=false;ptimer=0;L.grip=false;
+ stats.warn=0;stats.bleed=0;stats.tens.clear();
+ L.x=W*.36;L.y=H*.56;R.x=W*.64;R.y=H*.56;
+}
+function jump(k){
+ resetAll();
+ for(let i=0;i<k;i++)for(const tk of PH[i].tasks){for(const it of tk.items)it.p=1;if(tk.type==='clip')tk.items.forEach(it=>placed.push({v:tk.vessel,t:it.t}))}
+ pi=k;const c=PH[k].cam;cam.x=c[0];cam.y=c[1];cam.z=c[2];updPanel();
+}
+let lastPanel='';
+function updPanel(){
+ const ph=PH[pi];if(!ph)return;
+ const tk=curTask();let a=0,n=0;for(const t of ph.tasks)for(const i of t.items){a+=Math.min(1,i.p);n++}
+ const key=pi+'|'+(tk?ph.tasks.indexOf(tk):-1)+'|'+Math.round(a/n*50);if(key===lastPanel)return;lastPanel=key;
+ $('#phNo').textContent=(pi+1)+'/'+PH.length;$('#phTi').textContent=ph.ti;$('#vlink').textContent='参考動画 '+ph.vt+' ↗';
+ $('#tkTxt').textContent=tk?tk.txt:'✓ この場面は完了';$('#tkTip').textContent=ph.tip;
+ $('#tkBar i').style.width=(a/n*100).toFixed(0)+'%';
+}
+
+/* ---------- 判定 ---------- */
+function reqDev(tk){return tk.type==='line'?tk.dev[0]:tk.type==='nodes'?tk.dev:tk.type==='clip'?'clip':tk.type==='divide'?'mono':tk.type==='seal'?'lig':'bip'}
+function okDev(tk,d){return tk.type==='line'?tk.dev.includes(d):reqDev(tk)===d}
+function active(h){const d=h.dev;if(d==='mono')return h.close||h.energy;if(d==='lig'||d==='mary'||d==='ra')return h.close;return false}
+function spark(x,y,col,n,type){for(let i=0;i<n;i++)parts.push({x,y,vx:(Math.random()-.5)*90,vy:-30-Math.random()*70,life:.5+Math.random()*.6,max:1,col,r:2+Math.random()*3,type})}
+
+function step(dt){
+ const ph=PH[pi];
+ const c=ph?ph.cam:PH[PH.length-1].cam,k=1-Math.exp(-dt*2.2);cam.x+=(c[0]-cam.x)*k;cam.y+=(c[1]-cam.y)*k;cam.z+=(c[2]-cam.z)*k;
+ if(paused||ended||!started)return;
+ elapsed+=dt;
+
+ // 入力 → 手
+ if(demo){demoStep(dt);L.grip=L.close}
+ else{
+  const sp=.42*Math.min(W,H);
+  const lx=(U.L.ux||0)+((kb.KeyD?1:0)-(kb.KeyA?1:0)),ly=(U.L.uy||0)+((kb.KeyS?1:0)-(kb.KeyW?1:0));
+  const rx=(U.R.ux||0)+((kb.ArrowRight?1:0)-(kb.ArrowLeft?1:0)),ry=(U.R.uy||0)+((kb.ArrowDown?1:0)-(kb.ArrowUp?1:0));
+  L.x+=clamp(lx,-1,1)*sp*dt;L.y+=clamp(ly,-1,1)*sp*dt;R.x+=clamp(rx,-1,1)*sp*dt;R.y+=clamp(ry,-1,1)*sp*dt;
+  const la=U.L.act||!!kb.KeyF;if(la&&!L.pa)L.grip=!L.grip;L.pa=la;L.close=L.grip;
+  L.energy=U.L.en||!!kb.KeyG;
+  const pedal=U.L.mono||!!kb.KeyE, scis=U.L.sc||!!kb.KeyQ;
+  R.close=U.R.act||!!kb.KeyK||(R.dev==='mono'&&scis);
+  R.energy=(R.dev==='mono'&&pedal)||(R.dev==='lig'&&R.close);
+  if((pedal||scis)&&R.dev!=='mono')toast('ペダル（モノ通電・ハサミ）は右手がモノポーラのときに使います','','pedal');
+ }
+ for(const h of[L,R]){h.x=clamp(h.x,W*.04,W*.96);h.y=clamp(h.y,H*.12,H*.92)}
+ for(const h of[L,R]){const spread=h.dev==='mary'||h.dev==='ra';const tgt=spread?(h.close?1:.12):(h.close?0:.7);h.jaw+=(tgt-h.jaw)*(1-Math.exp(-dt*14));h.fire=Math.max(0,h.fire-dt)}
+ $('#lAct').classList.toggle('lock',L.grip);
+ const [lx,ly]=toW(L.x,L.y),[rx,ry]=toW(R.x,R.y);
+ const pressR=R.close&&!R.pc, pressRE=R.energy&&!R.pe;
+
+ // 左手の牽引
+ if(ph&&ph.grab&&L.close&&!L.pc&&!grab.on){
+  if(Math.hypot(lx-ph.grab[0],ly-ph.grab[1])<95){grab.on=true;grab.sx=lx;grab.sy=ly}
+  else toast('青い手の印の場所をつかむと張力がかかります','','grabhint');
+ }
+ if(!L.close||!ph||!ph.grab)grab.on=false;
+ tension=false;
+ if(grab.on){let dx=lx-grab.sx,dy=ly-grab.sy;const m=Math.hypot(dx,dy);if(m>55){dx*=55/m;dy*=55/m}kOff.x+=(dx*.55-kOff.x)*.3;kOff.y+=(dy*.55-kOff.y)*.3;tension=m>14;if(tension)stats.tens.add(pi)}
+ else{kOff.x*=.85;kOff.y*=.85;if(Math.abs(kOff.x)<.1)kOff.x=0;if(Math.abs(kOff.y)<.1)kOff.y=0}
+ $('#bgTen').hidden=!tension;
+
+ // 出血
+ for(const b of bleeds){b.r=Math.min(b.max,b.r+dt*6);if(Math.random()<dt*3)parts.push({x:b.x,y:b.y,vx:0,vy:0,life:1.2,max:1.2,col:C.blood,r:4,type:'drip',world:1})}
+ if(L.energy){for(const b of bleeds)if(Math.hypot(lx-b.x,ly-b.y)<b.r+16)b.p+=dt/.7}
+ bleeds=bleeds.filter(b=>{if(b.p>=1){toast('止血できました','');return false}return true});
+ $('#bgBleed').hidden=!bleeds.length;
+ const blocked=bleeds.length>0;
+
+ // 課題
+ const tk=curTask();
+ if(tk){
+  if(tk.type==='coag'){
+   if(L.energy)for(const it of tk.items){if(it.p>=1)continue;const p=ipos(tk,it);if(Math.hypot(lx-p.x,ly-p.y)<26)it.p+=dt/.8}
+   if((pressR||pressRE)&&tk.items.some(it=>{const p=ipos(tk,it);return it.p<1&&Math.hypot(rx-p.x,ry-p.y)<40}))toast('止血は左手のバイポーラで（通電 G）','');
+  }else{
+   const near=it=>{const p=ipos(tk,it);return Math.hypot(rx-p.x,ry-p.y)};
+   const rad=tk.type==='line'?34:tk.type==='nodes'?24:22;
+   const cand=tk.items.filter(it=>it.p<1&&near(it)<rad).sort((a,b)=>near(a)-near(b))[0];
+   if(cand&&!okDev(tk,R.dev)&&(pressR||pressRE))toast('ここは「'+DEV[reqDev(tk)].n+'」で','');
+   if(blocked&&cand&&(pressR||pressRE))toast('先に左手バイポーラで止血を','warn','blk');
+   if(cand&&okDev(tk,R.dev)&&!blocked){
+    const rate=(tension?1.9:1);
+    if(tk.type==='line'&&active(R)){cand.p+=dt*1.5*rate;if(Math.random()<.5)spark(R.x,R.y,R.energy&&R.dev==='mono'?'#ffe27a':'#ffffff',1,R.energy?'spark':'bit')}
+    if(tk.type==='nodes'&&R.close){cand.p+=dt*1.3*rate}
+    if(tk.type==='seal'&&R.close){cand.p+=dt/1.3;if(Math.random()<.4)spark(R.x,R.y,'rgba(255,255,255,.8)',1,'steam');if(cand.p>=1)toast('シール完了 → カット','')}
+    if(tk.type==='divide'&&R.close){cand.p+=dt*1.6;if(R.energy)toast('クリップの近くでは通電しない（熱でクリップが外れる・断端損傷）','warn','divEn')}
+    if(tk.type==='clip'&&pressR&&R.fire<=0){cand.p=1;R.fire=.6;placed.push({v:tk.vessel,t:cand.t});toast('クリップ '+tk.items.filter(i=>i.p>=1).length+'/'+tk.items.length,'')}
+   }
+   if(tk.type==='clip'&&R.dev==='clip'&&pressR&&!cand&&R.fire<=0){
+    const v=VS[tk.vessel];if(dpoly(rx,ry,vp(tk.vessel))<v.w/2+16)toast('クリップ位置がずれています（水色の目印に合わせる）','warn','cpos');R.fire=.4}
+  }
+ }
+ hazards(dt,rx,ry,tk);
+
+ for(const p of parts){p.life-=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.type==='steam'){p.vy-=20*dt;p.r+=dt*8}}
+ parts=parts.filter(p=>p.life>0);
+ if(R.energy&&R.dev==='mono')spark(R.x,R.y,'#ffe27a',1,'spark');
+ if(R.energy&&R.dev==='lig'&&Math.random()<.4)spark(R.x,R.y,'rgba(255,255,255,.8)',1,'steam');
+ if(L.energy&&Math.random()<.5)spark(L.x,L.y,'#9fc3ff',1,'arc');
+
+ R.pc=R.close;R.pe=R.energy;L.pc=L.close;L.pe=L.energy;
+
+ if(ph&&ph.tasks.every(tdone)&&!bleeds.length){
+  ptimer+=dt;if(ptimer>1.3){ptimer=0;pi++;grab.on=false;if(pi>=PH.length){finish();return}toast('次へ：'+PH[pi].ti,'');}
+ }
+ updPanel();
+}
+let hzCd=0;
+function hazards(dt,rx,ry,tk){
+ hzCd-=dt;
+ const mono=R.dev==='mono'&&(R.close||R.energy), lig=R.dev==='lig'&&R.close;
+ if(!mono&&!lig)return;
+ const exempt=name=>{if(!tk||tk.vessel!==name||!okDev(tk,R.dev))return false;return tk.items.some(it=>{const p=ipos(tk,it);return Math.hypot(rx-p.x,ry-p.y)<30})};
+ for(const name of['artery','vein','lumbar']){
+  const v=VS[name];
+  if(pi<IDX(v.main?'art':'vein'))continue; // まだ脂肪の奥で見えていない
+  const dv=divided(name);
+  if(dpoly(rx,ry,vp(name))<v.w/2+6&&!exempt(name)){
+   if(lig&&v.main){toast(v.n+'はシールせずHem-o-lokで処理','warn','lig'+name);return}
+   if(mono&&dv==null){
+    if(hzCd<=0){const q=nearestOn(vp(name),rx,ry);bleeds.push({x:q[0],y:q[1],r:6,max:v.main?34:20,p:0});stats.bleed++;hzCd=1.2;
+     toast(v.n+'を損傷！左手バイポーラで止血','bad','bl'+name)}
+    return}
+  }
+ }
+ if(pi>=IDX('border')&&dpoly(rx,ry,vp('ureter'))<VS.ureter.w/2+6)toast('尿管に注意：腎尿管全摘では尿管を切らずに残す','warn','ure');
+ if(R.energy&&placed.some(c=>{const q=at(vp(c.v),c.t);return Math.hypot(rx-q.x,ry-q.y)<22}))toast('クリップに通電しない','warn','clipE');
+}
+function nearestOn(p,x,y){let best=null,bd=1e9;for(let i=0;i<=40;i++){const q=at(p,i/40),d=Math.hypot(q.x-x,q.y-y);if(d<bd){bd=d;best=[q.x,q.y]}}return best}
+
+/* ---------- デモ（見本操作） ---------- */
+const dm={cd:0};
+function moveTo(h,sx,sy,dt,sp){const dx=sx-h.x,dy=sy-h.y,d=Math.hypot(dx,dy),v=sp*.65*Math.min(W,H)*dt;if(d<=v){h.x=sx;h.y=sy;return true}h.x+=dx/d*v;h.y+=dy/d*v;return d<4}
+function demoStep(dt){
+ const ph=PH[pi],tk=curTask();dm.cd-=dt;
+ L.close=false;L.energy=false;R.close=false;R.energy=false;
+ if(bleeds.length){const s=toS(bleeds[0].x,bleeds[0].y);if(moveTo(L,s[0],s[1],dt,.5))L.energy=true}
+ else if(tk&&tk.type==='coag'){const it=nextItem(tk),p=ipos(tk,it),s=toS(p.x,p.y);if(moveTo(L,s[0],s[1],dt,.5))L.energy=true}
+ else if(ph&&ph.grab&&tk){
+  if(!grab.on){const s=toS(...ph.grab);if(moveTo(L,s[0],s[1],dt,.55))L.close=true}
+  else{L.close=true;const s=toS(grab.sx+ph.pull[0],grab.sy+ph.pull[1]);moveTo(L,s[0],s[1],dt,.25)}
+ }else moveTo(L,W*.3,H*.62,dt,.4);
+ const wantTension=ph&&ph.grab&&tk&&tk.type!=='coag';
+ if(tk&&tk.type!=='coag'&&!bleeds.length){
+  const d=reqDev(tk);if(R.dev!==d)setDev(d);
+  const it=nextItem(tk),p=ipos(tk,it),s=toS(p.x,p.y);
+  const ready=!wantTension||(grab.on&&Math.hypot(kOff.x,kOff.y)>8);
+  const arrived=moveTo(R,s[0],s[1],dt,.5);
+  if(arrived&&ready){
+   if(tk.type==='line'||tk.type==='divide'||tk.type==='nodes'||tk.type==='seal')R.close=true;
+   if(tk.type==='clip'&&dm.cd<=0){R.close=true;dm.cd=.8}
+   if(R.dev==='lig'&&R.close)R.energy=true;
+  }
+ }else moveTo(R,W*.7,H*.62,dt,.4);
+}
+
+/* ---------- 描画 ---------- */
+function path(p){g.beginPath();g.moveTo(p[0][0],p[0][1]);for(let i=1;i<p.length;i++)g.lineTo(p[i][0],p[i][1])}
+function tube(p,w,c,l,h){
+ g.lineCap='round';g.lineJoin='round';
+ path(p);g.lineWidth=w+5;g.strokeStyle=l;g.stroke();
+ path(p);g.lineWidth=w;g.strokeStyle=c;g.stroke();
+ const hp=p.map((q,i)=>{const a=i?p[i-1]:p[1],b=i?q:p[0];let tx=(i?q[0]-a[0]:a[0]-b[0]),ty=(i?q[1]-a[1]:a[1]-b[1]);const m=Math.hypot(tx,ty)||1;return[q[0]+ty/m*w*.22,q[1]-tx/m*w*.22]});
+ path(hp);g.lineWidth=Math.max(1.5,w*.22);g.strokeStyle=h;g.globalAlpha=.75;g.stroke();g.globalAlpha=1;
+}
+function drawVessel(name){
+ const v=VS[name],p=vp(name),dv=divided(name);
+ if(dv!=null){tube(sub(p,0,dv-.06),v.w,v.c,v.l,v.h);tube(sub(p,dv+.06,1),v.w,v.c,v.l,v.h);
+  for(const t of[dv-.06,dv+.06]){const q=at(p,t);g.beginPath();g.ellipse(q.x,q.y,v.w*.5,v.w*.25,Math.atan2(q.ty,q.tx)+Math.PI/2,0,7);g.fillStyle=v.l;g.fill()}return}
+ tube(p,v.w,v.c,v.l,v.h);
+}
+function fatBlob(cx,cy,rx,ry,a,seed,f1,f2,ln){if(a<=.01)return;const r=rng(seed);g.globalAlpha=a;
+ for(let i=0;i<34;i++){const t=r()*6.3,d=Math.sqrt(r());const x=cx+Math.cos(t)*rx*d,y=cy+Math.sin(t)*ry*d,rad=14+r()*16;
+  g.beginPath();g.ellipse(x,y,rad,rad*.8,r()*3,0,7);g.fillStyle=i%2?(f1||C.lob):(f2||C.lob2);g.fill();g.lineWidth=1.2;g.strokeStyle=ln||C.lobL;g.stroke()}
+ g.globalAlpha=1}
+function strands(tk){
+ for(const it of tk.items){const a=at(tk.poly,it.t0),b=at(tk.poly,it.t1);
+  if(it.p>=1){g.lineCap='round';g.beginPath();g.moveTo(a.x,a.y);g.lineTo(b.x,b.y);g.lineWidth=9;g.strokeStyle='rgba(77,42,20,.85)';g.stroke();
+   g.lineWidth=2;g.strokeStyle='rgba(255,240,200,.7)';g.beginPath();g.moveTo(a.x-a.ty*6,a.y+a.tx*6);g.lineTo(b.x-b.ty*6,b.y+b.tx*6);g.stroke();continue}
+  for(let k=0;k<4;k++){const t=it.t0+(it.t1-it.t0)*(k+.5)/4,q=at(tk.poly,t),l=16*(1-it.p*.7);
+   g.beginPath();g.moveTo(q.x-q.ty*l+q.tx*3,q.y+q.tx*l+q.ty*3);g.quadraticCurveTo(q.x+q.tx*6,q.y+q.ty*6,q.x+q.ty*l-q.tx*2,q.y-q.tx*l);
+   g.lineWidth=2.2;g.strokeStyle='rgba(255,255,250,.85)';g.stroke()}
+ }
+}
+function drawClip(x,y,tx,ty,w,a){
+ g.save();g.translate(x,y);g.rotate(Math.atan2(ty,tx)+Math.PI/2);g.globalAlpha=a;
+ const L=w/2+9;g.lineCap='round';
+ g.beginPath();g.moveTo(-L,-2.5);g.lineTo(L,-2.5);g.moveTo(-L,2.5);g.lineTo(L,2.5);g.lineWidth=5.5;g.strokeStyle='#4a4f57';g.stroke();
+ g.lineWidth=3.5;g.strokeStyle='#f6f6f2';g.stroke();
+ g.beginPath();g.arc(L+3,0,4,0,7);g.fillStyle='#f6f6f2';g.fill();g.lineWidth=1.5;g.strokeStyle='#4a4f57';g.stroke();
+ g.restore();
+}
+function ring(x,y,r,p,t,col){const s=scale();const pulse=1+.12*Math.sin(t*6);
+ g.beginPath();g.arc(x,y,r*pulse,0,7);g.lineWidth=3.5/s;g.strokeStyle=col||C.tgt;g.setLineDash([6/s,5/s]);g.stroke();g.setLineDash([]);
+ if(p>0){g.beginPath();g.arc(x,y,r*pulse+4/s,-Math.PI/2,-Math.PI/2+p*6.283);g.lineWidth=4/s;g.strokeStyle='#ffffff';g.stroke()}}
+function handMark(x,y,t){const s=scale();ring(x,y,26,0,t,C.hand);g.font=`800 ${13/s}px ${FF}`;g.textAlign='center';g.textBaseline='middle';
+ g.fillStyle='rgba(10,14,18,.7)';rr(x-30/s,y-40/s,60/s,18/s,6/s);g.fill();g.fillStyle='#bcd8ff';g.fillText('左手でつかむ',x,y-31/s)}
+
+function drawWorld(t){
+ const s=scale();
+ g.save();g.translate(W/2,cy0());g.scale(s,s);g.translate(-cam.x,-cam.y);
+ g.drawImage(base,0,0,1600,1000);
+ // 大血管側の脂肪と psoas window
+ g.drawImage(pvf,0,0,1600,1000);
+ const wp=prog('window');
+ if(wp>0){g.save();g.globalAlpha=Math.min(1,wp*1.1);g.beginPath();g.ellipse(585,752,215+kOff.x*0,34,-.03,0,7);g.fillStyle=C.psoas;g.fill();g.lineWidth=2.5;g.strokeStyle=C.psoasL;g.stroke();
+  g.clip();g.strokeStyle=C.psoasS;g.lineWidth=1.5;for(let k=0;k<6;k++){g.beginPath();g.moveTo(360,728+k*10);g.lineTo(820,716+k*10);g.stroke()}
+  g.strokeStyle='rgba(255,220,210,.5)';g.lineWidth=2;g.beginPath();g.moveTo(400,740);g.lineTo(780,728);g.stroke();g.restore()}
+ // 境界（持ち上げると見やすい）
+ if(pi>=IDX('cone')+1){const bt=T('border',0);const a=.18+(pi===IDX('border')?(tension?.6:0):.25);
+  g.save();g.globalAlpha=a;path(bt.poly);g.lineWidth=5;g.strokeStyle='#a86a12';g.setLineDash([3,6]);g.stroke();g.setLineDash([]);g.restore()}
+ // 尿管・分枝・血管
+ drawVessel('ureter');if(pi>=IDX('art'))drawVessel('lumbar');
+ drawVessel('vein');
+ fatBlob(892+kOff.x*.4,650+kOff.y*.4,40,60,.9*(1-prog('vein')),31,C.plob,C.pfat,C.plobL);
+ drawVessel('artery');
+ fatBlob(797+kOff.x*.4,655+kOff.y*.4,28,58,.9*(1-prog('art')),41,C.plob,C.pfat,C.plobL);
+ fatBlob(845,690,120,40,.95*(1-Math.max(prog('art'),prog('window')*.5)),21,C.plob,C.pfat,C.plobL);
+ // Gerota（腎）
+ g.drawImage(ger,GER.x-GER.rx-20+kOff.x,GER.y-GER.ry-20+kOff.y,GER.rx*2+40,GER.ry*2+40);
+ // 副腎側と架橋組織
+ const up=prog('upper');
+ g.save();g.translate(1205+up*12,615+up*6);g.rotate(.5);g.beginPath();g.moveTo(-40,-50);g.quadraticCurveTo(10,-28,30,8);g.quadraticCurveTo(0,28,-35,50);g.quadraticCurveTo(-10,0,-40,-50);g.closePath();
+ g.fillStyle=C.adr;g.fill();g.lineWidth=3;g.strokeStyle=C.adrL;g.stroke();g.restore();
+ for(const it of T('upper',0).items){const x=it.x+kOff.x*.5,y=it.y+kOff.y*.5;
+  g.save();g.translate(x,y);g.rotate(-.55);
+  if(it.p>=1){g.beginPath();g.arc(-14,0,7,0,7);g.arc(14,0,7,0,7);g.fillStyle=C.char;g.fill();g.restore();continue}
+  g.beginPath();g.moveTo(-34,-6);g.quadraticCurveTo(0,-14,38,-4);g.lineTo(38,8);g.quadraticCurveTo(0,14,-34,8);g.closePath();g.fillStyle='#f3d27e';g.fill();g.lineWidth=1.5;g.strokeStyle=C.lobL;g.stroke();
+  g.beginPath();g.moveTo(-32,1);g.bezierCurveTo(-10,-6,10,6,36,0);g.lineWidth=3;g.strokeStyle=it.p>0?`rgba(77,42,20,${.4+it.p*.6})`:'#d8483d';g.stroke();g.restore()}
+ // 脾臓（腹膜越し）と腹膜
+ g.beginPath();g.ellipse(1390,110,170,95,-.15,0,7);g.fillStyle='#7c4a8c';g.fill();g.lineWidth=3;g.strokeStyle='#3e1f4a';g.stroke();
+ const ap=prog('ant');
+ g.beginPath();g.moveTo(0,0);g.lineTo(1600,0);g.lineTo(1600,180);
+ for(let x=1600;x>=0;x-=40)g.lineTo(x,(x>1150?195+(x-1150)*.35:190)+Math.sin(x*.02)*8-ap*20);g.closePath();
+ g.fillStyle=C.peri;g.fill();g.lineWidth=2.5;g.strokeStyle=C.periL;g.stroke();
+ g.strokeStyle='rgba(150,70,150,.5)';g.lineWidth=1.6;
+ for(let i=0;i<9;i++){g.beginPath();g.moveTo(120+i*170,20);g.bezierCurveTo(160+i*170,80,90+i*170,120,150+i*170,170);g.stroke()}
+ // 剥離線
+ for(const kk of['border','window','ant'])strands(T(kk,0));
+ // 外側円錐筋膜
+ const tc=T('cone',0),cp=prog('cone'),memA=cp>=1?.1:.6-cp*.15;
+ g.save();g.globalAlpha=memA;g.beginPath();g.moveTo(240,210);g.quadraticCurveTo(820,150,1420,210);g.lineTo(1420,PSO(1420)-6);g.lineTo(240,PSO(240)-6);g.closePath();g.fillStyle='#f4f2ea';g.fill();
+ g.globalAlpha=memA*.9;g.strokeStyle='rgba(150,140,120,.6)';g.lineWidth=1.3;for(let i=0;i<30;i++){g.beginPath();g.moveTo(260+i*39,200);g.bezierCurveTo(240+i*39,360,290+i*39,560,265+i*39,PSO(265+i*39)-8);g.stroke()}g.restore();
+ for(const it of tc.items){if(it.p<=0)continue;const a=at(tc.poly,it.t0),b=at(tc.poly,it.t1);const w=it.p>=1?14:it.p*10,f=Math.min(1,it.p);
+  g.beginPath();g.moveTo(a.x,a.y);g.lineTo(a.x+(b.x-a.x)*f,a.y+(b.y-a.y)*f);g.lineCap='round';g.lineWidth=w;g.strokeStyle='rgba(227,167,68,.95)';g.stroke();g.lineWidth=2;g.strokeStyle='rgba(120,90,50,.8)';g.stroke()}
+ // フランクパッド
+ const fp=prog('flank');
+ if(fp<1){g.save();g.globalAlpha=1-fp*.55;g.drawImage(pad,820-PAD.rx-20+(pi===0?kOff.x:0),440-PAD.ry-20-fp*90+(pi===0?kOff.y:0),PAD.rx*2+40,PAD.ry*2+40);g.restore();
+  strands(T('flank',0))}
+ // クリップ
+ for(const c of placed){const v=VS[c.v],q=at(vp(c.v),c.t);drawClip(q.x,q.y,q.tx,q.ty,v.w,1)}
+ // 出血
+ for(const b of bleeds){g.beginPath();g.arc(b.x,b.y,b.r,0,7);g.fillStyle=C.blood;g.globalAlpha=.85;g.fill();g.globalAlpha=1;
+  g.beginPath();g.arc(b.x-b.r*.3,b.y-b.r*.35,b.r*.25,0,7);g.fillStyle=C.bloodH;g.fill()}
+ // 目標
+ const tk=curTask(),ph=PH[pi];
+ if(tk&&started&&!ended){
+  if(ph.grab&&!grab.on&&tk.type!=='coag')handMark(ph.grab[0],ph.grab[1],t);
+  if(tk.type==='line'){
+   g.setLineDash([10/s,8/s]);g.lineWidth=4/s;g.strokeStyle=C.tgt;g.lineCap='round';
+   for(const it of tk.items){if(it.p>=1)continue;const a=at(tk.poly,it.t0),b=at(tk.poly,it.t1);g.beginPath();g.moveTo(a.x,a.y);g.lineTo(b.x,b.y);g.stroke()}
+   g.setLineDash([]);const it=nextItem(tk);if(it){const p=ipos(tk,it);ring(p.x,p.y,16,it.p,t)}
+  }else for(const it of tk.items){if(it.p>=1)continue;const p=ipos(tk,it);
+   if(tk.type==='coag'){g.beginPath();g.arc(p.x,p.y,10+2*Math.sin(t*5),0,7);g.fillStyle=C.blood;g.fill()}
+   if(tk.type==='clip'){drawClip(p.x,p.y,p.tx,p.ty,VS[tk.vessel].w,.4)}
+   if(tk.type==='divide'){const w=VS[tk.vessel].w/2+12;g.setLineDash([5/s,4/s]);g.beginPath();g.moveTo(p.x-p.ty*w,p.y+p.tx*w);g.lineTo(p.x+p.ty*w,p.y-p.tx*w);g.lineWidth=3/s;g.strokeStyle=C.tgt;g.stroke();g.setLineDash([])}
+   ring(p.x,p.y,tk.type==='nodes'?12:17,it.p,t)}
+ }
+ if(grab.on){const [lx,ly]=toW(L.x,L.y);g.beginPath();g.moveTo(lx,ly);g.lineTo(grab.sx-26+kOff.x,grab.sy+18+kOff.y);g.lineTo(grab.sx+26+kOff.x,grab.sy+18+kOff.y);g.closePath();g.fillStyle='rgba(248,227,162,.75)';g.fill();g.lineWidth=1.5;g.strokeStyle=C.gerL;g.stroke()}
+ if(labels)drawLabels();
+ g.restore();
+}
+function drawLabels(){
+ const s=scale(),A=[];
+ A.push(['腸腰筋',300,895]);A.push(['腹膜',700,110]);
+ if(pi===0)A.push(['フランクパッド',820,500+kOff.y]);
+ if(pi<=1)A.push(['外側円錐筋膜',640,700]);
+ if(pi>=2){A.push(['腎（Gerota筋膜内）',820+kOff.x,420+kOff.y]);A.push(['尿管（温存）',430,630])}
+ if(pi>=2&&pi<=4)A.push(['大血管側の脂肪',1050,735]);
+ if(prog('window')>.5)A.push(['psoas window',585,770]);
+ if(pi>=IDX('art')){const a=at(vp('artery'),.5),v=at(vp('vein'),.5);A.push(['腎動脈',a.x-62,a.y]);A.push(['腎静脈',v.x+66,v.y-10])}
+ if(pi>=IDX('vein'))A.push(['腰静脈',1000,770]);
+ if(pi>=IDX('vein'))A.push(['副腎（温存）',1250,640]);
+ if(pi>=IDX('ant'))A.push(['脾臓（腹膜越し）',1390,120]);
+ g.font=`800 ${12/s}px ${FF}`;g.textAlign='center';g.textBaseline='middle';
+ for(const [tx,x,y] of A){const w=g.measureText(tx).width+12/s,h=18/s;g.fillStyle='rgba(10,14,18,.66)';rr(x-w/2,y-h/2,w,h,6/s);g.fill();g.fillStyle='#fff';g.fillText(tx,x,y+.5/s)}
+}
+function rr(x,y,w,h,r){g.beginPath();g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w,y+h,x,y+h,r);g.arcTo(x,y+h,x,y,r);g.arcTo(x,y,x+w,y,r);g.closePath()}
+
+/* ---------- 器械 ---------- */
+function blade(len,w,curve,fill){g.beginPath();g.moveTo(0,-w/2);g.quadraticCurveTo(len*.6,-w/2+curve*len*.1,len,curve*len*.22);g.quadraticCurveTo(len*.6,w/2+curve*len*.1,0,w/2);g.closePath();g.fillStyle=fill;g.fill();g.stroke()}
+function drawTool(h,side){
+ const k=Math.max(.75,Math.min(W,H)/620);
+ const ex=side<0?-.1*W:1.1*W,ey=1.02*H;
+ let dx=h.x-ex,dy=h.y-ey;const d=Math.hypot(dx,dy)||1;const ux=dx/d,uy=dy/d,nx=-uy,ny=ux;
+ const jl=(h.dev==='lig'?36:h.dev==='mono'?32:28)*k;
+ const px=h.x-ux*jl,py=h.y-uy*jl,wE=40*k,wP=14*k;
+ g.lineJoin='round';g.beginPath();g.moveTo(ex+nx*wE/2,ey+ny*wE/2);g.lineTo(px+nx*wP/2,py+ny*wP/2);g.lineTo(px-nx*wP/2,py-ny*wP/2);g.lineTo(ex-nx*wE/2,ey-ny*wE/2);g.closePath();
+ g.fillStyle='#9ea9b4';g.fill();g.lineWidth=2;g.strokeStyle='#1b2026';g.stroke();
+ g.beginPath();g.moveTo(ex+nx*wE*.22,ey+ny*wE*.22);g.lineTo(px+nx*wP*.22,py+ny*wP*.22);g.lineWidth=2.5*k;g.strokeStyle='rgba(240,246,250,.7)';g.stroke();
+ const D=DEV[h.dev];const bx=px-ux*22*k,by=py-uy*22*k,wb=wP*1.25;
+ g.beginPath();g.moveTo(bx+nx*wb/2,by+ny*wb/2);g.lineTo(px+nx*wP/2,py+ny*wP/2);g.lineTo(px-nx*wP/2,py-ny*wP/2);g.lineTo(bx-nx*wb/2,by-ny*wb/2);g.closePath();g.fillStyle=h.dev==='lig'?'#2c2840':D.c;g.fill();g.stroke();
+ if(h.dev==='lig'){g.beginPath();g.moveTo(bx+nx*wb/2,by+ny*wb/2);g.lineTo(bx-nx*wb/2,by-ny*wb/2);g.lineWidth=4*k;g.strokeStyle=D.c;g.stroke()}
+ g.save();g.translate(px,py);g.rotate(Math.atan2(uy,ux));g.lineWidth=1.6;g.strokeStyle='#1b2026';
+ const a=h.jaw*(h.dev==='mary'||h.dev==='ra'?.75:.55),metal='#d9e0e6';
+ for(const sgn of[-1,1]){g.save();g.rotate(sgn*a/2);
+  if(h.dev==='bip'){blade(jl,5*k,0,metal);g.beginPath();g.arc(jl,0,2.2*k,0,7);g.fillStyle='#3d7bf0';g.fill()}
+  else if(h.dev==='mono')blade(jl,6.5*k,.5,metal);
+  else if(h.dev==='lig'){blade(jl,10*k,0,'#34303f');g.beginPath();g.moveTo(4*k,sgn*-1.5*k);g.lineTo(jl-4*k,sgn*-1*k);g.lineWidth=2*k;g.strokeStyle='#cfc6ef';g.stroke();g.lineWidth=1.6;g.strokeStyle='#1b2026'}
+  else if(h.dev==='mary')blade(jl,6*k,1.1,metal);
+  else if(h.dev==='ra'){g.beginPath();g.moveTo(0,-2.5*k);g.lineTo(jl*.62,-2.5*k);g.lineTo(jl*.62-2*k,-jl*.48);g.lineTo(jl*.62+3.5*k,-jl*.48);g.lineTo(jl*.62+5*k,2.5*k);g.lineTo(0,2.5*k);g.closePath();g.fillStyle=metal;g.fill();g.stroke()}
+  else if(h.dev==='clip'){blade(jl,7*k,0,'#7d6a8a');if(h.fire<=.2){g.beginPath();g.moveTo(5*k,-sgn*2.5*k);g.lineTo(jl-3*k,-sgn*2.5*k);g.lineWidth=3*k;g.strokeStyle='#f6f6f2';g.stroke();g.lineWidth=1.6;g.strokeStyle='#1b2026'}}
+  g.restore()}
+ g.beginPath();g.arc(0,0,4*k,0,7);g.fillStyle='#59636e';g.fill();g.stroke();g.restore();
+ if(h.energy){const col=h.dev==='bip'?'rgba(120,170,255,':h.dev==='lig'?'rgba(190,160,255,':'rgba(255,226,110,';
+  const rg=g.createRadialGradient(h.x,h.y,0,h.x,h.y,30*k);rg.addColorStop(0,col+'.85)');rg.addColorStop(1,col+'0)');g.fillStyle=rg;g.beginPath();g.arc(h.x,h.y,30*k,0,7);g.fill()}
+}
+function drawParts(){
+ const s=scale();
+ for(const p of parts){const a=Math.max(0,p.life/p.max);let x=p.x,y=p.y;if(p.world)[x,y]=toS(p.x,p.y+(1-a)*14);
+  g.globalAlpha=a;g.beginPath();g.arc(x,y,p.type==='drip'?p.r*s:p.r,0,7);g.fillStyle=p.col;g.fill()}
+ g.globalAlpha=1;
+}
+function vignette(){const r=Math.hypot(W,H)/2;const rg=g.createRadialGradient(W/2,H/2,r*.55,W/2,H/2,r*1.02);rg.addColorStop(0,'rgba(0,0,0,0)');rg.addColorStop(1,'rgba(0,0,0,.78)');g.fillStyle=rg;g.fillRect(0,0,W,H)}
+
+/* ---------- ループ ---------- */
+let last=performance.now();
+function frame(now){
+ const dt=Math.min(.05,(now-last)/1000);last=now;
+ if(cv.clientWidth!==W||cv.clientHeight!==H)resize();
+ step(dt);
+ g.setTransform(DPR,0,0,DPR,0,0);g.fillStyle='#0b0e12';g.fillRect(0,0,W,H);
+ drawWorld(now/1000);drawTool(L,-1);drawTool(R,1);drawParts();vignette();
+ $('#clock').textContent=fmt(elapsed);
+ requestAnimationFrame(frame);
+}
+function fmt(s){s=Math.floor(s);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+function resize(){DPR=Math.min(2,devicePixelRatio||1);const oW=W,oH=H;W=cv.clientWidth||1;H=cv.clientHeight||1;cv.width=W*DPR;cv.height=H*DPR;
+ if(oW>1){L.x*=W/oW;L.y*=H/oH;R.x*=W/oW;R.y*=H/oH}}
+
+/* ---------- 画面のボタン ---------- */
+function togglePause(){if(!started||ended)return;paused=!paused;$('#bPause').textContent=paused?'再開':'停止';$('#bPause').classList.toggle('on',paused);if(paused)toast('一時停止中','','pz')}
+function finish(){ended=true;pi=PH.length-1;
+ const tn=PH.filter(p=>p.grab).length,used=stats.tens.size;
+ $('#stats').innerHTML=`<div><b>${fmt(elapsed)}</b><small>タイム</small></div><div><b>${stats.bleed}</b><small>出血</small></div><div><b>${stats.warn}</b><small>警告</small></div><div><b>${used}/${tn}</b><small>牽引を使った場面</small></div>`;
+ $('#endMsg').textContent=stats.bleed===0&&stats.warn<=2?'出血なしで完了。動脈→静脈の順、クリップは中枢2・腎側1の基本どおりです。':stats.bleed?'血管の近くでモノポーラを使った場面がありました。太い血管の周りはメリーランド・直角鉗子で剥離し、処理はクリップで。':'完了。警告の出た場面を「場面」から選んでもう一度練習できます。';
+ $('#ovEnd').hidden=false;demo=false;$('#bDemo').classList.remove('on')}
+function begin(withDemo){$('#ovStart').hidden=true;$('#ovEnd').hidden=true;jump(0);started=true;paused=false;$('#bPause').textContent='停止';$('#bPause').classList.remove('on');
+ demo=!!withDemo;$('#bDemo').classList.toggle('on',demo)}
+$('#bStart').onclick=()=>begin(false);$('#bStartDemo').onclick=()=>begin(true);
+$('#bAgain').onclick=()=>begin(false);$('#bEndDemo').onclick=()=>begin(true);
+$('#bDemo').onclick=()=>{if(!started||ended){begin(true);return}demo=!demo;$('#bDemo').classList.toggle('on',demo);if(demo)toast('デモ：見本の操作を再生中（スティックを触ると手動に戻る）','')};
+$('#bLab').onclick=()=>{labels=!labels;$('#bLab').classList.toggle('on',labels)};
+$('#bPause').onclick=togglePause;
+let menuPaused=false;
+function openMenu(){menuPaused=started&&!ended&&!paused;if(menuPaused)paused=true;const ml=$('#mlist');ml.innerHTML='';PH.forEach((p,i)=>{const b=document.createElement('button');if(i===pi&&started)b.className='cur';b.innerHTML=`${i+1}. ${p.ti}<span>動画 ${p.vt}</span>`;b.onclick=()=>{menuPaused=false;$('#ovMenu').hidden=true;$('#ovStart').hidden=true;$('#ovEnd').hidden=true;started=true;jump(i);paused=false;$('#bPause').textContent='停止'};ml.appendChild(b)});$('#ovMenu').hidden=false}
+$('#bMenu').onclick=openMenu;$('#bEndMenu').onclick=()=>{$('#ovEnd').hidden=true;openMenu()};
+$('#bMenuClose').onclick=()=>{$('#ovMenu').hidden=true;if(menuPaused){paused=false;menuPaused=false}};
+
+/* ---------- 起動 ---------- */
+resize();drawBase();initTasks();syncDevUI();resetAll();updPanel();
+requestAnimationFrame(frame);
+})();
+</script>
+
+</body></html>
