@@ -9,8 +9,8 @@ note には公式の投稿APIがないので、**ブラウザを自動で動か�
    - ログイン状態は `.note-auth.json` に保存されます。パスワードはどこにも保存しません。
 
 ## 投稿
-- 下書きとして保存（おすすめ）: `npm run note:draft -- note/2026-11-nonfryer-potato.md`
-- 公開まで自動で: `npm run note:publish -- note/2026-11-nonfryer-potato.md`
+- 下書きとして保存: `npm run note:draft -- note/2026-11-nonfryer-potato.md`
+- 公開は note の画面で内容を確認してから、自分で「公開に進む」を押してください（自動公開はしない運用）
 
 終わると `note-result.png` に画面のスクリーンショットが保存されます。
 

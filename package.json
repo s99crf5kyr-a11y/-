@@ -4,8 +4,7 @@
   "type": "module",
   "scripts": {
     "note:login": "node tools/note-post.mjs login",
-    "note:draft": "node tools/note-post.mjs post",
-    "note:publish": "node tools/note-post.mjs post --publish"
+    "note:draft": "node tools/note-post.mjs post"
   },
   "dependencies": {
     "playwright": "^1.48.0"
