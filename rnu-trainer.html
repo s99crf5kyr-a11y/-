@@ -1,0 +1,1364 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>腎尿管全摘 3D手順トレーナー</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Kaku+Gothic+New:wght@500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: 術野ビューポート（左・大）＋手順パネル（右）。スマホでは縦積み */
+:root{
+  --bg:#eef1f3; --surface:#ffffff; --fg:#17212b; --muted:#5b6875; --line:#d5dce2;
+  --accent:#0f6f86; --accent-soft:#dcedf1; --warn:#b5462c; --warn-soft:#f8e6e0;
+  --ok:#2f7a4a; --memo:#6a4fa8; --view:#1b2530; --view-fg:#e8eef3;
+  --f-display:"Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif;
+  --f-body:"BIZ UDPGothic","Hiragino Sans","Yu Gothic",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#10161c; --surface:#18212a; --fg:#e4eaef; --muted:#93a1ad; --line:#2a3642;
+  --accent:#4fb6cc; --accent-soft:#16323a; --warn:#e88a6f; --warn-soft:#3a221b;
+  --ok:#6cc58e; --memo:#b49ae8; --view:#0b1116; --view-fg:#e8eef3; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10161c; --surface:#18212a; --fg:#e4eaef; --muted:#93a1ad; --line:#2a3642;
+  --accent:#4fb6cc; --accent-soft:#16323a; --warn:#e88a6f; --warn-soft:#3a221b;
+  --ok:#6cc58e; --memo:#b49ae8; --view:#0b1116; --view-fg:#e8eef3; color-scheme:dark}
+html,body{height:100%}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-body);font-size:15px;line-height:1.7;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px;box-sizing:border-box}
+*{box-sizing:border-box}
+header{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 16px;margin-bottom:10px}
+h1{font-family:var(--f-display);font-weight:700;font-size:1.35rem;margin:0;text-wrap:balance;letter-spacing:.02em}
+.sub{color:var(--muted);font-size:.85rem}
+.settings{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;margin-bottom:12px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{font:inherit;font-size:13px;border:0;background:transparent;color:var(--fg);padding:6px 12px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent);color:#fff}
+.setlbl{font-size:12px;color:var(--muted);margin-right:6px;letter-spacing:.04em}
+.app{display:grid;grid-template-columns:minmax(0,1fr) 420px;gap:16px;align-items:start}
+@media (max-width:960px){.app{grid-template-columns:1fr}}
+.viewwrap{position:relative;background:var(--view);border-radius:10px;overflow:hidden;height:min(80vh,760px);min-height:340px}
+@media (max-width:960px){.viewwrap{height:58vh}}
+#cv{display:block;width:100%;height:100%;touch-action:none}
+.labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.lbl{position:absolute;transform:translate(-50%,-130%);font-size:11.5px;color:var(--view-fg);
+  background:rgba(10,16,22,.62);padding:1px 7px;border-radius:4px;white-space:nowrap;transition:opacity .2s}
+.lbl.hi{background:var(--accent);color:#fff;font-weight:700}
+.lbl.port{background:#f4f6f8;color:#17212b;font-weight:700}
+.lbl.land{background:transparent;color:#ffd9a8;font-size:11px}
+.orient{position:absolute;left:12px;bottom:10px;font-family:var(--f-mono);font-size:11px;color:var(--view-fg);opacity:.8;line-height:1.5;background:rgba(10,16,22,.45);padding:4px 8px;border-radius:6px}
+.vtools{position:absolute;right:10px;top:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;max-width:70%}
+.vbtn{font:inherit;font-size:12px;color:var(--view-fg);background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:6px;padding:4px 10px;cursor:pointer}
+.vbtn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.vbtn:focus-visible,.btn:focus-visible,.chip:focus-visible,.seg button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.pick{position:absolute;left:12px;top:10px;max-width:min(320px,60%);background:rgba(10,16,22,.85);color:var(--view-fg);border-radius:8px;padding:8px 12px;font-size:12.5px;line-height:1.55}
+.pick b{font-family:var(--f-display);font-size:13.5px}
+.viewname{position:absolute;left:12px;top:10px;font-size:11px;font-family:var(--f-mono);color:var(--view-fg);opacity:.7}
+.pick:not([hidden])~.viewname{display:none}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font-family:var(--f-mono);font-size:12px;min-width:32px;height:30px;border-radius:6px;border:1px solid var(--line);background:transparent;color:var(--fg);cursor:pointer;position:relative;padding:0 6px}
+.chip[aria-current="step"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip.done::after{content:"";position:absolute;right:3px;top:3px;width:6px;height:6px;border-radius:50%;background:var(--accent)}
+.chip[aria-current="step"].done::after{background:#fff}
+.chip.later{border-style:dashed;color:var(--muted);cursor:default}
+.eyebrow{font-family:var(--f-mono);font-size:11.5px;color:var(--accent);letter-spacing:.08em}
+h2{font-family:var(--f-display);font-size:1.25rem;margin:2px 0 0;line-height:1.4;text-wrap:balance}
+.aim{color:var(--muted);margin:4px 0 0;font-size:.92rem}
+h3{font-family:var(--f-display);font-size:.82rem;letter-spacing:.06em;margin:0 0 6px;color:var(--muted)}
+ul{margin:0;padding-left:0;list-style:none}
+li{margin:5px 0;display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:baseline}
+.tag{font-size:10.5px;font-weight:700;border-radius:4px;padding:0 5px;white-space:nowrap;border:1px solid currentColor;line-height:1.6}
+.t-教科書{color:var(--accent)} .t-メモ{color:var(--memo)} .t-文献{color:var(--ok)} .t-要確認{color:var(--warn)} .t-一般{color:var(--muted)}
+.caution{background:var(--warn-soft);border-radius:8px;padding:10px 12px}
+.caution h3{color:var(--warn)}
+.card{border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+.quiz p{margin:0}
+.ans{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.btn{font:inherit;font-size:13px;border-radius:6px;padding:6px 12px;cursor:pointer;border:1px solid var(--accent);background:transparent;color:var(--accent)}
+.btn.primary{background:var(--accent);color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.sm{font-size:12px;padding:3px 9px}
+.nav{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.check{display:flex;gap:6px;align-items:center;font-size:13px;color:var(--muted);cursor:pointer}
+.note{font-size:12px;color:var(--muted);margin-top:14px;max-width:90ch}
+.recall .hideable{filter:blur(6px);user-select:none;cursor:pointer}
+.trow{display:grid;gap:4px;padding:8px 0;border-top:1px solid var(--line)}
+.trow:first-of-type{border-top:0;padding-top:0}
+.tport{display:flex;gap:8px;align-items:baseline;font-size:13px;font-weight:700;flex-wrap:wrap}
+.mm{font-family:var(--f-mono);font-size:11px;font-weight:500;color:var(--muted)}
+select{font:inherit;font-size:13px;padding:5px 8px;border-radius:6px;border:1px solid var(--line);background:var(--surface);color:var(--fg);width:100%}
+.tnote{font-size:12.5px;line-height:1.55;color:var(--muted)}
+.tnote b{font-weight:700}
+.st-ok{color:var(--ok)} .st-ng{color:var(--warn)} .st-alt{color:var(--muted)}
+.layers svg{width:100%;height:auto;display:block}
+.layers .ldesc{font-size:13px;margin:6px 0 0;min-height:3.2em}
+.lnav{display:flex;gap:6px;align-items:center;margin-top:6px;flex-wrap:wrap}
+.err{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--view-fg);padding:24px;text-align:center}
+@media (prefers-reduced-motion:reduce){.lbl{transition:none}}
+/* シミュレーション */
+.simhead{display:flex;justify-content:space-between;align-items:baseline;gap:4px 10px;flex-wrap:wrap}
+.simhead h3{margin:0}
+.score{font-family:var(--f-mono);font-size:11.5px;color:var(--muted)}
+.tasks{margin:8px 0 4px;display:grid;gap:0}
+.tasks li{grid-template-columns:18px 1fr;font-size:13px;color:var(--muted);margin:2px 0}
+.tasks li.now{color:var(--fg);font-weight:700}
+.ic{font-family:var(--f-mono);text-align:center}
+.ic.ok{color:var(--ok)} .ic.retry{color:var(--memo)} .ic.shown{color:var(--warn)}
+.step-lbl{font-size:11.5px;color:var(--muted);margin:10px 0 4px;letter-spacing:.04em}
+.opts{display:flex;flex-wrap:wrap;gap:5px}
+.opt{font:inherit;font-size:12.5px;line-height:1.45;border:1px solid var(--line);background:transparent;color:var(--fg);border-radius:6px;padding:4px 9px;cursor:pointer;text-align:left}
+.opt[aria-pressed="true"]{background:var(--accent);color:#fff;border-color:var(--accent)}
+.opt:disabled{opacity:.45;cursor:default}
+.opt:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opt .mm{color:inherit;opacity:.75}
+.choice{display:grid;gap:5px}
+.choice .opt{width:100%;padding:6px 10px}
+.seq{font-size:12.5px;color:var(--fg);margin:6px 0 0;min-height:1.6em}
+.fb{border-radius:8px;padding:8px 10px;font-size:13px;line-height:1.6;margin-top:10px}
+.fb.ok{background:var(--accent-soft)} .fb.ng{background:var(--warn-soft)}
+.fb.comp{background:var(--warn-soft);border:2px solid var(--warn)} .fb.info{background:var(--bg)}
+.fb b.h{font-family:var(--f-display)}
+.simbtns{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.review{margin-top:8px;font-size:12.5px}
+.review li{grid-template-columns:auto 1fr}
+details.exp{margin-top:8px;font-size:13px} details.exp summary{cursor:pointer;color:var(--accent)}
+.simbar{position:absolute;right:10px;bottom:10px;max-width:min(360px,62%);background:rgba(10,16,22,.85);color:var(--view-fg);border-radius:8px;padding:6px 10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--accent)}
+.flashov{position:absolute;inset:0;pointer-events:none}
+.flashov.on{animation:fl .9s ease-out}
+@keyframes fl{0%{background:rgba(210,40,30,.45)}100%{background:rgba(210,40,30,0)}}
+@media (prefers-reduced-motion:reduce){.flashov.on{animation:none}}
+</style>
+
+<header>
+  <h1>腎尿管全摘 3D手順トレーナー</h1>
+  <span class="sub">Part 1 腎・尿管の処理｜ドラッグで回転・ホイール/ピンチで拡大・構造やポートをクリックで説明</span>
+</header>
+
+<div class="settings">
+  <div><span class="setlbl">モード</span><span class="seg" id="segMode"><button data-v="learn">学習</button><button data-v="sim">シミュレーション</button></span></div>
+  <div><span class="setlbl">アプローチ</span><span class="seg" id="segAp"><button data-v="retro">後腹膜（レトロ）</button><button data-v="intra">経腹膜（イントラ）</button></span></div>
+  <div><span class="setlbl">患側</span><span class="seg" id="segSide"><button data-v="1">左</button><button data-v="-1">右</button></span></div>
+  <div><span class="setlbl">ビュー</span><span class="seg" id="segView"><button data-v="scope">術野（スコープ）</button><button data-v="ext">体外（ポート）</button></span></div>
+</div>
+
+<div class="app">
+  <div class="viewwrap" id="viewwrap">
+    <canvas id="cv" aria-label="腎周囲解剖とポートの3Dモデル"></canvas>
+    <div class="labels" id="labels"></div>
+    <div class="pick" id="pick" hidden></div>
+    <div class="viewname" id="viewname"></div>
+    <div class="vtools">
+      <button class="vbtn" id="tLabels" aria-pressed="true">ラベル</button>
+      <button class="vbtn" id="tFocus" aria-pressed="true">注目構造を強調</button>
+      <button class="vbtn" id="tGerota" aria-pressed="true">Gerota筋膜</button>
+      <button class="vbtn" id="tTools" aria-pressed="true">器械</button>
+      <button class="vbtn" id="tRoll">画面を90°回す</button>
+      <button class="vbtn" id="tReset">視点を戻す</button>
+    </div>
+    <div class="orient" id="orient"></div>
+    <div class="simbar" id="simbar" hidden></div>
+    <div class="flashov" id="flashov"></div>
+  </div>
+
+  <aside class="panel" id="panel">
+    <div class="chips" id="chips" role="list"></div>
+    <div>
+      <div class="eyebrow" id="eyebrow"></div>
+      <h2 id="title"></h2>
+      <p class="aim" id="aim"></p>
+    </div>
+    <div class="hideable" id="pointsBox"><h3>手技のポイント</h3><ul id="points"></ul></div>
+    <div class="caution hideable" id="cautionBox"><h3>注意点・落とし穴</h3><ul id="caution"></ul></div>
+    <div class="card layers" id="layersBox" hidden>
+      <h3 id="layersTitle">腹壁の層（ポート挿入）</h3>
+      <svg id="layerSvg" viewBox="0 0 380 250" role="img" aria-label="腹壁の層とトロカーの深さ"></svg>
+      <p class="ldesc" id="ldesc"></p>
+      <div class="lnav"><button class="btn sm" id="lPrev">← 浅く</button><button class="btn sm primary" id="lNext">次の層へ →</button><button class="btn sm" id="lPlay">通して再生</button><span class="mm" id="lCount"></span></div>
+    </div>
+    <div class="card" id="toolsBox">
+      <h3>使う器械（ポートごとに選択）</h3>
+      <div id="tools"></div>
+    </div>
+    <div class="card quiz" id="quizBox"><h3>確認問題</h3><p id="q"></p><div class="ans" id="ans" hidden></div>
+      <div style="margin-top:8px"><button class="btn sm" id="showAns">答えを見る</button></div></div>
+    <div class="card" id="simBox" hidden>
+      <div class="simhead"><h3>シミュレーション</h3><span class="score" id="simScore"></span></div>
+      <ul class="tasks" id="simTasks"></ul>
+      <div id="simCur"></div>
+      <div class="fb" id="simFb" aria-live="polite" hidden></div>
+      <div class="simbtns" id="simBtns">
+        <button class="btn sm" data-a="hint">ヒント（解説を見る）</button>
+        <button class="btn sm" data-a="reveal">答えを見て進む</button>
+        <button class="btn sm" data-a="retry">このステップをやり直す</button>
+      </div>
+      <div id="simHint" hidden></div>
+    </div>
+    <div class="nav" id="checkNav">
+      <label class="check"><input type="checkbox" id="doneCb"> このステップを復習した</label>
+      <label class="check"><input type="checkbox" id="recallCb"> 想起モード（解説を隠す）</label>
+    </div>
+    <div class="nav">
+      <button class="btn" id="prev">← 前へ</button>
+      <button class="btn" id="play">手順を再生</button>
+      <button class="btn primary" id="next">次へ →</button>
+    </div>
+  </aside>
+</div>
+
+<p class="note">出典タグ：<b>教科書</b>＝寒野徹「左・右腎摘除術：後腹膜アプローチ」（『究める 腎・副腎腫瘍に対する腹腔鏡・ロボット支援手術』）の要約、<b>メモ</b>＝手術メモ・手術記録、<b>文献</b>＝その他の文献、<b>要確認</b>＝確認待ち、<b>一般</b>＝資料にない一般的な知識。臓器とポートの位置は模式的です。右側のレトロのポート配置は、教科書の左腎配置を鏡像にした推定です。下部尿管処理（Part 2：体位変換・傍腹直筋切開）は準備中です。<b>シミュレーション</b>モードでは、各ステップのタスクを自分で操作します（ポートと器械を選び、3D画面で対象をクリック）。危険な構造を切ると合併症として記録されます。正誤の判定は上の資料にもとづく模式的なもので、施設の方法と違う場合があります。</p>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<script>
+(function(){
+/* ---------------- 手順データ ---------------- */
+// 箇条書き: [タグ, 本文, 側('L'|'R'|省略)]
+const RETRO=[
+ {t:"体位",aim:"腎摘位（完全側臥位）で、肋骨弓と腸骨稜の間を広げる",view:"ext",ports:[],
+  pts:[["教科書","腰部斜切開と同じ腎摘位が基本。いつでも開腹へ移れるように準備しておく"],
+   ["メモ","マジックベッドで健側下の完全側臥位（ほぼ90°）"],
+   ["教科書","脇腹の真下で台を屈曲させ（鯖折り）、肋骨弓と腸骨稜の間を広げる。腎枕は使わない"],
+   ["メモ","マジックベッドは脇の高さまでにし、腋窩枕で脇を圧迫しない。上側の腕は肩の高さで前方の腕台へ（頭より上げない）"],
+   ["メモ","支持器は背側（肩甲骨・仙骨の高さ）、症例により鼠径部にも。肩と骨盤をテープで固定。下側の脚は膝を曲げ、両脚の間にクッション"],
+   ["教科書","主モニターは術者の正面。上〜中部尿管の操作では術者が足側を向くので、足側に副モニターがあると便利"]],
+  cau:[["文献","レトロでは後ろに倒さない（背側のポートが台や支持器に近づく）。教科書には記載なし"],["要確認","施設で後ろに倒しているか"],
+   ["教科書","フットペダルは軸足でない足の先に。左腎では軸足は左","L"],["教科書","フットペダルは軸足でない足の先に。右腎では軸足は右","R"]],
+  q:"レトロで体位を後ろに倒さない理由は？",a:"背側のポートが手術台や支持器に近づき、操作が干渉するため（文献より。教科書には記載なし）。",hi:[],st:{}},
+ {t:"第1ポート（オープン法）",aim:"肋骨弓と腸骨稜の中点で、腹壁を一層ずつ開けて後腹膜腔に入る",view:"ext",ports:["cam"],layers:"retro",
+  pts:[["教科書","位置は肋骨弓と腸骨稜の中点か、やや頭側"],["教科書","皮膚切開は20mm程度の必要最小限。S字鉤を使うと視野が得やすい"],
+   ["教科書","筋層ごとの厚みと線維の向きを意識する（下の「腹壁の層」で一層ずつ確認）"],
+   ["メモ","腹横筋筋膜までは通常どおり開け、PDBバルーンが入る大きさまで切開。指で周りの腹膜を落とす"]],
+  cau:[["教科書","浅すぎると腹横筋の中、深すぎると脂肪の中に入る"],["教科書","内側の腹横筋筋膜は薄く、場所がずれると腹膜があることがある。損傷しても直視下に縫合でき、気腹には問題ない"]],
+  q:"第1ポートで後腹膜腔に入るまでに通る層を、浅い順に言えますか？",a:"皮膚 → 皮下脂肪 → 外腹斜筋腱膜 → 内腹斜筋 → 腹横筋 → 腹横筋筋膜 → 後腹膜脂肪（後腹膜腔）。腹膜には入らない。",hi:[],st:{}},
+ {t:"後腹膜腔の展開とポート留置",aim:"腔を広げ、腹膜を内側へ落としてから残りのポートを鏡視下に立てる",view:"scope",tg:"space",dist:3.4,ports:["cam","V","D","A"],
+  pts:[["教科書","腹横筋筋膜を触れながら、脂肪を筋膜から指でできるだけ剥がす。肋骨・腸骨を触れて正しい腔か確認"],
+   ["教科書","PDBバルーンダイレーターを腎の後面に向けて入れ、側腹部が硬く膨らむまで少しずつ拡張"],
+   ["教科書","バルーントロカーを固定し、気腹をゆっくり開始（12mmHgまで）"],
+   ["教科書","背側のトロカーを鏡視下に確認しながら、腹壁を垂直に貫くように入れる"],
+   ["教科書","腹膜の折り返しを確認し、腹横筋筋膜をなぞるように腹膜を剥がす（Swing & progress technique）"],
+   ["教科書","腹側（5mm）、足側（12mm）のトロカーを入れ、以後は気腹圧を8mmHgに下げる"]],
+  cau:[["教科書","急いで拡張すると腹膜や横隔膜を損傷しうる"],["教科書","指の剥離が不正確だとflank padが腹壁側に残り、以後の視野と操作が非常に難しくなる"],
+   ["メモ","各ポートは外腹斜筋に注意し、腹腔内に入り込まないように立てる"]],
+  q:"腹膜を剥がすとき、引き下ろす以外にどう剥がす？",a:"腹横筋筋膜をなぞるように剥がす（Swing & progress）。腹膜を引き下ろすと損傷しやすい。",
+  hi:["peri"],st:{peri:1,flank:1},tools:{cam:"pdb"}},
+ {t:"脂肪（flank pad）の処理",aim:"視野の邪魔になれば、腹壁側の脂肪を一塊に外す",view:"scope",tg:"flank",dist:3,ports:["cam","V","D","A"],
+  pts:[["教科書","視野の邪魔になるなら取るが、必須ではない"],["教科書","取るときは腹側・頭側から、ばらばらにならないよう外側円錐筋膜の面から一塊に剥がす"],["教科書","必要ならカメラポートから体外へ出す"]],
+  cau:[["教科書","後腹膜腔を展開するとき腹横筋筋膜と脂肪の間を正確に剥がせていないと、flank padが腹壁側に残って視野が悪くなる"]],
+  q:"flank padを取るときのコツは？",a:"腹側・頭側から、外側円錐筋膜の面に沿って、ばらばらにせず一塊に剥がす。",
+  hi:["flank"],st:{peri:1,flank:0.5},tools:{L:"grasper",R:"scissors"},aim2:{L:"flank",R:"flank"}},
+ {t:"外側円錐筋膜の切開",aim:"腸腰筋に沿って筋膜を大きく開け、腎の背側に入る",view:"scope",tg:"psoasF",dist:3.2,ports:["cam","V","D","A"],
+  pts:[["教科書","外側円錐筋膜が腹横筋筋膜に付着する部分を確認。脂肪が多ければ、腹横筋筋膜を背側へ出すように脂肪を剥がす"],
+   ["教科書","小さな穴を開けて奥の腎周囲脂肪と腸腰筋筋膜を確認し、付着部に沿って上下に大きく切開する"],
+   ["教科書","腸腰筋筋膜を確認したら腎にトラクションをかけ、「あわあわ」の粗な結合織を筋膜寄りで鋭的に切る"]],
+  cau:[["教科書","脂肪を剥がす意識がないと、外側円錐筋膜を腹横筋から剥がしてしまい腸腰筋の中に入る"],
+   ["メモ","下に行きすぎると腸腰筋筋膜の下に潜り、大動脈の裏から対側へ迷い込む（筋膜の表面が正解）"]],
+  q:"「あわあわ」はどの層で切る？",a:"腸腰筋筋膜の表面（腎周囲脂肪側）。下に行きすぎると筋膜の下に潜り、大動脈の裏へ迷い込む。",
+  hi:["gerota","psoas"],st:{peri:1,flank:0,cone:1},tools:{L:"maryland",R:"scissors"},aim2:{L:"kidneyPost",R:"psoasF"}},
+ {t:"腎後面の剥離と腎門部への到達",aim:"腎を腹側に引き上げ、腎と大血管の間のラインを開く",view:"scope",tg:"hilumPost",dist:3.2,ports:["cam","V","D","A"],
+  pts:[["教科書","内側へ剥がすと、腎周囲脂肪と大血管周囲脂肪の間に空気が入って隙間ができる。大動脈との境界近くに左手でテンション","L"],
+   ["教科書","右腎を腹側に強く引くと、下大静脈周囲脂肪との境界が自然に開く。足側で下大静脈の拍動が透けて見えることが多い","R"],
+   ["教科書","左手は強さだけでなく向き（腎を腹側に引き上げる向き）が重要"],
+   ["教科書","下極側で尿管を同定したら、尿管を腎側につけるように腎を引くと、腎と大血管の間が自然に開く。頭側・足側へ広く開ける"],
+   ["メモ","外側円錐筋膜の下の腎周囲脂肪の中を、尿管と性腺静脈が並んで走る。その下に大腰筋"]],
+  cau:[["教科書","腎茎部は大血管に直交する向きにリンパ管が多く、腎が持ち上がりにくい"],["教科書","腎茎だけが突っ張り、前後が広く開いている視野が安全な手術の前提"]],
+  q:"腎門部へのラインを開くとき、尿管をどう利用する？",a:"下極側で尿管を同定し、尿管を腎側につけるように腎を引くと、腎と大血管の間が自然に開く。",
+  hi:["kidney","ureter","gonadal","psoas","GV"],st:{peri:1,flank:0,cone:1,lift:1},tools:{L:"grasper",R:"scissors",A:"suction"},aim2:{L:"kidneyPost",R:"hilumPost",A:"ureterMid"}},
+ {t:"腎動脈の処理",aim:"動脈を浮かせて、Hem-o-lokで中枢2：末梢1",view:"scope",tg:"artery",dist:2.8,ports:["cam","V","D","A"],
+  pts:[["教科書","まず左腰静脈の処理が必要なことが多い。走行の変異が多いので確実に同定し、シーリングかクリップで処理","L"],
+   ["教科書","腎静脈をステイプラーで切るなら、腰静脈のクリップが邪魔にならないか考え、邪魔ならシーリングで","L"],
+   ["教科書","右腎動脈は下大静脈の背側を横切る。下大静脈を足側から頭側へ出していけば必ず見つかる","R"],
+   ["教科書","動脈周囲の組織は血管に直交する向きに剥離鉗子で剥がし、焼灼切断する"],
+   ["教科書","剥離鉗子は血管の走行に直交する向きに、ゆっくり大きく開く。開くと同時に軽く押し当て、少し奥へ送る"],
+   ["教科書","腎動脈以外がすべて処理され、動脈が浮いている状態が理想。足側・腹側の10mmポートからHem-o-lokを入れ、中枢側2：末梢側1"]],
+  cau:[["教科書","超音波凝固切開装置はキャビテーション、シーリングデバイスはブレードの熱損傷に注意"],
+   ["教科書","先端が見えないブラインド操作はしない。腎茎の奥には腎静脈や腹腔内臓器（十二指腸・膵・脾）がある","L"],
+   ["教科書","先端が見えないブラインド操作はしない。腎茎の奥には腎静脈や十二指腸がある","R"]],
+  q:"Hem-o-lokを足側・腹側のポートから入れる理由は？",a:"腎から遠く、腎動静脈に直交する角度になってクリップをかけやすいため。",
+  hi:["artery","GV","lumbar","ivc"],st:{peri:1,flank:0,cone:1,lift:1},mk:{artery:"clip",lumbar:"seal"},cut:["artery"],tools:{L:"bipolar",R:"maryland",A:"clip"},aim2:{L:"kidneyPost",R:"artery",A:"artery"}},
+ {t:"腎静脈の処理",aim:"静脈の周りを大きく開け、ステイプラーかHem-o-lok XLで切る",view:"scope",tg:"vein",dist:2.9,ports:["cam","V","D","A"],
+  pts:[["教科書","動脈処理の後、さらに周囲を剥がして腎静脈の周りに大きなスペースを作る"],
+   ["教科書","性腺静脈・副腎静脈を確認し、どこで処理するか決める。枝はクリップでなくシーリングで、腎静脈から少し離れた所で","L"],
+   ["教科書","右手の剥離鉗子で左腎静脈を少し横に引くと、片手でも全周剥離できることが多い","L"],
+   ["教科書","下大静脈の頭側も広く開け、右腎静脈が煙突のように立ち上がるまで剥がす。合流部の頭側の角をきれいに出す","R"],
+   ["教科書","腹側足側のポートからステイプラーかHem-o-lok XLを入れて切断。ステイプラーは先端を少し閉じながら入れると周りを挟みにくい"]],
+  cau:[["教科書","背側も十分剥がすが、細心の注意を払う"],
+   ["教科書","カメラが回転していて、下大静脈を右腎静脈と誤認しステイプラーで切った報告がある","R"],
+   ["教科書","右腎静脈は短いので、過度なテンションで出血させない","R"]],
+  q:{L:"左腎静脈を切る前に確認・処理する枝は？",R:"右腎静脈をステイプラーで切る前に必ず確認することは？"},
+  a:{L:"性腺静脈・副腎静脈（と腰静脈）。枝はシーリングで、腎静脈から少し離れた所で処理する。",R:"下大静脈との合流部の頭側の角を出し、下大静脈を右腎静脈と誤認していないこと（カメラの回転に注意）。"},
+  hi:["vein","GV","gonadal","adrenalv","lumbar"],st:{peri:1,flank:0,cone:1,lift:1},mk:{artery:"clip",vein:"staple",lumbar:"seal",gonadal:"seal",adrenalv:"seal"},cut:["artery","vein"],tools:{L:"bipolar",R:"maryland",A:"stapler"},aim2:{L:"kidneyPost",R:"vein",A:"vein"}},
+ {t:"副腎の温存と腎上極",aim:"副腎を背面から確認・温存し、上極の可動性を出す",view:"scope",tg:"adrenal",dist:3,ports:["cam","V","D","A"],
+  pts:[["教科書","腎茎処理に続いて頭側へ。副腎は背面から確認・温存する。難しければ無理せず、腹膜と腎の間を剥がして腎を背側に落としてから"],
+   ["教科書","副腎に比較的近い所で腎周囲脂肪を切り、腎上極が出すぎないようにする"],
+   ["教科書","副腎は意外と頭側に長い。奥は腹膜のラインまで開けるのが理想"],
+   ["教科書","腎上極の剥離を進め、腎の可動性をよくしておく。背面のポートが届かなければ腹側頭側のポートから"]],
+  cau:[["教科書","電気メスで横隔膜を損傷しない"]],
+  q:"副腎を背面から処理するのが難しいときは？",a:"無理せず、腹膜と腎の間を剥がして腎を背側に落としてから処理する。",
+  hi:["adrenal","kidney"],st:{peri:1,flank:0,cone:1,lift:1},mk:{artery:"clip",vein:"staple",lumbar:"seal",gonadal:"seal",adrenalv:"seal"},cut:["artery","vein"],tools:{L:"grasper",R:"sealer"},aim2:{L:"kidneyUpper",R:"adrenal"}},
+ {t:"腎前面・下極と尿管",aim:"腹膜ぎりぎりで腎前面を外し、尿管は切らずに末梢へ剥離する",view:"scope",tg:"kidneyAnt",dist:3.4,ports:["cam","V","D","A"],
+  pts:[["教科書","腎前面は中央部から。外側円錐筋膜の断端を腹側に引き、腹膜ぎりぎりの層で「あわあわ」を鋭的に切る"],
+   ["教科書","断端は助手に持たせるか、直針で糸をかけて引くとよい視野になる"],
+   ["教科書","中央部を広く開けてから頭側・足側へ。上極と下極だけでぶら下がるハンモック状が理想"],
+   ["教科書","下極は脂肪が多い。腎を外側に引き、腎と腹膜の間にトラクションをかけて鋭的に切る"],
+   ["メモ","腎尿管全摘では尿管を切らず、レトロのまま末梢へできるだけ剥離しておく（下部尿管処理で膀胱カフごと摘出）"]],
+  cau:[["教科書","腎の頭側は腹膜が薄く損傷しやすい"],["教科書","鈍的剥離やシーリング中心だと層を失いやすい"]],
+  q:"腎摘と腎尿管全摘で、この段階の尿管の扱いはどう違う？",a:"腎摘では尿管を剥離・切断する。腎尿管全摘では切らずに末梢へ剥離し、下部尿管処理で膀胱カフごと一塊に摘出する。",
+  hi:["kidney","peri","ureter"],st:{peri:1,flank:0,cone:1,lift:1,free:0.4},mk:{artery:"clip",vein:"staple",lumbar:"seal",gonadal:"seal",adrenalv:"seal"},cut:["artery","vein"],tools:{L:"grasper",R:"scissors",A:"grasper"},aim2:{L:"kidneyLat",R:"kidneyAnt",A:"periFold"}},
+ {t:"止血確認・腎の収納・ドレーン",aim:"収納袋に腎を収め、最後まで止血を確認する",view:"scope",tg:"kidney",dist:4,ports:["cam","V","D","A"],
+  pts:[["教科書","腎が完全に遊離したら、腹側足側のポートから収納袋を入れて腎を収める"],
+   ["メモ","ドレーンは5mmポートから入れることが多い（腹側・背側のどちらかは症例による）"],
+   ["メモ","この後、仰臥位に体位変換して傍腹直筋切開で下部尿管処理へ（Part 2）"]],
+  cau:[["教科書","後腹膜はスペースが狭く、収納袋の扱いに注意"],["教科書","収納袋の糸が腎茎のクリップに引っかかって大出血した報告がある。最後まで気を抜かない"]],
+  q:"収納袋の操作で特に注意することは？",a:"袋の糸が腎茎のクリップに引っかからないようにする（大出血の報告あり）。",
+  hi:["kidney"],st:{peri:1,flank:0,cone:1,lift:1,free:1},mk:{artery:"clip",vein:"staple",lumbar:"seal",gonadal:"seal",adrenalv:"seal"},cut:["artery","vein"],tools:{L:"grasper",R:"bipolar",A:"bag"},aim2:{L:"kidneyLat",R:"hilumStump",A:"kidneyLower"}}
+];
+const INTRA=[
+ {t:"体位",aim:"側臥位で、下部尿管処理まで見越して準備する",view:"ext",ports:[],
+  pts:[["一般","健側下の側臥位（60〜90°程度）で腰部を伸展させる"],["メモ","経腹膜で腎を処理した後、仰臥位に変えて下部尿管も腹腔鏡で処理する流れ"],
+   ["メモ","下部尿管処理を見越して、カメラポートは通常の腎摘より気持ち下目に作る"]],
+  cau:[["一般","除圧（腋窩枕・骨突出部）と体幹の確実な固定"]],
+  q:"経腹膜の腎尿管全摘で、カメラポートを通常の腎摘より下目に置く理由は？",a:"下部尿管処理（仰臥位）でもそのまま使うため。",hi:[],st:{}},
+ {t:"ポート配置",aim:"臍付近から腹膜を開けて腹腔に入り、残りのポートを立てる",view:"ext",ports:["cam","P2","P3","A","LR"],layers:"intra",
+  pts:[["メモ","左：4ポート（①カメラ、②③術者、④助手）。カメラが助手を兼ね実質2名","L"],
+   ["メモ","右：5ポート（①カメラ、②③術者、④助手＝肝臓挙上、⑤助手）。術者・助手・カメラの3名","R"],
+   ["一般","第1ポートは臍付近でオープン法。皮膚 → 皮下脂肪 → 筋膜 → 腹膜と開けて腹腔に入る（下の「腹壁の層」）"],
+   ["メモ","③は後で上のドレーン。④（助手5mm）は下部尿管パートで術者左手になる。④の皮膚切開は摘出創を考えて少し斜めに","L"],
+   ["メモ","④（肝臓挙上）は後で上のドレーン。腎摘の術者左手と助手ポートは下部尿管パートでもそのまま使う","R"]],
+  cau:[["要確認","ポート位置は手書きメモの模式化。番号のない丸の意味は要確認"]],
+  q:"経腹膜とレトロで、第1ポートの最後の層はどう違う？",a:"経腹膜は腹膜を開けて腹腔へ入る。レトロは腹横筋筋膜までで、腹膜は内側へ落として入らない。",hi:[],st:{}},
+ {t:"結腸の授動",aim:"結腸を内側へ寄せ、Gerota筋膜前面を露出する",view:"scope",tg:"colonLine",dist:3.6,ports:["cam","P2","P3","A","LR"],
+  pts:[["一般","Toldtの白線を切開し、結腸を内側へ授動する"],["一般","脾結腸間膜を切離し、結腸を脾下極から離す","L"],
+   ["一般","肝結腸間膜を切離し、必要に応じて十二指腸を内側へ授動（Kocher授動）","R"],
+   ["一般","結腸間膜とGerota筋膜前葉の間の無血管層を保って剥離する"]],
+  cau:[["一般","結腸・結腸間膜の損傷"],["一般","脾被膜の損傷","L"],["一般","十二指腸の損傷（熱損傷を含む）","R"]],
+  q:"結腸授動で入るべき層はどこ？",a:"結腸間膜とGerota筋膜前葉の間の、疎で出血の少ない層。",
+  hi:["colon","spleen","liver","duod"],st:{colon:1},tools:{P2:"bipolar",P3:"scissors",A:"grasper",LR:"grasper"},aim2:{P2:"colon",P3:"colonLine",A:"colon",LR:"liver"}},
+ {t:"尿管・性腺静脈の同定",aim:"腸腰筋の前面で尿管を見つけ、腫瘍より遠位で閉じる",view:"scope",tg:"ureterMid",dist:3.2,ports:["cam","P2","P3","A","LR"],
+  pts:[["一般","腎下極の高さ、腸腰筋の前面で性腺静脈と、その背外側を走る尿管を同定する"],
+   ["一般","腫瘍細胞が膀胱側へ流れないよう、早期に腫瘍より遠位で尿管をクリップする（切断はしない）"],["要確認","施設で早期に尿管クリップをしているか"]],
+  cau:[["一般","性腺静脈と尿管の取り違え（蠕動・走行で確認）"],["一般","この段階で尿管を切断しない"]],
+  q:"早い段階で尿管をクリップする理由は？",a:"操作中に腫瘍細胞が尿管内を遠位へ流れ、膀胱内再発や播種につながるのを防ぐため。",
+  hi:["ureter","gonadal","psoas"],st:{colon:1},mk:{ureter:"clip"},tools:{P2:"maryland",P3:"clip",A:"grasper",LR:"grasper"},aim2:{P2:"ureterMid",P3:"ureterClip",A:"colon",LR:"liver"}},
+ {t:"下極の挙上と腎門部への到達",aim:"尿管と性腺静脈ごと下極を持ち上げ、腎門部を展開する",view:"scope",tg:"hilumAnt",dist:3.2,ports:["cam","P2","P3","A","LR"],
+  pts:[["一般","尿管と性腺静脈をまとめて外側へ持ち上げ、腸腰筋の前面を頭側へ剥離する"],["一般","左では性腺静脈を頭側へ辿ると左腎静脈に到達する","L"],
+   ["一般","右では下大静脈の前面・外側に沿って頭側へ進むと右腎静脈に到達する","R"],["教科書","腎茎だけが突っ張り、前後が広く開いている視野が安全な手術の前提（レトロの章より）"]],
+  cau:[["一般","腰静脈からの出血、腸腰筋前面の陰部大腿神経の損傷"]],
+  q:"左側で腎静脈に到達するときのよい目印は？",a:"性腺静脈。尾側から頭側へ辿ると左腎静脈に流入する。",
+  hi:["kidney","gonadal","ureter","psoas","GV"],st:{colon:1,lift:1},mk:{ureter:"clip"},tools:{P2:"grasper",P3:"scissors",A:"suction",LR:"grasper"},aim2:{P2:"kidneyLower",P3:"hilumAnt",A:"ureterMid",LR:"liver"}},
+ {t:"腎動脈の処理",aim:"静脈の背側で動脈を剥離し、静脈より先に閉じる",view:"scope",tg:"artery",dist:2.8,ports:["cam","P2","P3","A","LR"],
+  pts:[["一般","腎静脈の背側・頭側で腎動脈を同定し、全周性に剥離する（静脈を少し牽引すると見やすい）"],
+   ["教科書","剥離鉗子は血管の走行に直交する向きに、ゆっくり大きく開く（レトロの章より）"],
+   ["教科書","Hem-o-lokで中枢側2：末梢側1（レトロの章より）。12mmポートから入れる"],["一般","静脈より先に動脈を処理する（腎のうっ血を防ぐ）"]],
+  cau:[["一般","上腸間膜動脈を腎動脈と誤認しない","L"],["一般","右腎動脈は下大静脈の背側。下大静脈を損傷しない","R"],["一般","複数腎動脈の有無を術前CTで確認"]],
+  q:"動脈を静脈より先に処理する理由は？",a:"静脈を先に閉じると動脈血の流入が続き、腎がうっ血・腫大して出血が増えるため。",
+  hi:["artery","GV","vein"],st:{colon:1,lift:1},mk:{ureter:"clip",artery:"clip"},cut:["artery"],tools:{P2:"bipolar",P3:"clip",A:"suction",LR:"grasper"},aim2:{P2:"vein",P3:"artery",A:"hilumAnt",LR:"liver"}},
+ {t:"腎静脈の処理",aim:"虚脱を確認し、枝を整理してから腎静脈を切る",view:"scope",tg:"vein",dist:3,ports:["cam","P2","P3","A","LR"],
+  pts:[["教科書","性腺静脈・副腎静脈を確認し、どこで処理するか決める。枝はシーリングで腎静脈から少し離れた所で（レトロの章より）","L"],
+   ["教科書","右腎静脈と下大静脈の合流部の頭側の角をきれいに出す（レトロの章より）","R"],
+   ["一般","動脈処理後に腎静脈が虚脱していることを確認する"],["教科書","ステイプラーは先端を少し閉じながら入れると周りを挟みにくい"]],
+  cau:[["一般","静脈が虚脱しなければ未処理の動脈を疑う"],["教科書","右腎静脈は短い。下大静脈を誤認しない","R"]],
+  q:"動脈を処理したのに腎静脈が虚脱しないとき、何を考える？",a:"未処理の腎動脈（複数腎動脈）が残っている可能性。",
+  hi:["vein","GV","gonadal","adrenalv","lumbar"],st:{colon:1,lift:1},mk:{ureter:"clip",artery:"clip",vein:"staple",gonadal:"seal",adrenalv:"seal",lumbar:"seal"},cut:["artery","vein"],tools:{P2:"bipolar",P3:"stapler",A:"suction",LR:"grasper"},aim2:{P2:"kidneyLower",P3:"vein",A:"hilumAnt",LR:"liver"}},
+ {t:"上極・副腎の剥離",aim:"副腎を残して腎上極を外す",view:"scope",tg:"adrenal",dist:3.2,ports:["cam","P2","P3","A","LR"],
+  pts:[["一般","副腎浸潤がなければ副腎を温存し、腎上極との間を剥離する"],["一般","脾腎間膜を切離して上極外側を授動する","L"],
+   ["メモ","④の助手鉗子で肝臓を挙上して視野を作る","R"],["一般","Gerota筋膜を破らない層で剥離する"]],
+  cau:[["一般","脾臓・膵尾部の損傷","L"],["一般","肝臓・下大静脈の損傷。右副腎静脈は短く下大静脈に直接入る","R"],["教科書","電気メスで横隔膜を損傷しない"]],
+  q:{L:"左腎上極を剥離するとき、特に注意する隣接臓器は？",R:"右腎上極で、肝挙上以外に注意する構造は？"},a:{L:"脾臓と膵尾部。",R:"下大静脈と、下大静脈に直接入る短い右副腎静脈。"},
+  hi:["adrenal","spleen","liver","kidney"],st:{colon:1,lift:1,liverUp:1},mk:{ureter:"clip",artery:"clip",vein:"staple",gonadal:"seal",adrenalv:"seal",lumbar:"seal"},cut:["artery","vein"],tools:{P2:"grasper",P3:"sealer",A:"suction",LR:"grasper"},aim2:{P2:"kidneyUpper",P3:"adrenal",A:"kidneyLat",LR:"liver"}},
+ {t:"授動完了・収納・ドレーン",aim:"Gerota筋膜ごと腎を一塊に遊離し、尿管でつながったまま次へ進む",view:"scope",tg:"kidney",dist:4.2,ports:["cam","P2","P3","A","LR"],
+  pts:[["一般","腎の外側・背側の付着を切離し、Gerota筋膜ごと腎を一塊に授動する"],["一般","腎は尿管でつながったまま、下部尿管処理（仰臥位）へ進む"],
+   ["メモ","ドレーン：腎摘部は③から、下部尿管部は⑤から","L"],["メモ","ドレーン：腎摘部は④（肝臓挙上の助手ポート）から","R"],
+   ["メモ","クロットリテンションのリスクも含め、尿道カテーテルは18Fr"]],
+  cau:[["一般","ここで尿管を切り離さない（腎・尿管・膀胱カフを一塊で摘出）"],["教科書","収納袋の糸が腎茎のクリップに引っかからないように"]],
+  q:"この時点で尿管を切断しない理由は？",a:"腎・尿管・膀胱カフを一塊に摘出し、尿路を開放しないことで腫瘍の播種を防ぐため。",
+  hi:["kidney","ureter"],st:{colon:1,lift:1,free:1},mk:{ureter:"clip",artery:"clip",vein:"staple",gonadal:"seal",adrenalv:"seal",lumbar:"seal"},cut:["artery","vein"],tools:{P2:"grasper",P3:"bag",A:"suction",LR:"grasper"},aim2:{P2:"kidneyLat",P3:"kidneyLower",A:"hilumStump",LR:"liver"}}
+];
+
+/* ---------------- 器械 ---------------- */
+const TOOLS={
+ grasper:{n:"把持鉗子",min:5,kind:"jaw",col:0x3a4048,use:"組織や腎を把持して牽引する。トラクションは作用点・強さ・向きを意識",src:"教科書"},
+ maryland:{n:"剥離鉗子（メリーランド）",min:5,kind:"jaw",col:0x2b2f35,thin:1,use:"血管周囲の剥離。血管の走行に直交する向きに、ゆっくり大きく開く",src:"教科書"},
+ scissors:{n:"剪刀（モノポーラ通電）",min:5,kind:"scissors",col:0xbfc6cc,use:"剥離面を追う鋭的切開（plane dissection）の主役",src:"教科書"},
+ hook:{n:"電気メス（フック）",min:5,kind:"hook",col:0xbfc6cc,use:"鋭的切開。上極付近では横隔膜の損傷に注意",src:"教科書"},
+ bipolar:{n:"バイポーラ鉗子",min:5,kind:"jaw",col:0x2c4f8c,use:"鋭的操作と反対の手に持ち、牽引と止血を兼ねる",src:"教科書"},
+ usad:{n:"超音波凝固切開装置",min:5,kind:"usad",col:0xd8dde2,use:"凝固と切開を同時に行う。キャビテーションに注意",src:"教科書"},
+ sealer:{n:"シーリングデバイス",min:5,kind:"sealer",col:0xc9a227,use:"面と面をつなぐ操作や血管のシーリング。ブレードの熱損傷に注意",src:"教科書"},
+ clip:{n:"Hem-o-lokクリップ（L）",min:10,kind:"clip",col:0x8a5fd1,use:"腎動脈：中枢側2、末梢側1。10mmポートから",src:"教科書"},
+ clipxl:{n:"Hem-o-lokクリップ（XL）",min:10,kind:"clip",col:0x8a5fd1,use:"腎静脈をクリップで切る場合に使う",src:"教科書"},
+ stapler:{n:"自動縫合器（血管用）",min:12,kind:"stapler",col:0x3a4048,use:"腎静脈の切断。先端を少し閉じながら入れると周りを挟みにくい",src:"教科書"},
+ suction:{n:"吸引管",min:5,kind:"suction",col:0xc8ced3,use:"出血や洗浄液の吸引、鈍的な圧排",src:"一般"},
+ pdb:{n:"PDBバルーンダイレーター",min:10,kind:"balloon",col:0xd8dde2,use:"後腹膜腔の拡張。腎の後面に向けて少しずつ膨らませる",src:"教科書"},
+ bag:{n:"収納袋",min:10,kind:"bag",col:0xd8dde2,use:"遊離した腎を収納。糸が腎茎のクリップに引っかからないように",src:"教科書"},
+ drain:{n:"ドレーン",min:5,kind:"drain",col:0xf2f2f2,use:"5mmポートから留置することが多い",src:"メモ"}
+};
+
+/* ---------------- 腹壁の層 ---------------- */
+const LAYERS={
+ retro:{title:"腹壁の層：レトロの第1ポート（側腹部）",items:[
+  ["皮膚",10,"#e2b597","皮膚切開は20mm程度。S字鉤で視野を取る","教科書"],
+  ["皮下脂肪",30,"#f1d98a","電気メスで切開して、外腹斜筋腱膜まで","教科書"],
+  ["外腹斜筋（腱膜）",14,"#b4574a","腱膜が見えたら、線維と平行に切開する","教科書"],
+  ["内腹斜筋",22,"#a14a40","閉じたメッツェンを抵抗がなくなるまで入れ、90°回して線維と直角に開く","教科書"],
+  ["腹横筋",18,"#8e3f37","同じ操作を繰り返す。浅すぎると腹横筋の中に留まる","教科書"],
+  ["腹横筋筋膜",5,"#e9e6dc","薄い筋膜。剥離鉗子で開いて後腹膜脂肪に到達する。ずれると腹膜があることも","教科書"],
+  ["後腹膜脂肪（後腹膜腔）",40,"#f6e7a8","指で筋膜から脂肪を剥がし、PDBバルーンで拡張する。腹膜は内側へ落とし、入らない","教科書"]],
+  under:["腹膜（入らない）","#7fb6c9"]},
+ intra:{title:"腹壁の層：経腹膜の第1ポート（臍付近）",items:[
+  ["皮膚",10,"#e2b597","臍付近で皮膚切開（オープン法）","一般"],
+  ["皮下脂肪",30,"#f1d98a","筋膜まで分ける","一般"],
+  ["筋膜（腹直筋鞘／腱膜）",8,"#e9e6dc","筋膜を切開し、両端に糸をかけて持ち上げる","一般"],
+  ["筋層（腹直筋の外縁・側腹筋）",24,"#a14a40","線維方向に分ける。正中寄りなら白線で筋層はない","一般"],
+  ["横筋筋膜",5,"#e9e6dc","薄い筋膜。腹膜前脂肪の手前","一般"],
+  ["腹膜前脂肪",14,"#f6e7a8","腹膜をつまみ上げて、腸管を巻き込んでいないことを確認","一般"],
+  ["腹膜",5,"#7fb6c9","腹膜を開けて腹腔へ。ここを開けるのがレトロとの違い","一般"],
+  ["腹腔",34,"#2a3a48","気腹してカメラを入れ、残りのポートを鏡視下に立てる","一般"]]}
+};
+
+const INFO={
+ kidney:["腎","Gerota筋膜ごと一塊に剥離する。腎門部は内側"],
+ gerota:["Gerota筋膜・外側円錐筋膜","腎・副腎・腎周囲脂肪を包む。レトロではまず外側円錐筋膜を腸腰筋に沿って切開する"],
+ artery:["腎動脈","静脈の背側。動脈が浮いた状態にしてHem-o-lokを中枢2：末梢1"],
+ vein:["腎静脈","左は長く大動脈の腹側を越える。右は短く下大静脈に直接合流する"],
+ aorta:["腹部大動脈","レトロで背側に行きすぎると、この裏へ迷い込む"],
+ ivc:["下大静脈","右腎動脈はこの背側を横切る。右腎静脈との合流部頭側の角を出す"],
+ ureter:["尿管","腎周囲脂肪の中を性腺静脈と並走。腎尿管全摘では切らずに末梢へ剥離する"],
+ gonadal:["性腺静脈","左は左腎静脈へ、右は下大静脈へ流入する"],
+ adrenalv:["副腎静脈","左は左腎静脈へ、右は下大静脈へ直接入る"],
+ lumbar:["腰静脈","左腎静脈に背側から入る。走行の変異が多く、動脈処理の前に処理が必要なことが多い"],
+ adrenal:["副腎","背面から確認・温存。意外と頭側に長い"],
+ spleen:["脾臓","左上極の外側。剥離時の被膜損傷に注意"],
+ liver:["肝臓","右では助手鉗子で挙上して視野を作る"],
+ duod:["十二指腸","右の腎茎の奥。ブラインド操作や熱損傷に注意"],
+ panc:["膵尾部","左の腎茎・上極の奥。ブラインド操作に注意"],
+ colon:["結腸","経腹膜ではToldt白線を切開して内側へ授動する。レトロでは腹膜の向こう側"],
+ psoas:["腸腰筋（大腰筋）","剥離の背側の目印。筋膜の表面で切る（下に潜らない）"],
+ peri:["腹膜（折り返し）","レトロでは入らずに内側へ落とす。腎の頭側では薄く損傷しやすい"],
+ flank:["flank pad（側腹部の脂肪）","視野の邪魔なら外側円錐筋膜の面から一塊に剥がす"],
+ skin:["体表","肋骨弓・腸骨稜・背筋群に囲まれた範囲にポートを収める"],
+ toldt:["Toldtの白線","結腸の外側の腹膜の折り返し。ここを切開して結腸を内側へ授動する"]
+};
+
+/* ---------------- シミュレーションのタスク ----------------
+ type: act＝ポート＋器械を選んで対象をクリック / id＝構造をクリック / choice＝選択 / order＝層を順にクリック / place＝体表にポートを置く
+ port: 'L'/'R'＝術者の左手/右手（レトロではポートに変換）、それ以外はポートID。tool: 正解の器械、alt: 可だが注釈つき
+ tgt: 正解の構造、ng: 構造ごとの指摘、comp: 合併症として扱う構造、sd: 'L'/'R'＝その患側のみ。{ID}はポート名に置き換える */
+const SIM_R=[
+ [{type:'choice',txt:'レトロの体位は？',opts:[
+   ['健側下の完全側臥位。脇腹の真下で台を屈曲し、腎枕は使わない',1,'腰部斜切開と同じ腎摘位。台の屈曲で肋骨弓と腸骨稜の間を広げる（教科書）'],
+   ['健側下の半側臥位（45°）で腎枕を入れる',0,'レトロは完全側臥位（ほぼ90°）。教科書では腎枕は使わず、台の屈曲で広げる'],
+   ['仰臥位',0,'仰臥位はPart 2（下部尿管処理）の体位'],
+   ['患側下の側臥位',0,'患側を上にする（健側下）']]},
+  {type:'choice',txt:'体幹を後ろに倒しますか？',opts:[
+   ['倒さない',1,'背側のポートが手術台や支持器に近づいて操作が干渉するため（文献。施設の運用は要確認）'],
+   ['20〜30°後ろに倒す',0,'レトロでは背側のポートが台や支持器と干渉する（文献。施設の運用は要確認）']]},
+  {type:'choice',txt:'上側の腕はどこに置く？',opts:[
+   ['肩の高さで、前方の腕台へ',1,'頭より上げない（メモ）'],
+   ['頭より上に挙上して固定',0,'頭より上げない。肩の高さで前方の腕台へ（メモ）'],
+   ['体側に沿わせてテープで固定',0,'上側の腕は前方の腕台へ（メモ）']]}],
+ [{type:'place',port:'cam',txt:'第1ポート（{cam}）の位置を体表でクリック',why:'肋骨弓と腸骨稜の中点か、やや頭側（教科書）'},
+  {type:'order',layers:'retro',txt:'後腹膜腔に入るまでに開ける層を、浅い順にクリック',distract:[['腹膜','レトロでは腹膜は開けない。内側へ落として後腹膜腔に入る（教科書）']],
+   why:'浅すぎると腹横筋の中、深すぎると脂肪の中に入る。腹膜には入らない（教科書）'}],
+ [{type:'act',txt:'PDBバルーンで後腹膜腔を拡張する',port:['cam'],tool:['pdb'],tgt:['kidney','gerota','psoas','flank'],
+   ng:{peri:'腹膜に向けて膨らませると腹膜損傷につながる。腎の後面（背側）に向ける'},
+   why:'腎の後面に向けて、側腹部が硬く膨らむまで少しずつ拡張する。急ぐと腹膜や横隔膜を損傷しうる（教科書）'},
+  {type:'place',port:'D',txt:'背側のポート（{D}）の位置を体表でクリック',why:'背筋群の縁のすぐ腹側。鏡視下に、腹壁を垂直に貫くように入れる（教科書）'},
+  {type:'act',txt:'腹膜の折り返しを内側へ剥がす',port:['D'],tool:['grasper','maryland','suction','bipolar'],alt:{scissors:'切るより、腹横筋筋膜をなぞるように剥がすのが基本'},tgt:['peri'],
+   why:'腹横筋筋膜をなぞるように剥がす（Swing & progress）。腹膜を引き下ろすと損傷しやすい（教科書）'},
+  {type:'place',port:'V',txt:'腹側のポート（{V}）の位置を体表でクリック',why:'カメラポートから3横指。腹側のポートはやや頭側に（教科書）'},
+  {type:'place',port:'A',txt:'足側のポート（{A}）の位置を体表でクリック',why:'腹側ポートから5横指以上足側、腸骨稜から2横指内側。以後、気腹圧を8mmHgに下げる（教科書）'}],
+ [{type:'act',txt:'flank padを把持して牽引する',port:['V','D'],tool:['grasper','bipolar'],alt:{maryland:'把持の面積が小さく、脂肪がちぎれやすい'},tgt:['flank'],
+   why:'腹側・頭側から外していく（教科書）'},
+  {type:'act',txt:'外側円錐筋膜の面から、flank padを一塊に剥がす',port:['V','D'],tool:['scissors','hook'],alt:{sealer:'可能だが、層を見失いやすい',usad:'可能だが、層を見失いやすい'},tgt:['flank'],
+   why:'ばらばらにしないで一塊に外す。必要ならカメラポートから体外へ（教科書）'}],
+ [{type:'id',txt:'切開の目印になる腸腰筋（大腰筋）をクリック',tgt:['psoas'],ng:{flank:'それはflank pad'},why:'外側円錐筋膜は腸腰筋に沿って切開する（教科書）'},
+  {type:'act',txt:'外側円錐筋膜を、腸腰筋に沿って切開する',port:['V','D'],tool:['scissors','hook'],alt:{sealer:'可能だが、層を見失いやすい'},tgt:['gerota','kidney'],
+   ng:{psoas:'腸腰筋そのものを切ると筋層の中に入る。筋膜の表面（腎周囲脂肪側）で切る（メモ）'},
+   why:'小さな穴から腸腰筋筋膜を確認し、付着部に沿って上下に大きく開く（教科書）'},
+  {type:'act',txt:'腎にトラクションをかけて「あわあわ」を出す',port:['V','D'],tool:['grasper','maryland','bipolar'],alt:{suction:'圧排でも可'},tgt:['kidney','gerota'],
+   why:'腎を引き、粗な結合織を腸腰筋筋膜寄りで鋭的に切る。下に行きすぎると大動脈の裏へ迷い込む（教科書・メモ）'}],
+ [{type:'id',txt:'下極側で尿管を見つけてクリック',tgt:['ureter'],ng:{gonadal:'それは性腺静脈。尿管は性腺静脈と並走し、蠕動がある'},
+   why:'尿管を腎側につけるように腎を引くと、腎と大血管の間が自然に開く（教科書）'},
+  {type:'act',txt:'腎を腹側に引き上げる（術者の左手）',port:['L'],tool:['grasper','bipolar','suction'],alt:{maryland:'可能だが、把持の面積が小さく滑りやすい'},tgt:['kidney','gerota','ureter'],
+   why:'強さだけでなく向き（腎を腹側に引き上げる向き）が重要（教科書）'},
+  {type:'id',sd:'L',txt:'内側で境界にする大血管をクリック',tgt:['aorta'],ng:{ivc:'左腎の内側は大動脈'},
+   why:'大動脈との境界近くに左手でテンションをかけると、腎周囲脂肪と大血管周囲脂肪の間が開く（教科書）'},
+  {type:'id',sd:'R',txt:'内側で境界にする大血管をクリック',tgt:['ivc'],ng:{aorta:'右腎の内側は下大静脈'},
+   why:'右腎を腹側に強く引くと、下大静脈周囲脂肪との境界が自然に開く。足側で拍動が透けて見える（教科書）'}],
+ [{type:'act',sd:'L',txt:'動脈の前に、腰静脈を処理する',port:['L','R'],tool:['sealer','bipolar'],alt:{clip:'可。ただし後で腎静脈にステイプラーをかけるなら、クリップが邪魔にならないか考える（教科書）',clipxl:'可。ただしステイプラーの邪魔にならないか考える',usad:'可'},tgt:['lumbar'],
+   ng:{gonadal:'それは性腺静脈。腰静脈は腎静脈に背側から入る'},why:'走行の変異が多いので確実に同定し、シーリングかクリップで処理する（教科書）'},
+  {type:'id',sd:'R',txt:'下大静脈の背側を横切る右腎動脈をクリック',tgt:['artery'],ng:{vein:'それは右腎静脈。動脈は静脈の背側'},
+   why:'下大静脈を足側から頭側へ出していけば必ず見つかる（教科書）'},
+  {type:'act',txt:'腎動脈の周囲を剥離する',port:['L','R'],tool:['maryland'],alt:{scissors:'鋭的剥離も可',bipolar:'可'},tgt:['artery'],
+   ng:{vein:'それは腎静脈。動脈は静脈の背側'},why:'剥離鉗子は血管の走行に直交する向きに、ゆっくり大きく開く。先端が見えないブラインド操作はしない（教科書）'},
+  {type:'act',txt:'腎動脈にHem-o-lokをかける（中枢2：末梢1）',port:['A'],tool:['clip'],alt:{clipxl:'XLは静脈用。動脈はLで足りる'},tgt:['artery'],
+   ng:{vein:'静脈を先に閉じると動脈血の流入が続き、腎がうっ血して出血が増える。動脈が先'},
+   portWhy:'足側・腹側の12mmポート（④）から：腎から遠く、腎動静脈に直交する角度でかけられる（教科書）',
+   why:'中枢側2：末梢側1。足側・腹側の12mmポートからだと血管に直交する角度になる（教科書）'}],
+ [{type:'act',sd:'L',txt:'左腎静脈に入る性腺静脈を処理する',port:['L','R'],tool:['sealer','bipolar'],alt:{usad:'可'},tgt:['gonadal'],
+   ng:{ureter:'それは尿管。腎尿管全摘では切らない'},why:'枝はクリップでなくシーリングで、腎静脈から少し離れた所で（教科書）'},
+  {type:'act',sd:'L',txt:'左腎静脈に入る副腎静脈を処理する',port:['L','R'],tool:['sealer','bipolar'],alt:{usad:'可'},tgt:['adrenalv'],
+   why:'枝はシーリングで、腎静脈から少し離れた所で（教科書）'},
+  {type:'id',sd:'R',txt:'ステイプラーをかける前に、右腎静脈をクリックして確認',tgt:['vein'],ng:{ivc:'それは下大静脈。カメラが回転していて、下大静脈を右腎静脈と誤認して切った報告がある（教科書）'},
+   why:'合流部の頭側の角を出し、右腎静脈が煙突のように立ち上がるまで剥がす（教科書）'},
+  {type:'act',txt:'腎静脈を切断する',port:['A'],tool:['stapler'],alt:{clipxl:'Hem-o-lok XLで切る方法も可（教科書）'},tgt:['vein'],
+   portWhy:'腹側足側の12mmポート（④）から入れる（教科書）',
+   why:'ステイプラーは先端を少し閉じながら入れると、周りを挟みにくい（教科書）'}],
+ [{type:'id',txt:'温存する副腎をクリック',tgt:['adrenal'],why:'副腎は背面から確認・温存する。意外と頭側に長い（教科書）'},
+  {type:'act',txt:'副腎の近くで腎周囲脂肪を切り、腎上極を外す',port:['L','R'],tool:['sealer','usad','scissors'],alt:{hook:'可。横隔膜の損傷に注意'},tgt:['kidney','gerota'],
+   ng:{adrenal:'副腎を切った：副腎は温存する'},comp:['adrenal'],
+   why:'副腎に比較的近い所で腎周囲脂肪を切り、上極が出すぎないようにする。電気メスで横隔膜を損傷しない（教科書）'}],
+ [{type:'act',txt:'外側円錐筋膜の断端（腎）を引いて視野を作る',port:['L','A'],tool:['grasper','bipolar'],alt:{suction:'圧排でも可'},tgt:['kidney','gerota'],
+   why:'断端は助手に持たせるか、直針で糸をかけて引くとよい視野になる（教科書）'},
+  {type:'act',txt:'腹膜ぎりぎりの層で、腎前面の「あわあわ」を切る',port:['R'],tool:['scissors','hook'],alt:{sealer:'可能だが、シーリング中心だと層を失いやすい',usad:'可能だが、層を失いやすい'},tgt:['kidney','gerota'],
+   ng:{peri:'腹膜を切った：腹膜ぎりぎりの層で、腹膜は残す。腎の頭側は特に薄い（教科書）'},
+   why:'中央部から広く開け、上極と下極だけでぶら下がるハンモック状にする（教科書）'},
+  {type:'choice',txt:'この段階で尿管はどうする？',opts:[
+   ['切らずに、末梢へできるだけ剥離しておく',1,'下部尿管処理で膀胱カフごと一塊に摘出する（メモ）'],
+   ['クリップして切断する',0,'それは腎摘の手順。腎尿管全摘では切らずに膀胱カフごと摘出する'],
+   ['切断して断端を結紮する',0,'尿路を開放すると播種のリスク。切らずに一塊で摘出する']]}],
+ [{type:'act',txt:'収納袋に腎を収める',port:['A'],tool:['bag'],tgt:['kidney','gerota'],portWhy:'腹側足側の12mmポート（④）から入れる（教科書）',
+   why:'後腹膜はスペースが狭いので袋の扱いに注意（教科書）'},
+  {type:'choice',txt:'収納袋の操作で特に注意することは？',opts:[
+   ['袋の糸が腎茎のクリップに引っかからないようにする',1,'糸がクリップに引っかかって大出血した報告がある（教科書）'],
+   ['袋を大きく開くために気腹圧を上げる',0,'教科書の注意点は、袋の糸が腎茎のクリップに引っかかる大出血'],
+   ['袋を入れる前にカメラを抜く',0,'教科書の注意点は、袋の糸が腎茎のクリップに引っかかる大出血']]},
+  {type:'choice',txt:'ドレーンはどのポートから入れることが多い？',opts:[
+   ['5mmのポート',1,'腹側・背側のどちらかは症例による（メモ）'],
+   ['①カメラポート（12mm）',0,'メモでは5mmのポートから']]}]
+];
+const SIM_I=[
+ [{type:'choice',txt:'経腹膜の体位は？',opts:[
+   ['健側下の側臥位（60〜90°）で、腰部を伸展させる',1,'（一般）'],
+   ['仰臥位',0,'仰臥位は腎の処理の後、下部尿管処理のとき'],
+   ['砕石位',0,'腎の処理は側臥位で行う']]},
+  {type:'choice',txt:'カメラポートは、通常の腎摘と比べてどこに作る？',opts:[
+   ['気持ち下目（足側）',1,'下部尿管処理でもそのまま使うため（メモ）'],
+   ['気持ち上目（頭側）',0,'下部尿管処理を見越して下目に作る（メモ）'],
+   ['同じ位置',0,'下部尿管処理を見越して下目に作る（メモ）']]}],
+ [{type:'place',port:'cam',txt:'第1ポート（{cam}）の位置を体表でクリック',why:'臍の近く。通常の腎摘より気持ち下目（メモ）'},
+  {type:'order',layers:'intra',txt:'腹腔に入るまでに開ける層を、浅い順にクリック',why:'経腹膜は腹膜を開けて腹腔に入る。ここがレトロとの違い'}],
+ [{type:'act',txt:'結腸を内側へ牽引して、白線に緊張をかける',port:['P2','A'],tool:['grasper','bipolar'],alt:{suction:'圧排でも可'},tgt:['colon'],
+   why:'結腸を内側へ寄せると、外側の腹膜の折り返し（Toldtの白線）が見やすくなる（一般）'},
+  {type:'act',txt:'Toldtの白線を切開する',port:['P3','P2'],tool:['scissors','hook'],alt:{sealer:'可',usad:'可'},tgt:['toldt'],
+   ng:{kidney:'腎そのものではなく、結腸外側の白線（白い線）を切る'},
+   why:'結腸間膜とGerota筋膜前葉の間の、出血の少ない層へ入る（一般）'}],
+ [{type:'id',txt:'腸腰筋の前面で尿管を見つけてクリック',tgt:['ureter'],ng:{gonadal:'それは性腺静脈。尿管はその背外側を走り、蠕動がある'},
+   why:'腎下極の高さ、腸腰筋の前面で性腺静脈とその背外側の尿管を同定する（一般）'},
+  {type:'act',txt:'腫瘍より遠位で尿管をクリップする（切らない）',port:['P3'],tool:['clip'],alt:{clipxl:'可'},tgt:['ureter'],
+   ng:{gonadal:'性腺静脈にクリップした：尿管と取り違えている'},portWhy:'クリップは12mmの③から入れる',
+   why:'操作中に腫瘍細胞が膀胱側へ流れるのを防ぐ。切断はしない（一般。施設の運用は要確認）'}],
+ [{type:'act',txt:'尿管と性腺静脈ごと下極を外側へ持ち上げる',port:['P2','A'],tool:['grasper','bipolar'],alt:{suction:'圧排でも可'},tgt:['ureter','gonadal','kidney','gerota'],
+   why:'持ち上げたまま腸腰筋の前面を頭側へ剥離する（一般）'},
+  {type:'id',sd:'L',txt:'性腺静脈を頭側へたどった先の、左腎静脈をクリック',tgt:['vein'],ng:{artery:'それは腎動脈。静脈の背側・頭側にある'},
+   why:'左の性腺静脈は左腎静脈に流入する。よい目印になる（一般）'},
+  {type:'id',sd:'R',txt:'下大静脈に沿って頭側へ進んだ先の、右腎静脈をクリック',tgt:['vein'],ng:{ivc:'それは下大静脈'},
+   why:'下大静脈の前面・外側に沿って頭側へ進むと右腎静脈に到達する（一般）'}],
+ [{type:'act',txt:'腎静脈の背側で、腎動脈を全周性に剥離する',port:['P2','P3'],tool:['maryland'],alt:{scissors:'鋭的剥離も可',bipolar:'可'},tgt:['artery'],
+   ng:{vein:'それは腎静脈。動脈は静脈の背側・頭側'},why:'剥離鉗子は血管の走行に直交する向きに、ゆっくり大きく開く（教科書）'},
+  {type:'act',txt:'腎動脈にHem-o-lokをかける（中枢2：末梢1）',port:['P3'],tool:['clip'],alt:{clipxl:'XLは静脈用。動脈はLで足りる'},tgt:['artery'],
+   ng:{vein:'静脈を先に閉じると動脈血の流入が続き、腎がうっ血して出血が増える。動脈が先'},portWhy:'クリップは12mmの③から入れる',
+   why:'静脈より先に動脈を閉じる。中枢側2：末梢側1（教科書）'}],
+ [{type:'act',sd:'L',txt:'左腎静脈に入る性腺静脈を処理する',port:['P2','P3'],tool:['sealer','bipolar'],alt:{usad:'可'},tgt:['gonadal'],
+   ng:{ureter:'それは尿管。腎尿管全摘では切らない'},why:'枝はシーリングで、腎静脈から少し離れた所で（教科書）'},
+  {type:'act',sd:'L',txt:'左腎静脈に入る副腎静脈を処理する',port:['P2','P3'],tool:['sealer','bipolar'],alt:{usad:'可'},tgt:['adrenalv'],
+   why:'枝はシーリングで、腎静脈から少し離れた所で（教科書）'},
+  {type:'choice',txt:'動脈を処理したのに腎静脈が虚脱しない。何を考える？',opts:[
+   ['未処理の腎動脈（複数腎動脈）が残っている',1,'術前CTで複数腎動脈の有無を確認しておく（一般）'],
+   ['気腹圧が高すぎる',0,'まず未処理の腎動脈（複数腎動脈）を疑う'],
+   ['問題ないので、そのまま静脈を切る',0,'未処理の動脈が残っていると、静脈を切ったあと腎がうっ血する']]},
+  {type:'id',sd:'R',txt:'ステイプラーをかける前に、右腎静脈をクリックして確認',tgt:['vein'],ng:{ivc:'それは下大静脈。右腎静脈は短く、下大静脈と誤認しやすい（教科書）'},
+   why:'右腎静脈と下大静脈の合流部の頭側の角をきれいに出す（教科書）'},
+  {type:'act',txt:'腎静脈を切断する',port:['P3'],tool:['stapler'],alt:{clipxl:'Hem-o-lok XLで切る方法も可'},tgt:['vein'],portWhy:'ステイプラーは12mmの③から入れる',
+   why:'ステイプラーは先端を少し閉じながら入れると、周りを挟みにくい（教科書）'}],
+ [{type:'act',sd:'R',txt:'肝臓を挙上して視野を作る',port:['LR'],tool:['grasper'],alt:{suction:'可'},tgt:['liver'],
+   portWhy:'肝臓の挙上は助手の④（肝臓挙上）ポートから（メモ）',why:'④の助手鉗子で肝臓を挙上する（メモ）'},
+  {type:'id',txt:'温存する副腎をクリック',tgt:['adrenal'],why:'副腎浸潤がなければ温存する（一般）'},
+  {type:'act',txt:'副腎を残して、腎上極を剥離する',port:['P3','P2'],tool:['sealer','usad'],alt:{scissors:'可',hook:'可。横隔膜の損傷に注意'},tgt:['kidney','gerota'],
+   ng:{adrenal:'副腎を切った：副腎は温存する'},comp:['adrenal'],
+   why:'Gerota筋膜を破らない層で剥離する。電気メスで横隔膜を損傷しない（一般・教科書）'}],
+ [{type:'act',txt:'遊離した腎を収納袋に収める',port:['P3'],tool:['bag'],tgt:['kidney','gerota'],portWhy:'収納袋は12mmの③から入れる',
+   why:'収納袋の糸が腎茎のクリップに引っかからないように（教科書）'},
+  {type:'choice',txt:'この時点で尿管はどうする？',opts:[
+   ['切らずに、腎とつながったまま下部尿管処理へ進む',1,'腎・尿管・膀胱カフを一塊で摘出し、尿路を開放しない（一般）'],
+   ['クリップの下で切断し、腎を先に摘出する',0,'尿路を開放すると播種のリスク。一塊で摘出する'],
+   ['切断して断端を結紮する',0,'尿路を開放すると播種のリスク。一塊で摘出する']]}]
+];
+// 器械で切ると合併症になる構造（タスクの対象でない場合）
+const CUTS=['scissors','hook','usad','sealer','stapler','clip','clipxl'];
+const DANGER={aorta:'大動脈損傷（大出血）',ivc:'下大静脈損傷（大出血）',duod:'十二指腸損傷（穿孔・熱損傷）',spleen:'脾損傷（出血）',panc:'膵損傷（膵液瘻）',
+ colon:'結腸損傷（穿孔）',liver:'肝損傷（出血）',ureter:'尿管を切断（腎尿管全摘では尿路を開放しない）',psoas:'腸腰筋の中に入った（層の誤り・出血）'};
+
+/* ---------------- 状態 ---------------- */
+let AP="retro",S=1,cur=0,view="scope",roll=0;
+let showLabels=true,focus=true,showGerota=true,showTools=true;
+let toolOverride={};let layerIdx=0;let layerTimer=null;
+// シミュレーションの状態
+const sim={on:false,done:false,ti:0,port:null,tool:null,tries:0,missS:0,compS:0,stat:[],tools:{},aim:{},
+ order:null,optOrder:null,fb:null,hint:false,res:{},log:[]};
+const STEPS=()=>AP==="retro"?RETRO:INTRA;
+const sideTxt=()=>S===1?"左":"右";
+function sideItems(arr){return arr.filter(x=>!x[2]||x[2]===(S===1?"L":"R"));}
+function sv(v){return (v&&typeof v==="object"&&!Array.isArray(v))?v[S===1?"L":"R"]:v;}
+
+const wrap=document.getElementById('viewwrap');
+if(!window.THREE||!THREE.OrbitControls){wrap.insertAdjacentHTML('beforeend','<div class="err">3Dライブラリを読み込めませんでした。ネットワーク接続を確認して再読み込みしてください。</div>');return;}
+
+/* ---------------- three.js ---------------- */
+const V=(x,y,z)=>new THREE.Vector3(x,y,z);
+const M=(x,y,z)=>V(S*x,y,z);
+const cv=document.getElementById('cv');
+const renderer=new THREE.WebGLRenderer({canvas:cv,antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(46,1,0.05,200);
+let controls=null;
+scene.add(new THREE.HemisphereLight(0xffffff,0x334455,0.75));
+const dl=new THREE.DirectionalLight(0xffffff,0.8);dl.position.set(4,8,10);scene.add(dl);
+const dl2=new THREE.DirectionalLight(0xffe2cc,0.4);dl2.position.set(-6,-3,-4);scene.add(dl2);
+const headLight=new THREE.PointLight(0xffffff,0.55,30);scene.add(headLight);
+const fxG=new THREE.Group();scene.add(fxG);
+function setBg(){scene.background=new THREE.Color(getComputedStyle(document.documentElement).getPropertyValue('--view').trim()||'#1b2530');}
+setBg();matchMedia('(prefers-color-scheme: dark)').addEventListener('change',setBg);
+new MutationObserver(setBg).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+
+const ART=0xd23a2f,VEN=0x3f63c8,VEN2=0x5a7bd6,URE=0xe3cf8f;
+function mat(c,o){return new THREE.MeshStandardMaterial(Object.assign({color:c,roughness:.55,metalness:.05,transparent:true,opacity:1},o||{}));}
+
+let anat,spec,parts,vessels,labelList,anchorsFixed,pivot,ureterCur,ureterMesh,colonMesh,toldtMesh,colonBase,periMesh,flankMesh,liverMesh,liverBase,coneLine,marksG,specMarksG,portG,toolG,ports,toolObjs={},balloonT=0;
+const TOR={a:4.4,b:3.0,zc:-0.3};
+function surf(th,y,k){k=k||1;return V(S*TOR.a*k*Math.cos(th),y,TOR.zc+TOR.b*k*Math.sin(th));}
+function reg(key,mesh,parent){mesh.userData.key=key;mesh.userData.baseOp=mesh.material.opacity;(parts[key]=parts[key]||[]).push(mesh);(parent||anat).add(mesh);return mesh;}
+function curveOf(arr){return new THREE.CatmullRomCurve3(arr.map(p=>M(p[0],p[1],p[2])));}
+function subCurve(cur,a,b){const p=[];for(let i=0;i<=14;i++)p.push(cur.getPointAt(a+(b-a)*i/14));return new THREE.CatmullRomCurve3(p);}
+function specLocal(v){return v.clone().sub(pivot);}
+function kLocal(x,y,z){return specLocal(pivot.clone().add(V(S*x,y,z)));}
+
+function vesselDefs(){
+ if(S===1)return{
+  artery:{pts:[[0.35,0.75,-0.55],[1.0,0.78,-0.8],[1.5,0.5,-0.8],[1.95,0.25,-0.65]],r:0.11,c:ART,cut:0.55},
+  vein:{pts:[[-0.9,0.35,-0.25],[0.35,0.45,0.2],[1.1,0.35,0.0],[1.95,0.05,-0.4]],r:0.17,c:VEN,cut:0.78},
+  gonadal:[[1.05,0.32,-0.02],[1.15,-1.5,-0.3],[1.1,-3.4,-0.45],[0.9,-5.5,-0.5]],
+  adrenalv:[[1.0,0.42,-0.05],[1.35,1.2,-0.4],[1.75,1.9,-0.55]],
+  lumbar:[[0.8,0.33,-0.12],[0.9,-0.2,-0.9],[0.75,-0.6,-1.5]]};
+ // 右：座標は患者座標（xは左が+）。M()でS=-1が掛かるため、ここでは鏡像前の値で書く
+ return{
+  artery:{pts:[[-0.35,0.55,-0.6],[0.35,0.5,-1.05],[0.9,0.42,-1.1],[1.5,0.1,-0.85],[1.95,-0.12,-0.65]],r:0.11,c:ART,cut:0.8},
+  vein:{pts:[[0.9,0.1,-0.3],[1.4,0.0,-0.3],[1.95,-0.22,-0.42]],r:0.19,c:VEN,cut:0.5},
+  gonadal:[[0.62,-1.3,-0.02],[0.95,-2.5,-0.3],[1.05,-3.6,-0.45],[0.9,-5.5,-0.5]],
+  adrenalv:[[0.95,1.45,-0.55],[1.4,1.8,-0.75]]};
+}
+
+function build(){
+ if(anat){scene.remove(anat);anat.traverse(o=>{if(o.geometry)o.geometry.dispose();});}
+ anat=new THREE.Group();scene.add(anat);parts={};vessels={};labelList=[];toolObjs={};
+ pivot=S===1?V(2.6,0.3,-0.6):V(-2.55,-0.15,-0.6);
+ spec=new THREE.Group();spec.position.copy(pivot);anat.add(spec);
+ // 腎
+ const kg=new THREE.SphereGeometry(1,48,32);const pa=kg.attributes.position;
+ for(let i=0;i<pa.count;i++){let x=pa.getX(i),y=pa.getY(i),z=pa.getZ(i);
+  const med=S===1?Math.max(0,-x):Math.max(0,x);x+=S*med*Math.exp(-y*y*3)*0.45;pa.setXYZ(i,x*0.78,y*1.45,z*0.58);}
+ kg.computeVertexNormals();
+ const kid=reg('kidney',new THREE.Mesh(kg,mat(0x9d4134,{roughness:.4})),spec);kid.rotation.z=-0.18*S;
+ const pel=reg('kidney',new THREE.Mesh(new THREE.SphereGeometry(0.26,24,16),mat(URE)),spec);pel.position.copy(kLocal(-0.6,-0.5,0.05));pel.scale.set(1,1.3,0.8);
+ const ger=reg('gerota',new THREE.Mesh(new THREE.SphereGeometry(1,40,28),mat(0xf0d68a,{opacity:.22,depthWrite:false,roughness:.9})),spec);
+ ger.scale.set(1.15,1.95,0.9);ger.position.set(-0.05*S,0.2,0);
+ // 大血管・腸腰筋
+ const ao=reg('aorta',new THREE.Mesh(new THREE.CylinderGeometry(0.32,0.3,12,24),mat(0xc9372d)));ao.position.set(0.35,-0.5,-0.55);
+ const iv=reg('ivc',new THREE.Mesh(new THREE.CylinderGeometry(0.38,0.38,12,24),mat(0x3552b5)));iv.position.set(-0.9,-0.5,-0.3);
+ const ps=reg('psoas',new THREE.Mesh(new THREE.CylinderGeometry(0.45,0.65,9,24),mat(0xa9564a,{roughness:.8})));ps.position.copy(M(0.95,-1.6,-1.5));ps.rotation.z=-0.12*S;
+ // 周囲臓器
+ if(S===1){
+  const sp=reg('spleen',new THREE.Mesh(new THREE.SphereGeometry(1,32,24),mat(0x6e2a3c,{roughness:.45})));sp.position.set(3.6,3.0,-0.4);sp.scale.set(0.75,1.2,0.6);sp.rotation.z=0.5;
+  const pc=new THREE.CatmullRomCurve3([V(0.4,1.2,0.7),V(1.5,1.5,0.5),V(2.7,2.1,0.25)]);reg('panc',new THREE.Mesh(new THREE.TubeGeometry(pc,24,0.24,12,false),mat(0xe0c08a,{roughness:.7})));
+ }else{
+  liverMesh=reg('liver',new THREE.Mesh(new THREE.SphereGeometry(1,40,28),mat(0x7b3328,{roughness:.45})));liverBase=V(-2.2,3.45,0.25);liverMesh.position.copy(liverBase);liverMesh.scale.set(2.3,1.25,1.8);
+  const dc=new THREE.CatmullRomCurve3([V(-0.3,1.5,0.75),V(-1.4,1.25,0.55),V(-1.75,0.1,0.4),V(-1.3,-1.0,0.5),V(0.3,-1.15,0.6)]);reg('duod',new THREE.Mesh(new THREE.TubeGeometry(dc,40,0.28,14,false),mat(0xd8a890,{roughness:.7})));
+ }
+ if(S===1)liverMesh=null;
+ // 副腎
+ const ad=reg('adrenal',new THREE.Mesh(new THREE.ConeGeometry(0.55,0.9,3),mat(0xe1a63a,{roughness:.7})));
+ ad.position.copy(S===1?V(1.95,2.25,-0.55):V(-1.75,1.95,-0.75));ad.scale.set(1,1,0.35);ad.rotation.z=0.5*S;
+ // 血管
+ const D=vesselDefs();
+ ['artery','vein'].forEach(k=>{const d=D[k];const c=curveOf(d.pts);
+  const prox=new THREE.Mesh(new THREE.TubeGeometry(subCurve(c,0,d.cut),24,d.r,14,false),mat(d.c));
+  const dist=new THREE.Mesh(new THREE.TubeGeometry(subCurve(c,d.cut,1),24,d.r,14,false),mat(d.c));
+  reg(k,prox);reg(k,dist,spec);dist.position.copy(pivot).negate();
+  vessels[k]={cur:c,prox,dist,tCut:d.cut,tan:c.getTangentAt(d.cut),r:d.r};});
+ ['gonadal','adrenalv','lumbar'].forEach(k=>{if(!D[k])return;const c=curveOf(D[k]);reg(k,new THREE.Mesh(new THREE.TubeGeometry(c,40,k==='gonadal'?0.07:0.055,12,false),mat(VEN2)));vessels[k]={cur:c,r:0.07};});
+ // 尿管（標本の移動に合わせて再生成）
+ ureterMesh=reg('ureter',new THREE.Mesh(new THREE.BufferGeometry(),mat(URE,{roughness:.6})));
+ // 結腸
+ const cp=[[3.7,3.1,0.4],[3.8,1,0.75],[3.5,-2,0.85],[2.9,-4.6,0.7],[1.9,-5.8,0.6]];
+ colonMesh=reg('colon',new THREE.Mesh(new THREE.TubeGeometry(curveOf(cp),64,0.36,18,false),mat(0xd9a48c,{roughness:.7})));
+ // Toldtの白線（結腸の外側。経腹膜のみ）
+ const tp=[[4.12,3.0,0.28],[4.2,1,0.6],[3.92,-2,0.7],[3.3,-4.6,0.55]];
+ toldtMesh=reg('toldt',new THREE.Mesh(new THREE.TubeGeometry(curveOf(tp),48,0.07,8,false),mat(0xf4f1e6,{roughness:.9})));
+ // 腹膜（折り返し）
+ periMesh=reg('peri',new THREE.Mesh(new THREE.BufferGeometry(),mat(0x7fb6c9,{opacity:.32,side:THREE.DoubleSide,depthWrite:false,roughness:.8})));
+ // flank pad
+ flankMesh=reg('flank',new THREE.Mesh(new THREE.SphereGeometry(1,28,20),mat(0xf3d77e,{roughness:.9})));flankMesh.position.copy(M(3.65,-0.5,-1.45));flankMesh.scale.set(0.45,1.7,0.75);
+ // 外側円錐筋膜の切開線
+ const cl=new THREE.CatmullRomCurve3([M(2.05,2.3,-1.25),M(2.15,0.3,-1.38),M(2.1,-1.9,-1.28)]);
+ coneLine=new THREE.Mesh(new THREE.TubeGeometry(cl,30,0.035,8,false),new THREE.MeshBasicMaterial({color:0xff6a3d}));coneLine.visible=false;anat.add(coneLine);
+ // 体表・ランドマーク
+ const skin=new THREE.Mesh(new THREE.CylinderGeometry(1,1,1,64,1,true),mat(0xe8bfa0,{opacity:.16,side:THREE.DoubleSide,depthWrite:false}));
+ skin.scale.set(TOR.a,13,TOR.b);skin.position.set(0,-0.5,TOR.zc);skin.userData.key='skin';parts.skin=[skin];skin.userData.baseOp=.16;anat.add(skin);
+ const lands=[['肋骨弓',[[1.25,2.6],[0.8,2.0],[0.3,1.5],[-0.2,1.2]]],['腸骨稜',[[0.95,-4.4],[0.5,-3.9],[0,-3.7],[-0.5,-3.8],[-0.9,-4.0]]],
+  ['背筋群の縁',[[-0.85,1.6],[-0.85,-0.8],[-0.85,-3.6]]],['腹直筋の外縁',[[1.2,2.4],[1.22,-1.5],[1.25,-5.5]]]];
+ const landG=new THREE.Group();anat.add(landG);parts.land=[];
+ lands.forEach(([n,pts])=>{const c=new THREE.CatmullRomCurve3(pts.map(p=>surf(p[0],p[1],1.01)));
+  const m=new THREE.Mesh(new THREE.TubeGeometry(c,40,0.04,8,false),new THREE.MeshBasicMaterial({color:0xffb46b}));landG.add(m);
+  labelList.push({text:n,cls:'land',ext:true,pos:()=>c.getPoint(0.5)});});
+ const umb=new THREE.Mesh(new THREE.TorusGeometry(0.16,0.04,8,20),new THREE.MeshBasicMaterial({color:0xffb46b}));umb.position.copy(surf(Math.PI/2,-1.2,1.01));umb.rotation.x=Math.PI/2;landG.add(umb);
+ labelList.push({text:'臍',cls:'land',ext:true,pos:()=>surf(Math.PI/2,-1.2,1.05)});
+ parts.land=[landG];
+ marksG=new THREE.Group();anat.add(marksG);specMarksG=new THREE.Group();spec.add(specMarksG);
+ portG=new THREE.Group();anat.add(portG);toolG=new THREE.Group();anat.add(toolG);
+ buildPorts();
+ // 構造ラベル
+ const sl=[['kidney',()=>spec.localToWorld(kLocal(0.45,1.05,0.35))],['artery',()=>vessels.artery.cur.getPointAt(0.3)],['vein',()=>vessels.vein.cur.getPointAt(S===1?0.35:0.45)],
+  ['aorta',()=>V(0.35,3.2,-0.3)],['ivc',()=>V(-0.9,3.8,-0.05)],['ureter',()=>ureterCur?ureterCur.getPoint(0.72):V(0,0,0)],['gonadal',()=>vessels.gonadal.cur.getPointAt(0.6)],
+  ['adrenal',()=>(S===1?V(1.95,2.75,-0.4):V(-1.75,2.45,-0.6))],['psoas',()=>M(0.7,-4.3,-1.1)],['adrenalv',()=>vessels.adrenalv.cur.getPointAt(0.6)],
+  ['colon',()=>colonMesh.position.clone().add(M(3.6,-1.2,1.2))],['peri',()=>periPoint()],['flank',()=>flankMesh.position.clone().add(V(0,0.9,0))]];
+ if(vessels.lumbar)sl.push(['lumbar',()=>vessels.lumbar.cur.getPointAt(0.85)]);
+ if(S===1){sl.push(['spleen',()=>V(3.7,4.1,-0.2)]);sl.push(['panc',()=>V(1.4,1.85,0.6)]);}else{sl.push(['liver',()=>liverMesh.position.clone().add(V(0,1.1,0.4))]);sl.push(['duod',()=>V(-1.85,0.1,0.6)]);}
+ sl.forEach(([k,f])=>labelList.push({key:k,text:INFO[k][0],pos:f}));
+ makeLabelEls();
+}
+let periPush=0;
+function periPoint(){return M(3.3,1.8,0.9);}
+function buildPeri(push){
+ const base=[[3.9,-1.4],[4.1,-0.3],[3.65,0.85],[2.5,0.8],[1.2,0.75],[0.2,0.9]];
+ const pushed=[[3.2,-0.1],[3.15,0.55],[2.95,1.0],[2.5,0.85],[1.2,0.75],[0.2,0.9]];
+ const pts=base.map((p,i)=>V(S*(p[0]+(pushed[i][0]-p[0])*push),0,p[1]+(pushed[i][1]-p[1])*push));
+ const c=new THREE.CatmullRomCurve3(pts);const NU=30,NY=10,y0=-5.5,y1=3.6;
+ const pos=[],idx=[];
+ for(let j=0;j<=NY;j++){const y=y0+(y1-y0)*j/NY;for(let i=0;i<=NU;i++){const p=c.getPoint(i/NU);pos.push(p.x,y,p.z);}}
+ for(let j=0;j<NY;j++)for(let i=0;i<NU;i++){const a=j*(NU+1)+i,b=a+NU+1;idx.push(a,b,a+1,b,b+1,a+1);}
+ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setIndex(idx);g.computeVertexNormals();
+ periMesh.geometry.dispose();periMesh.geometry=g;
+}
+function rebuildUreter(){
+ const top=spec.localToWorld(kLocal(-0.6,-0.7,0.05)),mid=spec.localToWorld(kLocal(-0.85,-1.8,0));
+ ureterCur=new THREE.CatmullRomCurve3([top,mid,M(1.25,-3.2,-0.6),M(1.05,-5.6,-0.55)]);
+ ureterMesh.geometry.dispose();ureterMesh.geometry=new THREE.TubeGeometry(ureterCur,48,0.085,12,false);
+}
+
+/* ---------------- ポート ---------------- */
+function portDefs(){
+ if(AP==="retro"){
+  const vN=S===1?"②術者左手（腹側）":"②術者右手（腹側）",dN=S===1?"③術者右手（背側）":"③術者左手（背側）";
+  return[{id:"cam",n:"①カメラ",mm:12,th:-0.05,y:-1.0,note:"第1ポート（オープン法・バルーントロカー）。肋骨弓と腸骨稜の中点か、やや頭側",src:"教科書"},
+   {id:"V",n:vN,mm:5,th:0.42,y:-0.55,note:"カメラポートから3横指。腹側のポートはやや頭側に",src:"教科書"},
+   {id:"D",n:dN,mm:5,th:-0.62,y:-1.05,note:"背筋群の縁のすぐ腹側。施設では10〜12mmにしてクリップやステイプラーを入れていたかも（要確認）",src:"教科書"},
+   {id:"A",n:"④助手（腹側足側）",mm:12,th:0.55,y:-3.3,note:"術者の腹側ポートから5横指以上足側、腸骨稜から2横指内側。腎動静脈に直交する角度でクリップを入れやすい",src:"教科書"}];
+ }
+ const p=[{id:"cam",n:"①カメラ",mm:12,th:1.42,y:-1.4,note:"臍の近く。下部尿管処理を見越して通常の腎摘より気持ち下目",src:"メモ"},
+  {id:"P2",n:"②術者（頭側）",mm:5,th:1.22,y:1.5,note:"術者ポート（位置は模式）",src:"メモ"},
+  {id:"P3",n:"③術者（足側）",mm:12,th:1.0,y:-3.5,note:S===1?"術者ポート。後で上のドレーン（位置は模式）":"術者ポート（位置は模式）",src:"メモ"},
+  {id:"A",n:S===1?"④助手":"⑤助手",mm:5,th:1.62,y:-4.4,note:S===1?"助手5mm。下部尿管パートで術者左手になる。皮膚切開は少し斜めに":"助手ポート",src:"メモ"}];
+ if(S===-1)p.push({id:"LR",n:"④助手（肝臓挙上）",mm:5,th:1.62,y:3.3,note:"肝臓を挙上。後で上のドレーン",src:"メモ"});
+ return p;
+}
+function hand2port(h){if(AP!=="retro")return h;if(h==="L")return S===1?"V":"D";if(h==="R")return S===1?"D":"V";return h;}
+function buildPorts(){
+ while(portG.children.length)portG.remove(portG.children[0]);
+ ports=portDefs();
+ ports.forEach(p=>{p.pt=surf(p.th,p.y);const dir=pivot.clone().sub(p.pt).normalize();p.dir=dir;
+  const r=p.mm>=10?0.09:0.055;const g=new THREE.CylinderGeometry(r,r,1.3,16);g.translate(0,0.15,0);
+  const m=new THREE.Mesh(g,mat(p.id==="cam"?0x20262c:0x8a949c,{metalness:.4,roughness:.35}));
+  m.position.copy(p.pt);m.quaternion.setFromUnitVectors(V(0,-1,0),dir);m.userData.key='port:'+p.id;portG.add(m);p.mesh=m;
+  const cap=new THREE.Mesh(new THREE.CylinderGeometry(r*2.2,r*2.2,0.18,16),mat(p.id==="cam"?0x0f6f86:0x555d66));cap.position.copy(p.pt).add(dir.clone().multiplyScalar(-0.75));cap.quaternion.copy(m.quaternion);cap.userData.key='port:'+p.id;portG.add(cap);p.cap=cap;});
+}
+
+/* ---------------- 器械モデル ---------------- */
+function makeTool(id,mm){
+ const T=TOOLS[id];const g=new THREE.Group();const r=mm>=10?0.06:0.038;
+ const shaftM=new THREE.MeshStandardMaterial({color:id==='drain'?0xf0f0f0:0x2a2f35,roughness:.4,metalness:.3});
+ const sg=new THREE.CylinderGeometry(r,r,1,14);sg.rotateX(Math.PI/2);sg.translate(0,0,0.5);
+ const shaft=new THREE.Mesh(sg,shaftM);g.add(shaft);
+ const tip=new THREE.Group();g.add(tip);
+ const tm=new THREE.MeshStandardMaterial({color:T.col,roughness:.3,metalness:.6});
+ const o={g,shaft,tip,kind:T.kind,jaws:[]};
+ function jaw(w,h,l,m){const gg=new THREE.BoxGeometry(w,h,l);gg.translate(0,h/2,l/2);const a=new THREE.Mesh(gg,m||tm);const b=a.clone();b.scale.y=-1;tip.add(a);tip.add(b);o.jaws=[a,b];}
+ const k=T.kind;
+ if(k==='jaw')jaw(T.thin?0.05:0.07,0.035,0.34);
+ else if(k==='scissors'){jaw(0.04,0.03,0.3);o.jaws[0].rotation.z=0.15;}
+ else if(k==='sealer')jaw(0.09,0.045,0.38);
+ else if(k==='usad'){jaw(0.06,0.035,0.34);}
+ else if(k==='clip'){jaw(0.06,0.035,0.3);const c=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.05,0.26),new THREE.MeshStandardMaterial({color:0x8a5fd1}));c.position.z=0.17;tip.add(c);o.clipPiece=c;}
+ else if(k==='stapler'){const gg=new THREE.BoxGeometry(0.12,0.07,0.6);gg.translate(0,0.035,0.3);const a=new THREE.Mesh(gg,tm);const b=new THREE.Mesh(gg,new THREE.MeshStandardMaterial({color:0x3a6fc4,roughness:.5}));b.scale.y=-1;tip.add(a);tip.add(b);o.jaws=[a,b];}
+ else if(k==='hook'){const h1=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,0.22,8),tm);h1.rotation.x=Math.PI/2;h1.position.z=0.11;tip.add(h1);const h2=new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,0.12,8),tm);h2.position.set(0,0.06,0.22);tip.add(h2);}
+ else if(k==='suction'){const ring=new THREE.Mesh(new THREE.TorusGeometry(r,0.012,6,16),tm);tip.add(ring);}
+ else if(k==='balloon'){const b=new THREE.Mesh(new THREE.SphereGeometry(1,24,16),new THREE.MeshStandardMaterial({color:0xcfe6ef,transparent:true,opacity:.45,roughness:.2}));tip.add(b);o.balloon=b;}
+ else if(k==='bag'){const cg=new THREE.CylinderGeometry(0.9,0.12,1.6,24,1,true);cg.rotateX(-Math.PI/2);cg.translate(0,0,0.8);const b=new THREE.Mesh(cg,new THREE.MeshStandardMaterial({color:0xe8edf0,transparent:true,opacity:.35,side:THREE.DoubleSide,depthWrite:false}));tip.add(b);o.bag=b;}
+ g.traverse(m=>{if(m.isMesh)m.userData.key='tool:'+id;});
+ return o;
+}
+
+/* ---------------- アンカー ---------------- */
+function anchor(n){
+ switch(n){
+  case 'kidney':return spec.localToWorld(V(0,0,0));
+  case 'kidneyPost':return spec.localToWorld(kLocal(0.2,0.1,-0.6));
+  case 'kidneyAnt':return spec.localToWorld(kLocal(0.1,0.2,0.6));
+  case 'kidneyLower':return spec.localToWorld(kLocal(0.05,-1.35,0));
+  case 'kidneyUpper':return spec.localToWorld(kLocal(0.05,1.3,-0.1));
+  case 'kidneyLat':return spec.localToWorld(kLocal(0.8,0,0));
+  case 'hilumPost':return spec.localToWorld(kLocal(-0.75,0.1,-0.45));
+  case 'hilumAnt':return spec.localToWorld(kLocal(-0.75,0,0.35));
+  case 'hilumStump':return vessels.artery.prox.position.clone().add(vessels.artery.cur.getPointAt(vessels.artery.tCut-0.06));
+  case 'artery':return vessels.artery.cur.getPointAt(vessels.artery.tCut);
+  case 'vein':return vessels.vein.cur.getPointAt(vessels.vein.tCut);
+  case 'ureterMid':return ureterCur.getPoint(0.45);
+  case 'ureterClip':return ureterCur.getPoint(0.55);
+  case 'adrenal':return S===1?V(1.95,2.25,-0.55):V(-1.75,1.95,-0.75);
+  case 'psoasF':return M(1.5,-0.4,-1.15);
+  case 'flank':return flankMesh.position.clone();
+  case 'space':return M(3.0,-0.6,-0.9);
+  case 'periFold':return M(3.2,0.3,0.7);
+  case 'colon':return colonMesh.position.clone().add(M(3.5,-0.8,0.85));
+  case 'colonLine':return M(4.05,-0.6,0.25);
+  case 'liver':return liverMesh?liverMesh.position.clone().add(V(0,-1.0,0.2)):V(0,0,0);
+ }
+ return V(0,0,0);
+}
+
+/* ---------------- ラベル ---------------- */
+const labelsEl=document.getElementById('labels');
+function makeLabelEls(){labelsEl.innerHTML='';
+ labelList.forEach(l=>{const d=document.createElement('div');d.className='lbl'+(l.cls?' '+l.cls:'');d.textContent=l.text;labelsEl.appendChild(d);l.d=d;});
+ ports.forEach(p=>{const d=document.createElement('div');d.className='lbl port';d.textContent=p.n+' '+p.mm+'mm';labelsEl.appendChild(d);
+  labelList.push({text:p.n,port:p.id,d,pos:()=>p.pt.clone().add(p.dir.clone().multiplyScalar(-0.95))});});
+}
+
+/* ---------------- ステップ適用 ---------------- */
+const anim={colon:0,free:0,lift:0,peri:0,flank:1,liver:0};
+const tgt={colon:0,free:0,lift:0,peri:0,flank:1,liver:0};
+let cutAmt={artery:0,vein:0},cutTgt={artery:0,vein:0};
+let fly=null;
+
+function stepPorts(){const s=STEPS()[cur];return ports.filter(p=>s.ports.includes(p.id));}
+// シミュレーションで未完了のステップは、ひとつ前のステップの状態（まだ処理していない状態）で表示する
+function stateStep(){return (sim.on&&!sim.done)?(cur>0?STEPS()[cur-1]:{}):STEPS()[cur];}
+function applyState(){
+ const s=stateStep();const st=s.st||{};
+ tgt.colon=AP==='intra'?(st.colon||0):0;tgt.free=st.free||0;tgt.lift=st.lift||0;tgt.peri=st.peri||0;
+ tgt.flank=AP==='retro'?(st.flank===undefined?1:st.flank):0;tgt.liver=st.liverUp||0;
+ cutTgt.artery=(s.cut||[]).includes('artery')?1:0;cutTgt.vein=(s.cut||[]).includes('vein')?1:0;
+ coneLine.visible=AP==='retro'&&!!st.cone;
+ buildMarks(s.mk||{});
+}
+function applyStep(i,keepView){
+ cur=i;const s=STEPS()[cur];
+ if(!keepView)view=s.view;
+ toolOverride={};layerIdx=0;stopLayerPlay();
+ if(sim.on)simReset();
+ applyState();
+ setView(true);refreshHighlight();renderPanel();updateTools();
+}
+function buildMarks(mk){
+ [marksG,specMarksG].forEach(g=>{while(g.children.length){const c=g.children[0];g.remove(c);c.geometry&&c.geometry.dispose();}});
+ const clipM=new THREE.MeshStandardMaterial({color:0x8a5fd1,roughness:.35,metalness:.3});
+ const sealM=new THREE.MeshStandardMaterial({color:0xd9a441,roughness:.6});
+ const stapM=new THREE.MeshStandardMaterial({color:0xb8c0c8,roughness:.3,metalness:.7});
+ function put(cur,u,type,r,distal){
+  const p=cur.getPointAt(Math.min(0.99,Math.max(0.01,u))),tan=cur.getTangentAt(Math.min(0.99,Math.max(0.01,u)));
+  let m;
+  if(type==='clip'){let perp=tan.clone().cross(V(0,0,1));if(perp.lengthSq()<1e-3)perp=tan.clone().cross(V(1,0,0));perp.normalize();
+   m=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.06,r*2+0.32),clipM);m.quaternion.setFromUnitVectors(V(0,0,1),perp);}
+  else if(type==='staple'){m=new THREE.Mesh(new THREE.CylinderGeometry(r*1.15,r*1.15,0.07,16),stapM);m.quaternion.setFromUnitVectors(V(0,1,0),tan);}
+  else{m=new THREE.Mesh(new THREE.CylinderGeometry(r*1.25,r*1.25,0.12,16),sealM);m.quaternion.setFromUnitVectors(V(0,1,0),tan);}
+  m.position.copy(p);
+  if(distal){m.position.copy(specLocal(p));specMarksG.add(m);}else marksG.add(m);
+ }
+ ['artery','vein'].forEach(k=>{if(!mk[k])return;const v=vessels[k],L=v.cur.getLength();
+  const offs=mk[k]==='clip'?[-0.26,-0.14,0.14]:[-0.09,0.09];
+  offs.forEach(o=>put(v.cur,v.tCut+o/L,mk[k],v.r,o>0));});
+ ['gonadal','adrenalv','lumbar'].forEach(k=>{if(!mk[k]||!vessels[k]||S!==1)return;put(vessels[k].cur,k==='gonadal'?0.12:0.4,mk[k],0.07,false);});
+ marksG.userData.ureter=mk.ureter||null;
+}
+let ureterClipMesh=null;
+function placeUreterClip(){
+ if(!marksG.userData.ureter){if(ureterClipMesh)ureterClipMesh.visible=false;return;}
+ if(!ureterClipMesh||ureterClipMesh.parent!==anat){ureterClipMesh=new THREE.Mesh(new THREE.BoxGeometry(0.06,0.06,0.45),new THREE.MeshStandardMaterial({color:0x8a5fd1}));anat.add(ureterClipMesh);}
+ ureterClipMesh.visible=true;const p=ureterCur.getPoint(0.55),tan=ureterCur.getTangent(0.55);
+ ureterClipMesh.position.copy(p);ureterClipMesh.quaternion.setFromUnitVectors(V(0,0,1),tan.clone().cross(V(0,0,1)).normalize());
+}
+
+function hiList(){const s=STEPS()[cur];return (s.hi||[]).map(k=>k==='GV'?(S===1?'aorta':'ivc'):k);}
+function refreshHighlight(){
+ const hi=sim.on?[]:hiList();const ext=view==='ext';
+ Object.entries(parts).forEach(([k,arr])=>arr.forEach(m=>{
+  if(k==='land'){m.visible=ext;return;}
+  if(k==='skin'){m.visible=ext;return;}
+  if(!m.material||!m.material.color)return;
+  const on=hi.includes(k);let op=m.userData.baseOp;
+  if(k==='toldt')op=AP==='intra'?0.95:0;
+  else if(k==='gerota')op=showGerota?(focus&&hi.length&&!on?0.1:0.22):0;
+  else if(k==='peri')op=AP==='retro'?(on?0.45:0.22):0;
+  else if(k==='flank')op=AP==='retro'?1:0;
+  else if(focus&&hi.length&&!on)op=0.28;
+  if(AP==='retro'&&['colon','spleen','liver','duod','panc'].includes(k)&&!on)op=Math.min(op,0.3);
+  if(ext)op=Math.min(op,0.85);
+  m.material.opacity=op;m.material.depthWrite=op>0.9;m.visible=op>0.01;
+  m.material.emissive=on?m.material.color.clone().multiplyScalar(0.28):new THREE.Color(0);
+ }));
+ labelList.forEach(l=>{if(l.key)l.d.classList.toggle('hi',hi.includes(l.key));});
+}
+
+/* ---------------- カメラ ---------------- */
+function baseUp(){
+ if(view==='ext')return V(0,1,0);
+ return AP==='retro'?V(0,0,1):V(S,0,0);
+}
+function setView(animate){
+ const s=STEPS()[cur];const cam=ports.find(p=>p.id==='cam');
+ let pos,tg,up=baseUp();
+ if(view==='ext'){tg=M(3.2,-1.0,-0.3);pos=M(21,-1.0,-0.3).add(V(0,0,AP==='intra'?8:-1));if(AP==='intra')tg=M(2.2,-1,0.8);}
+ else{tg=anchor(s.tg||'kidney');const dir=cam.pt.clone().sub(tg).normalize();pos=tg.clone().add(dir.multiplyScalar((s.dist||3.4)*1.35));if(AP==='retro')pos.add(V(0,0,-0.75));}
+ if(view==='scope'&&roll){const dir=tg.clone().sub(pos).normalize();up.applyAxisAngle(dir,roll*Math.PI/2);}
+ if(controls)controls.dispose();
+ camera.up.copy(up);
+ controls=new THREE.OrbitControls(camera,cv);controls.enableDamping=true;controls.target.copy(tg);
+ controls.addEventListener('start',()=>{fly=null;});
+ if(animate&&!reduce){fly={pos,tg};}else{camera.position.copy(pos);controls.target.copy(tg);}
+ document.getElementById('viewname').textContent=view==='ext'?'体外ビュー（天井側から見た側腹部）':'術野ビュー（①カメラポートから）';
+ updateOrient();
+ document.querySelectorAll('#segView button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===view));
+ refreshHighlight();
+}
+function updateOrient(){
+ // 画面上・右がどの解剖学的方向かを計算して表示
+ camera.updateMatrixWorld();
+ const right=V(1,0,0).applyQuaternion(camera.quaternion),up=V(0,1,0).applyQuaternion(camera.quaternion);
+ function name(v){const ax=[[V(0,1,0),'頭側'],[V(0,-1,0),'足側'],[V(0,0,1),'腹側'],[V(0,0,-1),'背側'],[V(S,0,0),'外側'],[V(-S,0,0),'内側']];
+  let best=null,bd=-2;ax.forEach(([a,n])=>{const d=a.dot(v);if(d>bd){bd=d;best=n;}});return best;}
+ document.getElementById('orient').innerHTML='画面↑ '+name(up)+'　画面→ '+name(right)+'<br>'+(AP==='retro'?'後腹膜鏡':'経腹膜')+'・'+sideTxt()+'側';
+}
+
+/* ---------------- 器械の配置 ---------------- */
+function currentTools(){
+ const s=STEPS()[cur];const map={};const rec={};
+ Object.entries(s.tools||{}).forEach(([h,t])=>{const pid=hand2port(h);rec[pid]=t;});
+ stepPorts().forEach(p=>{map[p.id]=(p.id in toolOverride)?toolOverride[p.id]:(rec[p.id]||'');});
+ return{map,rec};
+}
+function aimFor(pid,toolId){
+ if(sim.on&&sim.aim[pid])return sim.aim[pid];
+ const s=STEPS()[cur];const a2=s.aim2||{};let an=null;
+ Object.entries(a2).forEach(([h,n])=>{if(hand2port(h)===pid)an=n;});
+ if(toolId==='pdb')an='space';
+ return anchor(an||s.tg||'kidney');
+}
+function updateTools(){
+ while(toolG.children.length)toolG.remove(toolG.children[0]);
+ toolObjs={};
+ const map=sim.on?sim.tools:currentTools().map;
+ Object.entries(map).forEach(([pid,tid])=>{if(!tid)return;const p=ports.find(x=>x.id===pid);if(!p)return;
+  if(TOOLS[tid].min>p.mm)return;
+  const o=makeTool(tid,p.mm);o.pid=pid;o.tid=tid;toolG.add(o.g);toolObjs[pid]=o;});
+ toolG.visible=showTools;
+}
+function poseTools(t){
+ Object.values(toolObjs).forEach(o=>{
+  const p=ports.find(x=>x.id===o.pid);const start=p.pt.clone().add(p.dir.clone().multiplyScalar(-0.6));
+  let tip=aimFor(o.pid,o.tid);
+  if(o.pid==='cam'&&view==='scope'){o.g.visible=true;}
+  const dir=tip.clone().sub(start);const L=dir.length();dir.normalize();
+  const back=o.kind==='bag'?0.9:(o.kind==='balloon'?0.2:0.16);
+  const len=Math.max(0.5,L-back);
+  o.g.position.copy(start);o.g.lookAt(start.clone().add(dir));
+  o.shaft.scale.z=len;o.tip.position.set(0,0,len);
+  const ph=(t*1.6+(o.pid.charCodeAt(0)%5))%(Math.PI*2);
+  if(o.jaws.length){let open;
+   if(o.kind==='stapler')open=0.12*(0.5+0.5*Math.cos(t*0.9));
+   else if(o.kind==='clip')open=0.32*(0.5+0.5*Math.cos(t*1.3));
+   else open=0.08+0.22*(0.5+0.5*Math.sin(ph));
+   o.jaws[0].rotation.x=-open;o.jaws[1].rotation.x=open;}
+  if(o.clipPiece)o.clipPiece.scale.set(1,1,1);
+  if(o.balloon){const s=0.35+0.9*(0.5-0.5*Math.cos(t*0.8));o.balloon.scale.set(s,s*1.4,s);o.balloon.position.z=s*0.9;}
+ });
+}
+
+/* ---------------- 描画ループ ---------------- */
+function resize(){const w=wrap.clientWidth,h=wrap.clientHeight;renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();}
+new ResizeObserver(resize).observe(wrap);
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const clock=new THREE.Clock();let lastPeri=-1,lastT=0;
+function tick(){
+ const t=clock.getElapsedTime();const dt=Math.min(0.5,t-lastT);lastT=t;const k=reduce?1:1-Math.exp(-dt*3.5);const kf=reduce?1:1-Math.exp(-dt*4.5);
+ Object.keys(tgt).forEach(n=>anim[n]+=(tgt[n]-anim[n])*k);
+ cutAmt.artery+=(cutTgt.artery-cutAmt.artery)*k;cutAmt.vein+=(cutTgt.vein-cutAmt.vein)*k;
+ colonMesh.position.set(-S*2.1*anim.colon,0,0.9*anim.colon);
+ if(liverMesh)liverMesh.position.copy(liverBase).add(V(0,0.7*anim.liver,0.3*anim.liver));
+ if(Math.abs(anim.peri-lastPeri)>0.002){buildPeri(anim.peri);lastPeri=anim.peri;}
+ flankMesh.scale.set(0.45*anim.flank,1.7*Math.max(anim.flank,0.01),0.75*anim.flank);flankMesh.visible=anim.flank>0.03&&AP==='retro'&&view!=='ext';
+ toldtMesh.position.copy(colonMesh.position);toldtMesh.visible=AP==='intra'&&anim.colon<0.5&&view!=='ext';
+ fxG.children.forEach(m=>{const a=t-m.userData.t0;
+  if(m.userData.kind==='bleed'){m.scale.setScalar(0.06+0.34*Math.min(1,a/1.2));}
+  else{m.scale.setScalar(0.12+a*0.5);m.material.opacity=Math.max(0,1-a/1.4);m.visible=a<1.4;}});
+ // 腎の挙上（腹側へ）と遊離
+ const liftV=AP==='retro'?V(0,0,0.15):V(S*0.06,0,0.12);
+ spec.position.copy(pivot).add(liftV.multiplyScalar(anim.lift)).add(V(S*0.9*anim.free,0.15*anim.free,0.9*anim.free));
+ spec.rotation.set(-0.12*anim.free,S*0.3*anim.free,0);
+ ['artery','vein'].forEach(key=>{const v=vessels[key];
+  v.prox.position.copy(v.tan).multiplyScalar(-0.12*cutAmt[key]);
+  v.dist.position.copy(pivot).negate().add(v.tan.clone().multiplyScalar(0.14*cutAmt[key]));});
+ spec.updateMatrixWorld(true);rebuildUreter();placeUreterClip();
+ if(fly){camera.position.lerp(fly.pos,kf);controls.target.lerp(fly.tg,kf);if(camera.position.distanceTo(fly.pos)<0.02)fly=null;}
+ controls.update();headLight.position.copy(camera.position);
+ poseTools(t);
+ renderer.render(scene,camera);
+ drawLabels();
+ if(Math.floor(t*4)!==Math.floor((t-0.016)*4))updateOrient();
+ requestAnimationFrame(tick);
+}
+function drawLabels(){
+ const w=wrap.clientWidth,h=wrap.clientHeight;const ext=view==='ext';const sp=visiblePorts().map(p=>p.id);
+ labelList.forEach(l=>{let vis=showLabels;
+  if(l.port)vis=(showLabels||sim.on)&&sp.includes(l.port)&&(ext);
+  else if(l.ext)vis=(showLabels||sim.on)&&ext;
+  else{const ms=parts[l.key]||[];vis=vis&&!ext&&ms.some(m=>m.visible&&m.material&&m.material.opacity>0.25);}
+  if(!vis){l.d.style.opacity=0;return;}
+  const p=l.pos().clone().project(camera);const on=p.z<1&&Math.abs(p.x)<1.02&&Math.abs(p.y)<1.02;
+  l.d.style.opacity=on?1:0;if(on){l.d.style.left=((p.x+1)/2*w)+'px';l.d.style.top=((1-p.y)/2*h)+'px';}});
+ portG.visible=true;portG.children.forEach(m=>{const id=m.userData.key.split(':')[1];m.visible=sp.includes(id);});
+}
+
+/* ---------------- クリック ---------------- */
+const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();const pickEl=document.getElementById('pick');let downAt=null;
+cv.addEventListener('pointerdown',e=>{downAt=[e.clientX,e.clientY];});
+cv.addEventListener('pointerup',e=>{
+ if(!downAt||Math.hypot(e.clientX-downAt[0],e.clientY-downAt[1])>5)return;
+ const r=cv.getBoundingClientRect();mouse.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);
+ ray.setFromCamera(mouse,camera);
+ if(sim.on&&!sim.done&&simClick())return;
+ const c=[];anat.traverse(m=>{if(m.isMesh&&m.visible&&m.userData.key&&!['gerota','skin','peri'].includes(m.userData.key)&&(!m.material.opacity||m.material.opacity>0.2))c.push(m);});
+ const hit=ray.intersectObjects(c,false)[0];
+ if(!hit){pickEl.hidden=true;return;}
+ const key=hit.object.userData.key;let html='';
+ if(key.startsWith('port:')){const p=ports.find(x=>x.id===key.slice(5));html='<b>'+p.n+'（'+p.mm+'mm）</b><br>'+p.note;}
+ else if(key.startsWith('tool:')){const T=TOOLS[key.slice(5)];html='<b>'+T.n+'</b><br>'+T.use;}
+ else{const inf=INFO[key];if(!inf)return;html='<b>'+(['kidney','artery','vein','ureter','gonadal','adrenalv','adrenal'].includes(key)?sideTxt():'')+inf[0]+'</b><br>'+inf[1];}
+ pickEl.innerHTML=html;pickEl.hidden=false;
+});
+
+/* ---------------- パネル ---------------- */
+const $=id=>document.getElementById(id);
+let done={};try{done=JSON.parse(localStorage.getItem('rnu-done2')||'{}')}catch(e){done={};}
+const dkey=i=>AP+(S===1?'L':'R')+i;
+function li(arr){return sideItems(arr).map(x=>'<li><span class="tag t-'+x[0]+'">'+x[0]+'</span><span>'+x[1]+'</span></li>').join('');}
+function renderChips(){
+ const c=$('chips');c.innerHTML='';
+ STEPS().forEach((s,i)=>{const b=document.createElement('button');b.className='chip'+((sim.on?sim.res[dkey(i)]:done[dkey(i)])?' done':'');b.textContent=String(i+1);b.title=s.t;b.setAttribute('role','listitem');
+  if(i===cur)b.setAttribute('aria-current','step');b.onclick=()=>applyStep(i);c.appendChild(b);});
+ const l=document.createElement('button');l.className='chip later';l.textContent='Part 2';l.title='下部尿管処理（準備中）';l.disabled=true;c.appendChild(l);
+}
+function renderPanel(){
+ const s=STEPS()[cur];
+ $('eyebrow').textContent=(sim.on?'シミュレーション・':'')+(AP==='retro'?'後腹膜鏡':'経腹膜')+'・'+sideTxt()+'　STEP '+(cur+1)+' / '+STEPS().length;
+ $('title').textContent=s.t;$('aim').textContent=s.aim;
+ $('points').innerHTML=li(s.pts);$('caution').innerHTML=li(s.cau);
+ $('q').textContent='Q. '+sv(s.q);$('ans').textContent='A. '+sv(s.a);$('ans').hidden=true;$('showAns').textContent='答えを見る';
+ $('doneCb').checked=!!done[dkey(cur)];
+ $('prev').disabled=cur===0;$('next').disabled=cur===STEPS().length-1;
+ document.querySelectorAll('.hideable').forEach(el=>el.style.filter='');
+ $('panel').classList.toggle('recall',$('recallCb').checked);
+ renderChips();renderLayers();renderToolRows();
+ ['pointsBox','cautionBox','toolsBox','quizBox','checkNav'].forEach(id=>$(id).hidden=sim.on);
+ if(sim.on)$('layersBox').hidden=true;
+ $('play').hidden=sim.on;$('simBox').hidden=!sim.on;
+ renderSim();
+}
+function renderToolRows(){
+ const box=$('tools');const sp=stepPorts().filter(p=>p.id!=='cam');
+ if(!sp.length){box.innerHTML='<p class="tnote">このステップでは術者・助手の器械は使いません。</p>';return;}
+ const {map,rec}=currentTools();
+ box.innerHTML=sp.map(p=>{
+  const opts=['<option value="">（使わない）</option>'].concat(Object.entries(TOOLS).filter(([k])=>k!=='pdb').map(([k,T])=>'<option value="'+k+'"'+(map[p.id]===k?' selected':'')+'>'+T.n+'</option>')).join('');
+  return '<div class="trow"><div class="tport">'+p.n+'<span class="mm">'+p.mm+'mm</span></div><select id="sel-'+p.id+'" data-p="'+p.id+'">'+opts+'</select><div class="tnote" id="note-'+p.id+'"></div></div>';}).join('')
+  +(map.cam?'<div class="trow"><div class="tport">①カメラ<span class="mm">12mm</span></div><div class="tnote"><b>'+TOOLS[map.cam].n+'</b>：'+TOOLS[map.cam].use+'（このステップではカメラポートから使う）</div></div>':'');
+ sp.forEach(p=>{const sel=$('sel-'+p.id);sel.onchange=()=>{toolOverride[p.id]=sel.value;updateTools();toolNote(p,rec);};toolNote(p,rec);});
+}
+function toolNote(p,rec){
+ const el=$('note-'+p.id);const tid=(p.id in toolOverride)?toolOverride[p.id]:(rec[p.id]||'');
+ if(!tid){el.innerHTML=rec[p.id]?'<span class="st-alt">推奨は「'+TOOLS[rec[p.id]].n+'」</span>':'<span class="st-alt">このステップでは使わない</span>';return;}
+ const T=TOOLS[tid];let st;
+ if(T.min>p.mm)st='<b class="st-ng">✕ 入らない：</b>'+p.mm+'mmポートには入らない（'+T.min+'mm以上が必要）。10〜12mmのポートから入れる。';
+ else if(rec[p.id]===tid)st='<b class="st-ok">✓ このステップの推奨</b>';
+ else st='<b class="st-alt">△ 推奨外</b>'+(rec[p.id]?'（推奨は「'+TOOLS[rec[p.id]].n+'」）':'');
+ el.innerHTML=st+'<br>'+T.use+' <span class="tag t-'+T.src+'">'+T.src+'</span>';
+}
+
+/* 腹壁の層（SVG） */
+function renderLayers(){
+ const s=STEPS()[cur];const box=$('layersBox');
+ if(!s.layers){box.hidden=true;return;}
+ box.hidden=false;const L=LAYERS[s.layers];$('layersTitle').textContent=L.title;
+ const items=L.items;const W=380,x0=20,bw=210;let y=24;const scale=150/items.reduce((a,b)=>a+b[1],0);
+ let svg='<text x="'+x0+'" y="14" font-size="11" style="fill:var(--muted)">体表</text>';
+ const ys=[];
+ items.forEach((it,i)=>{const hgt=Math.max(13,it[1]*scale);ys.push([y,hgt]);
+  svg+='<rect x="'+x0+'" y="'+y+'" width="'+bw+'" height="'+hgt+'" fill="'+it[2]+'" opacity="'+(i<=layerIdx?1:0.45)+'"/>';
+  svg+='<text x="'+(x0+bw+10)+'" y="'+(y+hgt/2+4)+'" font-size="11.5" style="fill:var(--fg)" font-weight="'+(i===layerIdx?700:400)+'">'+it[0]+'</text>';
+  y+=hgt;});
+ if(L.under){svg+='<path d="M'+(x0)+' '+(y+4)+' Q '+(x0+bw/2)+' '+(y+16)+' '+(x0+bw)+' '+(y+4)+'" stroke="'+L.under[1]+'" stroke-width="4" fill="none" stroke-dasharray="6 4"/>';
+  svg+='<text x="'+(x0+bw+10)+'" y="'+(y+14)+'" font-size="11.5" style="fill:var(--muted)">'+L.under[0]+'</text>';}
+ const d=ys[layerIdx][0]+ys[layerIdx][1]*0.75;const cx=x0+bw*0.42;
+ svg+='<rect x="'+(cx-9)+'" y="2" width="18" height="'+(d-12)+'" fill="#6b747c" stroke="#2a2f35"/>';
+ svg+='<path d="M'+(cx-9)+' '+(d-10)+' L'+(cx+9)+' '+(d-10)+' L'+cx+' '+d+' Z" fill="#2a2f35"/>';
+ $('layerSvg').innerHTML=svg;
+ const it=items[layerIdx];$('ldesc').innerHTML='<span class="tag t-'+it[4]+'">'+it[4]+'</span> <b>'+it[0]+'</b>：'+it[3];
+ $('lCount').textContent=(layerIdx+1)+' / '+items.length;
+ $('lPrev').disabled=layerIdx===0;$('lNext').disabled=layerIdx===items.length-1;
+}
+function stopLayerPlay(){if(layerTimer){clearInterval(layerTimer);layerTimer=null;$('lPlay').textContent='通して再生';}}
+$('lPrev').onclick=()=>{stopLayerPlay();layerIdx=Math.max(0,layerIdx-1);renderLayers();};
+$('lNext').onclick=()=>{stopLayerPlay();const n=LAYERS[STEPS()[cur].layers].items.length;layerIdx=Math.min(n-1,layerIdx+1);renderLayers();};
+$('lPlay').onclick=()=>{if(layerTimer){stopLayerPlay();return;}layerIdx=0;renderLayers();$('lPlay').textContent='停止';
+ layerTimer=setInterval(()=>{const n=LAYERS[STEPS()[cur].layers].items.length;if(layerIdx>=n-1){stopLayerPlay();return;}layerIdx++;renderLayers();},1600);};
+
+/* ---------------- シミュレーション ---------------- */
+function simTasks(){const all=(AP==='retro'?SIM_R:SIM_I)[cur]||[];const sd=S===1?'L':'R';return all.filter(t=>!t.sd||t.sd===sd);}
+function curTask(){return simTasks()[sim.ti];}
+function portOf(code){return ports.find(x=>x.id===hand2port(code));}
+function pname(code){const p=portOf(code);return p?p.n:code;}
+function tx(s){return s.replace(/\{(\w+)\}/g,(m,k)=>pname(k));}
+function kname(k){return INFO[k]?INFO[k][0]:k;}
+const simKey=()=>AP+(S===1?'L':'R');
+// まだ置いていないポートは隠す
+function visiblePorts(){
+ let sp=stepPorts();
+ if(sim.on&&!sim.done){const hid=simTasks().filter((t,i)=>t.type==='place'&&i>=sim.ti).map(t=>hand2port(t.port));sp=sp.filter(p=>!hid.includes(p.id));}
+ return sp;
+}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function simReset(){
+ sim.done=false;sim.ti=0;sim.missS=0;sim.compS=0;sim.stat=[];sim.tools={};sim.aim={};sim.fb=null;sim.hint=false;
+ const k=simKey();sim.log=sim.log.filter(e=>!(e.k===k&&e.i===cur));delete sim.res[dkey(cur)];
+ fxClear();startTask(true);
+}
+function startTask(initial){
+ sim.port=null;sim.tool=null;sim.tries=0;sim.order=null;sim.optOrder=null;sim.wrong=[];
+ const t=curTask();if(!t)return;
+ if(t.type==='order'){const names=LAYERS[t.layers].items.map(x=>x[0]);sim.order={seq:names,pos:0,opts:shuffle(names.concat((t.distract||[]).map(d=>d[0])))};}
+ if(t.type==='choice')sim.optOrder=shuffle(t.opts.map((o,i)=>i));
+ const v=t.type==='place'?'ext':(t.type==='act'||t.type==='id')?'scope':null;
+ if(v&&v!==view){view=v;if(!initial)setView(true);}
+}
+/* エフェクト */
+function fxClear(){while(fxG.children.length){const c=fxG.children[0];fxG.remove(c);c.geometry.dispose();c.material.dispose();}}
+function fxAt(kind,p){let m;
+ if(kind==='bleed')m=new THREE.Mesh(new THREE.SphereGeometry(1,20,14),new THREE.MeshStandardMaterial({color:0x8e0b0b,roughness:.25,transparent:true,opacity:.9}));
+ else m=new THREE.Mesh(new THREE.TorusGeometry(1,0.07,8,32),new THREE.MeshBasicMaterial({color:kind==='ok'?0x5fe08a:0xff8a5c,transparent:true,depthTest:false}));
+ m.position.copy(p);if(kind!=='bleed')m.lookAt(camera.position);m.renderOrder=5;m.userData={kind,t0:clock.getElapsedTime()};fxG.add(m);}
+function flash(){const f=$('flashov');f.classList.remove('on');void f.offsetWidth;f.classList.add('on');}
+const TP={kidney:'kidney',gerota:'kidneyPost',flank:'flank',peri:'periFold',colon:'colon',toldt:'colonLine',adrenal:'adrenal',liver:'liver',psoas:'psoasF',artery:'artery',vein:'vein',ureter:'ureterMid'};
+function targetPoint(k){if(TP[k])return anchor(TP[k]);if(vessels[k])return vessels[k].cur.getPointAt(0.4);
+ if(k==='aorta')return V(0.35,0.5,-0.3);if(k==='ivc')return V(-0.9,0.5,0.05);return anchor('kidney');}
+/* 判定 */
+function hintFor(t){
+ if(sim.tries<2)return '';
+ if(t.type==='act')return '<br><span class="st-alt">ヒント：対象は「'+kname(t.tgt[0])+'」、器械は「'+TOOLS[t.tool[0]].n+'」'+(sim.tries>=3?'、ポートは'+pname(t.port[0]):'')+'</span>';
+ if(t.type==='id')return '<br><span class="st-alt">ヒント：画面右上の「ラベル」で構造の名前を表示できます</span>';
+ if(t.type==='place')return '<br><span class="st-alt">ヒント：'+t.why+'</span>';
+ return '';
+}
+function miss(msg,comp,p){
+ const t=curTask();sim.tries++;sim.missS++;
+ if(comp){sim.compS++;flash();if(p)fxAt('bleed',p);}else if(p)fxAt('ng',p);
+ sim.log.push({k:simKey(),i:cur,task:tx(t.txt),msg,comp:!!comp});
+ sim.fb={cls:comp?'comp':'ng',html:(comp?'<b class="h">⚠ 合併症</b> ':'<b class="h">✕</b> ')+msg+hintFor(t)};
+ renderSim();
+}
+function advance(st,html,cls){
+ sim.stat[sim.ti]=st;sim.fb={cls,html};sim.ti++;
+ if(sim.ti>=simTasks().length)finishStep();else startTask(false);
+ renderSim();
+}
+function success(msg){advance(sim.tries?'retry':'ok','<b class="h">✓ 正解</b> '+msg,'ok');}
+function finishStep(){
+ sim.done=true;
+ sim.res[dkey(cur)]={ok:sim.stat.filter(x=>x==='ok').length,n:simTasks().length,miss:sim.missS,comp:sim.compS};
+ applyState();
+ const v=STEPS()[cur].view;if(v!==view){view=v;setView(true);}else refreshHighlight();
+ renderChips();
+}
+function sizeCheck(){
+ const p=ports.find(x=>x.id===sim.port),T=TOOLS[sim.tool];
+ if(p&&T&&T.min>p.mm){sim.tool=null;miss('入らない：「'+T.n+'」は'+T.min+'mm以上のポートが必要。'+p.n+'は'+p.mm+'mm');}
+}
+function simPick(t){
+ const MEM=['gerota','peri'];const c=[];
+ anat.traverse(m=>{const k=m.userData.key;if(m.isMesh&&m.visible&&k&&k!=='skin'&&!k.includes(':')&&m.material&&m.material.opacity>0.05)c.push(m);});
+ const hits=ray.intersectObjects(c,false);const tg=t.tgt||[];
+ // 半透明の膜（Gerota・腹膜）は、対象でなければ奥の構造を優先
+ for(const h of hits){const k=h.object.userData.key;
+  if(MEM.includes(k)&&!tg.includes(k)&&hits.some(o=>!MEM.includes(o.object.userData.key)))continue;
+  return{key:k,point:h.point.clone()};}
+ return null;
+}
+function simClick(){
+ const t=curTask();if(!t||!['act','id','place'].includes(t.type))return false;
+ if(t.type==='place'){
+  if(view!=='ext'){sim.fb={cls:'info',html:'体外ビューに切り替えてから、体表をクリックしてください'};renderSim();return true;}
+  const h=ray.intersectObject(parts.skin[0],false)[0];if(h)evalPlace(t,h.point);return true;}
+ if(view!=='scope'){sim.fb={cls:'info',html:'術野ビューに切り替えてからクリックしてください'};renderSim();return true;}
+ if(t.type==='act'&&(!sim.port||!sim.tool)){sim.fb={cls:'info',html:'先に ① ポート と ② 器械 を選んでください'};renderSim();return true;}
+ const h=simPick(t);if(h)evalAct(t,h.key,h.point);
+ return true;
+}
+function evalAct(t,k,p){
+ const isT=t.tgt.includes(k);const ng=(t.ng&&t.ng[k])||'';
+ if(t.type==='id'){if(isT){fxAt('ok',p);success(t.why);}else miss(ng||'違う構造：クリックしたのは「'+kname(k)+'」',false,p);return;}
+ const tool=sim.tool,pid=sim.port,T=TOOLS[tool];
+ const cutting=CUTS.includes(tool)&&!(k==='ureter'&&(tool==='clip'||tool==='clipxl'));
+ if(!isT&&cutting&&(DANGER[k]||(t.comp||[]).includes(k))){miss('「'+kname(k)+'」を'+T.n+'で処理した → '+(ng||DANGER[k]),true,p);return;}
+ if(!isT){miss(ng||'対象が違う：クリックしたのは「'+kname(k)+'」',false,p);return;}
+ const alt=t.alt&&t.alt[tool];
+ if(!t.tool.includes(tool)&&!alt){miss('器械が違う：「'+T.n+'」は'+T.use+'。この操作には合わない',false,p);return;}
+ if(!t.port.map(hand2port).includes(pid)){
+  miss(pid==='cam'?'①カメラポートにはスコープが入っている':(t.portWhy||'ポートが違う：この操作は'+t.port.map(pname).join(' か ')+'から'),false,p);return;}
+ sim.tools[pid]=tool;sim.aim[pid]=p;updateTools();fxAt('ok',p);
+ success((alt?'<span class="st-alt">△ '+alt+'</span><br>':'')+t.why);
+}
+function evalPlace(t,pt){
+ const p=portOf(t.port);const d=pt.distanceTo(p.pt);const tol=AP==='retro'?0.85:1.1;
+ if(d<=tol){fxAt('ok',p.pt);success(t.why);return;}
+ const thc=Math.atan2((pt.z-TOR.zc)/TOR.b,S*pt.x/TOR.a),dth=thc-p.th,dy=pt.y-p.pt.y;const dir=[];
+ if(dy>0.4)dir.push('頭側すぎる');else if(dy<-0.4)dir.push('足側すぎる');
+ if(dth>0.12)dir.push('腹側すぎる');else if(dth<-0.12)dir.push('背側すぎる');
+ miss('位置がずれている：'+(dir.join('、')||'もう少し')+'。肋骨弓・腸骨稜・背筋群の縁などを目安に',false,pt);
+}
+function evalOrder(name){
+ const o=sim.order,t=curTask();const ds=(t.distract||[]).find(d=>d[0]===name);
+ if(ds){miss(ds[1]);return;}
+ if(name===o.seq[o.pos]){o.pos++;if(o.pos>=o.seq.length)success(o.seq.join(' → ')+'。'+t.why);else{sim.fb={cls:'info',html:'✓ '+name};renderSim();}return;}
+ miss('順番が違う：「'+name+'」より浅い層がまだ残っている');
+}
+function evalChoice(i){const t=curTask(),o=t.opts[i];if(o[1])success(o[0]+'。'+o[2]);else{sim.wrong.push(i);miss(o[2]);}}
+function reveal(){
+ const t=curTask();if(!t)return;let h='';
+ if(t.type==='act'){const pid=hand2port(t.port[0]),pt=targetPoint(t.tgt[0]);sim.tools[pid]=t.tool[0];sim.aim[pid]=pt;updateTools();fxAt('ok',pt);
+  h=pname(t.port[0])+'から「'+TOOLS[t.tool[0]].n+'」で「'+kname(t.tgt[0])+'」。'+t.why;}
+ else if(t.type==='id'){fxAt('ok',targetPoint(t.tgt[0]));h='「'+kname(t.tgt[0])+'」。'+t.why;}
+ else if(t.type==='choice'){const o=t.opts.find(x=>x[1]);h=o[0]+'。'+o[2];}
+ else if(t.type==='order')h=LAYERS[t.layers].items.map(x=>x[0]).join(' → ')+'。'+t.why;
+ else if(t.type==='place'){fxAt('ok',portOf(t.port).pt);h=t.why;}
+ sim.log.push({k:simKey(),i:cur,task:tx(t.txt),msg:'答えを見た：'+h,comp:false});
+ advance('shown','<b class="h">答え</b> '+h,'info');
+}
+/* 表示 */
+function renderSim(){
+ const bar=$('simbar');
+ if(!sim.on){bar.hidden=true;return;}
+ const ts=simTasks(),t=curTask();
+ $('simScore').textContent='初回正解 '+sim.stat.filter(x=>x==='ok').length+'/'+ts.length+'　ミス '+sim.missS+'　合併症 '+sim.compS;
+ const IC={ok:'✓',retry:'△',shown:'—'};let rows='';
+ ts.forEach((x,i)=>{if(i<sim.ti)rows+='<li><span class="ic '+sim.stat[i]+'">'+IC[sim.stat[i]]+'</span><span>'+tx(x.txt)+'</span></li>';
+  else if(i===sim.ti)rows+='<li class="now"><span class="ic">▶</span><span>'+tx(x.txt)+'</span></li>';});
+ const rest=ts.length-sim.ti-1;if(!sim.done&&rest>0)rows+='<li><span class="ic">…</span><span>あと '+rest+' タスク</span></li>';
+ $('simTasks').innerHTML=rows;
+ let h='';
+ if(sim.done)h=doneHtml();
+ else if(t.type==='act'){
+  h+='<div class="step-lbl">① ポートを選ぶ</div><div class="opts">'+visiblePorts().map(p=>'<button class="opt" data-port="'+p.id+'" aria-pressed="'+(sim.port===p.id)+'">'+p.n+' <span class="mm">'+p.mm+'mm</span></button>').join('')+'</div>';
+  h+='<div class="step-lbl">② 器械を選ぶ</div><div class="opts">'+Object.entries(TOOLS).map(([k,T])=>'<button class="opt" data-tool="'+k+'" aria-pressed="'+(sim.tool===k)+'">'+T.n+'</button>').join('')+'</div>';
+  h+='<div class="step-lbl">③ 3D画面で、操作する対象をクリック</div>';}
+ else if(t.type==='id')h='<div class="step-lbl">3D画面で構造をクリック（ドラッグで回転・拡大して探す）</div>';
+ else if(t.type==='place')h='<div class="step-lbl">体外ビューで体表をクリック（オレンジの線＝ランドマーク）</div>';
+ else if(t.type==='choice')h='<div class="choice" style="margin-top:8px">'+sim.optOrder.map(i=>'<button class="opt" data-ch="'+i+'"'+(sim.wrong.includes(i)?' disabled':'')+'>'+t.opts[i][0]+'</button>').join('')+'</div>';
+ else if(t.type==='order'){const o=sim.order;
+  h='<p class="seq">体表 → '+(o.pos?o.seq.slice(0,o.pos).join(' → ')+' → ':'')+'？</p><div class="opts" style="margin-top:6px">'+
+   o.opts.map((n,i)=>{const j=o.seq.indexOf(n);return '<button class="opt" data-ly="'+i+'"'+(j>-1&&j<o.pos?' disabled':'')+'>'+n+'</button>';}).join('')+'</div>';}
+ $('simCur').innerHTML=h;
+ const fb=$('simFb');fb.hidden=!sim.fb;if(sim.fb){fb.className='fb '+sim.fb.cls;fb.innerHTML=sim.fb.html;}
+ $('simBtns').querySelector('[data-a="reveal"]').hidden=sim.done;
+ $('simBtns').querySelector('[data-a="hint"]').hidden=sim.done;
+ const hb=$('simHint');hb.hidden=!(sim.hint&&!sim.done);
+ if(!hb.hidden)hb.innerHTML='<ul style="margin-top:10px">'+li(STEPS()[cur].pts)+'</ul>';
+ bar.hidden=false;
+ if(sim.done)bar.innerHTML='<b>ステップ完了</b>';
+ else{const lead=t.type==='act'?(sim.port&&sim.tool?'対象をクリック':'ポートと器械を選ぶ'):t.type==='id'?'構造をクリック':t.type==='place'?'体表をクリック':'パネルで回答';
+  bar.innerHTML='<b>'+lead+'</b>：'+tx(t.txt);}
+}
+function doneHtml(){
+ const r=sim.res[dkey(cur)],s=STEPS()[cur];
+ let h='<p style="margin:8px 0 0"><b>このステップは完了</b>：初回正解 '+r.ok+'/'+r.n+'、ミス '+r.miss+'、合併症 '+r.comp+'</p>';
+ h+='<details class="exp"><summary>このステップの解説を見る</summary><h3 style="margin-top:8px">手技のポイント</h3><ul>'+li(s.pts)+'</ul><h3 style="margin-top:8px">注意点・落とし穴</h3><ul>'+li(s.cau)+'</ul></details>';
+ if(cur<STEPS().length-1)h+='<div class="simbtns"><button class="btn primary" data-a="next">次のステップへ →</button></div>';
+ else h+=finalHtml();
+ return h;
+}
+function finalHtml(){
+ let ok=0,n=0,ms=0,cp=0;const left=[];
+ STEPS().forEach((s,i)=>{const r=sim.res[dkey(i)];if(!r){left.push(i+1);return;}ok+=r.ok;n+=r.n;ms+=r.miss;cp+=r.comp;});
+ let h='<div class="card" style="margin-top:12px"><h3>通しの結果（'+(AP==='retro'?'後腹膜鏡':'経腹膜')+'・'+sideTxt()+'）</h3>';
+ h+='<p style="margin:0">初回正解 <b>'+ok+' / '+n+'</b>（'+(n?Math.round(ok/n*100):0)+'%）　ミス '+ms+'　合併症 '+cp+'</p>';
+ if(left.length)h+='<p class="tnote">未完了のステップ：'+left.join('、')+'</p>';
+ const lg=sim.log.filter(e=>e.k===simKey()).sort((a,b)=>a.i-b.i);
+ if(lg.length)h+='<h3 style="margin-top:10px">振り返り（ミスした所）</h3><ul class="review">'+lg.map(e=>'<li><span class="tag '+(e.comp?'t-要確認':'t-一般')+'">STEP '+(e.i+1)+'</span><span><b>'+e.task+'</b><br>'+e.msg+'</span></li>').join('')+'</ul>';
+ else if(!left.length)h+='<p class="tnote">ミスなしで通せました。</p>';
+ h+='<div class="simbtns"><button class="btn primary" data-a="restart">最初から通しでやり直す</button></div></div>';
+ return h;
+}
+$('simBox').addEventListener('click',e=>{
+ const b=e.target.closest('button');if(!b||b.disabled)return;
+ if(b.dataset.port){sim.port=b.dataset.port;sim.fb=null;sizeCheck();renderSim();return;}
+ if(b.dataset.tool){sim.tool=b.dataset.tool;sim.fb=null;sizeCheck();renderSim();return;}
+ if(b.dataset.ch!==undefined){evalChoice(+b.dataset.ch);return;}
+ if(b.dataset.ly!==undefined){evalOrder(sim.order.opts[+b.dataset.ly]);return;}
+ const a=b.dataset.a;
+ if(a==='hint'){sim.hint=!sim.hint;renderSim();}
+ else if(a==='reveal')reveal();
+ else if(a==='retry')applyStep(cur,true);
+ else if(a==='next')applyStep(cur+1);
+ else if(a==='restart'){const k=simKey();STEPS().forEach((s,i)=>delete sim.res[dkey(i)]);sim.log=sim.log.filter(e=>e.k!==k);applyStep(0);}
+});
+
+document.querySelectorAll('.hideable').forEach(el=>el.addEventListener('click',()=>{if($('panel').classList.contains('recall'))el.style.filter='none';}));
+$('recallCb').onchange=()=>{document.querySelectorAll('.hideable').forEach(el=>el.style.filter='');$('panel').classList.toggle('recall',$('recallCb').checked);};
+$('showAns').onclick=()=>{const a=$('ans');a.hidden=!a.hidden;$('showAns').textContent=a.hidden?'答えを見る':'答えを隠す';};
+$('doneCb').onchange=e=>{done[dkey(cur)]=e.target.checked;try{localStorage.setItem('rnu-done2',JSON.stringify(done))}catch(_){}renderChips();};
+$('prev').onclick=()=>cur>0&&applyStep(cur-1);
+$('next').onclick=()=>cur<STEPS().length-1&&applyStep(cur+1);
+let playTimer=null;
+$('play').onclick=()=>{
+ if(playTimer){clearInterval(playTimer);playTimer=null;$('play').textContent='手順を再生';return;}
+ applyStep(0);$('play').textContent='停止';
+ playTimer=setInterval(()=>{if(cur>=STEPS().length-1){clearInterval(playTimer);playTimer=null;$('play').textContent='手順を再生';return;}applyStep(cur+1);},5000);
+};
+function tog(id,fn){const b=$(id);b.onclick=()=>{const v=b.getAttribute('aria-pressed')!=='true';b.setAttribute('aria-pressed',v);fn(v);};}
+tog('tLabels',v=>{showLabels=v;});
+tog('tFocus',v=>{focus=v;refreshHighlight();});
+tog('tGerota',v=>{showGerota=v;refreshHighlight();});
+tog('tTools',v=>{showTools=v;toolG.visible=v;});
+$('tRoll').onclick=()=>{roll=(roll+1)%4;setView(false);};
+$('tReset').onclick=()=>{roll=0;setView(true);};
+function seg(id,fn){document.querySelectorAll('#'+id+' button').forEach(b=>b.onclick=()=>fn(b.dataset.v));}
+function syncSeg(){document.querySelectorAll('#segMode button').forEach(b=>b.setAttribute('aria-pressed',(b.dataset.v==='sim')===sim.on));
+ document.querySelectorAll('#segAp button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===AP));
+ document.querySelectorAll('#segSide button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.v===S));}
+function rebuildAll(){build();lastPeri=-1;cur=Math.min(cur,STEPS().length-1);
+ Object.keys(anim).forEach(k=>anim[k]=0);anim.flank=AP==='retro'?1:0;cutAmt={artery:0,vein:0};
+ syncSeg();applyStep(cur);}
+seg('segAp',v=>{if(v===AP)return;AP=v;roll=0;rebuildAll();});
+seg('segSide',v=>{v=+v;if(v===S)return;S=v;roll=0;rebuildAll();});
+seg('segView',v=>{view=v;setView(true);});
+seg('segMode',v=>{const on=v==='sim';if(on===sim.on)return;sim.on=on;
+ if(playTimer){clearInterval(playTimer);playTimer=null;$('play').textContent='手順を再生';}
+ showLabels=!on;$('tLabels').setAttribute('aria-pressed',String(showLabels));
+ if(!on){sim.tools={};sim.aim={};sim.done=false;fxClear();}
+ syncSeg();applyStep(cur);});
+document.addEventListener('keydown',e=>{if(['INPUT','SELECT'].includes(e.target.tagName))return;if(e.key==='ArrowRight')$('next').click();if(e.key==='ArrowLeft')$('prev').click();});
+
+resize();rebuildAll();if(fly){camera.position.copy(fly.pos);controls.target.copy(fly.tg);fly=null;}
+tick();
+})();
+</script>
+
+</body></html>
