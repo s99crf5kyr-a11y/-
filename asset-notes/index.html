@@ -1,57 +1,110 @@
 <title>ASSET対訳ノート</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,700&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
-/* Layout: one narrow reading column; each chapter = pretest → bilingual sentences + diagrams/figures → vocab → 3 points */
+/* Layout: textbook page (running header, maroon title, navy headings, square bullets, red-label figures) in one column; study tools sit outside the page */
 :root{
-  --bg:#f6f7f5; --surface:#ffffff; --fg:#1d2321; --muted:#5f6b67; --line:#dde3e0;
-  --accent:#0f6b5c; --accent-soft:#e2f0ec; --en:#1f3a5f; --warn:#a14a1c; --warn-soft:#fbeee6;
+  --bg:#eef0ee; --paper:#fdfdfb; --fg:#1d2321; --muted:#5f6b67; --line:#dde1df;
+  --maroon:#7b2230; --navy:#1f3a5f; --bullet:#4a6a96; --rule:#b3404f;
+  --ja:#3c5a52; --ja-bg:#eef5f2; --gloss:#0f6b5c; --gloss-bg:#dff0ea;
+  --accent:#0f6b5c; --accent-soft:#e2f0ec; --warn:#a14a1c; --warn-soft:#fbeee6; --supp:#f3f1ea; --supp-line:#cfc6ad;
   --ok:#1e7a3c; --ng:#b3261e;
   --art:#c0392b; --vein:#2f5fb3; --ure:#c08a00; --organ:#ead7cb; --organ-2:#c9a593; --zone:#e9ecea;
+  --font-en:"Source Sans 3","Myriad Pro","Helvetica Neue",Arial,sans-serif;
   --font-ja:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;
-  --font-en:"Source Serif 4",Georgia,"Times New Roman",serif;
   --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#121615; --surface:#1a201e; --fg:#e4ebe8; --muted:#9aa8a3; --line:#2c3532;
-  --accent:#5cc4ae; --accent-soft:#1d2f2b; --en:#a9c4ec; --warn:#f0a272; --warn-soft:#33241b;
+  --bg:#0f1312; --paper:#181d1c; --fg:#e4ebe8; --muted:#9aa8a3; --line:#2c3532;
+  --maroon:#f08a96; --navy:#a9c4ec; --bullet:#8fb0dc; --rule:#c46a76;
+  --ja:#a8d3c6; --ja-bg:#1c2a26; --gloss:#7fe0c8; --gloss-bg:#1d332d;
+  --accent:#5cc4ae; --accent-soft:#1d2f2b; --warn:#f0a272; --warn-soft:#33241b; --supp:#22241f; --supp-line:#4d4838;
   --ok:#6fd08f; --ng:#ff8a80;
   --art:#e5675a; --vein:#6f9be8; --ure:#f0c440; --organ:#4a3a33; --organ-2:#7a5c4f; --zone:#232a28; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#121615; --surface:#1a201e; --fg:#e4ebe8; --muted:#9aa8a3; --line:#2c3532;
-  --accent:#5cc4ae; --accent-soft:#1d2f2b; --en:#a9c4ec; --warn:#f0a272; --warn-soft:#33241b;
+  --bg:#0f1312; --paper:#181d1c; --fg:#e4ebe8; --muted:#9aa8a3; --line:#2c3532;
+  --maroon:#f08a96; --navy:#a9c4ec; --bullet:#8fb0dc; --rule:#c46a76;
+  --ja:#a8d3c6; --ja-bg:#1c2a26; --gloss:#7fe0c8; --gloss-bg:#1d332d;
+  --accent:#5cc4ae; --accent-soft:#1d2f2b; --warn:#f0a272; --warn-soft:#33241b; --supp:#22241f; --supp-line:#4d4838;
   --ok:#6fd08f; --ng:#ff8a80;
   --art:#e5675a; --vein:#6f9be8; --ure:#f0c440; --organ:#4a3a33; --organ-2:#7a5c4f; --zone:#232a28; color-scheme:dark}
-body{background:var(--bg);color:var(--fg);font-family:var(--font-ja);font-size:16px;line-height:1.75;
+body{background:var(--bg);color:var(--fg);font-family:var(--font-ja);font-size:16px;line-height:1.7;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
-.wrap{max-width:680px;margin:0 auto;padding-block:20px 64px}
-h1{font-size:1.5rem;margin:0 0 4px;text-wrap:balance}
-.lead{color:var(--muted);font-size:.9rem;margin:0}
-.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;
-  border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px;margin-top:16px}
-.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.btn,.chips a{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--fg);
-  border-radius:999px;padding:4px 12px;cursor:pointer;text-decoration:none}
-.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.wrap{max-width:720px;margin:0 auto;padding-block:16px 64px}
+button{font:inherit}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+/* toolbar */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;display:flex;flex-direction:column;gap:6px;border-bottom:1px solid var(--line)}
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+.btn,.chips a{font-size:.82rem;border:1px solid var(--line);background:var(--paper);color:var(--fg);border-radius:999px;padding:3px 11px;cursor:pointer;text-decoration:none;line-height:1.6}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--paper)}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
-.hint{font-size:.8rem;color:var(--muted)}
-button:focus-visible,a:focus-visible,.pair:focus-visible,.word:focus-visible,figure:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chips a{font-family:var(--font-en);color:var(--navy)}
 
-.chapter{margin-top:36px;scroll-margin-top:120px}
-.chno{font-family:var(--font-mono);font-size:.75rem;letter-spacing:.08em;color:var(--accent);text-transform:uppercase}
-.chapter h2{font-size:1.3rem;margin:2px 0 0;line-height:1.4;text-wrap:balance}
-.chapter .en-title{font-family:var(--font-en);color:var(--en);font-size:1rem;margin:2px 0 0}
-.meta{font-size:.8rem;color:var(--muted);margin:4px 0 0}
-h3{font-size:1.05rem;margin:28px 0 8px;padding-bottom:4px;border-bottom:2px solid var(--accent-soft);display:flex;flex-direction:column}
-h3 .en{font-family:var(--font-en);font-weight:600;color:var(--en);font-size:.95rem}
-h4{font-size:.8rem;letter-spacing:.06em;color:var(--muted);margin:20px 0 6px;font-weight:700}
+/* the textbook page */
+.page{background:var(--paper);border:1px solid var(--line);border-radius:4px;margin-top:14px;padding:18px 18px 22px 26px;position:relative;font-family:var(--font-en)}
+.page::before{content:"";position:absolute;left:12px;top:14px;bottom:14px;width:1.5px;background:var(--rule);opacity:.7}
+.runhead{font-size:.78rem;color:var(--muted);margin:0 0 14px;line-height:1.4}
+.runfoot{font-size:.85rem;color:var(--muted);margin:26px 0 0;border-top:1px solid var(--line);padding-top:8px}
+.runfoot i{font-weight:700;color:var(--fg)}
+h1.title{font-family:var(--font-en);color:var(--maroon);font-weight:700;font-size:1.65rem;line-height:1.2;margin:0;text-wrap:balance}
+.hja{display:block;font-family:var(--font-ja);font-size:.82rem;font-weight:500;color:var(--ja);margin-top:4px;line-height:1.5}
+h2.sec{font-family:var(--font-en);color:var(--navy);font-weight:700;font-size:1.3rem;margin:26px 0 8px;line-height:1.25;scroll-margin-top:110px}
+h3.sub{font-family:var(--font-en);color:var(--bullet);font-weight:700;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase;margin:16px 0 6px}
+.en-p{font-size:1.06rem;line-height:1.5;margin:0}
+.blk{display:flex;flex-direction:column;gap:4px;margin:8px 0}
+.items{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:12px}
+.items li{position:relative;padding-left:20px}
+.items.bul>li::before{content:"";position:absolute;left:2px;top:.62em;width:7px;height:7px;background:var(--bullet)}
+.items.num{counter-reset:n}
+.items.num>li{counter-increment:n}
+.items.num>li::before{content:counter(n) ".";position:absolute;left:0;top:0;font-weight:700;color:var(--navy);font-size:1.06rem;line-height:1.5}
+.items li.sub{margin-left:22px}
+.items li.sub::before{width:5px;height:5px;border-radius:50%;background:var(--muted)}
+.items li.warn .en-p{background:linear-gradient(transparent 62%,var(--warn-soft) 62%)}
+.step{display:inline-block;font-family:var(--font-mono);font-size:.68rem;color:var(--warn);letter-spacing:.06em;margin-bottom:2px}
+.en-p strong{font-weight:700}
 
-/* pretest */
-.quiz{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:16px}
-.quiz-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
-.quiz-head strong{font-size:.95rem}
+/* Japanese under each sentence */
+.ja{font-family:var(--font-ja);font-size:.88rem;line-height:1.65;color:var(--ja);background:var(--ja-bg);border-radius:4px;padding:4px 8px;margin-top:4px}
+.ja-btn{display:none;align-self:flex-start;font-size:.75rem;border:1px dashed var(--ja);color:var(--ja);background:transparent;border-radius:4px;padding:0 8px;cursor:pointer;margin-top:4px}
+body.hide-ja .blk:not(.open) .ja{display:none}
+body.hide-ja .blk:not(.open) .ja-btn{display:inline-block}
+
+/* tappable terms with inline gloss */
+.term{all:unset;cursor:pointer;border-bottom:1.5px dotted var(--bullet);border-radius:2px}
+.term:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.term.on{background:var(--gloss-bg)}
+.gloss{display:none;font-family:var(--font-ja);font-size:.78em;font-weight:500;color:var(--gloss);background:var(--gloss-bg);border-radius:3px;padding:0 4px;margin:0 2px;white-space:nowrap;text-transform:none;letter-spacing:0}
+.term.on+.gloss,body.all-gloss .gloss{display:inline}
+
+/* figures */
+figure{margin:16px 0}
+figure.photo img{display:block;width:100%;height:auto;border:1px solid var(--line)}
+figcaption{margin-top:6px;display:flex;flex-direction:column;gap:4px}
+.figlab{font-weight:700;color:var(--maroon)}
+.cap-en{font-size:.95rem;line-height:1.45}
+.labels{font-family:var(--font-ja);font-size:.78rem;color:var(--muted)}
+.missing{font-family:var(--font-ja);font-size:.8rem;color:var(--muted);border:1px dashed var(--line);border-radius:4px;padding:8px 10px;margin:14px 0}
+
+/* study diagrams (not from the textbook) */
+figure.dg{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 8px 0}
+figure.dg svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+figure.dg figcaption{font-family:var(--font-ja);font-size:.82rem;padding:6px 6px 10px}
+.dg-tag{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.06em;color:var(--accent);padding:0 4px}
+
+/* supplement from chapter 15 */
+.supp{background:var(--supp);border:1px solid var(--supp-line);border-radius:6px;padding:12px 14px;margin:14px 0 4px 0}
+.supp-tag{font-family:var(--font-ja);font-size:.75rem;font-weight:700;color:var(--warn);letter-spacing:.04em}
+.supp h2.sec{font-size:1.12rem;margin:4px 0 6px}
+
+/* study tools outside the page */
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:14px;scroll-margin-top:110px}
+.panel h2{font-size:1rem;margin:0}
+.panel-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
 .score{font-family:var(--font-mono);font-size:.8rem;color:var(--muted)}
 .levels{display:flex;gap:6px;margin:8px 0 4px;flex-wrap:wrap}
 .qlist{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
@@ -60,22 +113,28 @@ h4{font-size:.8rem;letter-spacing:.06em;color:var(--muted);margin:20px 0 6px;fon
 .q-row{display:flex;gap:10px;align-items:flex-start}
 .q-text{flex:1;min-width:0}
 .ox{display:flex;gap:6px;flex-shrink:0}
-.ox button{font:inherit;font-size:1.05rem;font-weight:700;width:44px;height:40px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer}
+.ox button{font-size:1.05rem;font-weight:700;width:44px;height:40px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer}
 .ox button[disabled]{cursor:default;opacity:.55}
 .ox button.picked{opacity:1;border-width:2px;border-color:var(--fg)}
 .result{font-size:.88rem;border-radius:6px;padding:6px 10px;background:var(--bg)}
 .result b.ok{color:var(--ok)} .result b.ng{color:var(--ng)}
 .quiz-foot{display:flex;justify-content:flex-end;margin-top:10px}
-
-/* figures & diagrams */
-figure{margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
-figure img{display:block;width:100%;height:auto}
-figure.dg{padding:12px 8px 0}
-figure.dg svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
-.dg-tag{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.06em;color:var(--accent);padding:0 4px}
-figcaption{padding:10px 12px;font-size:.85rem;display:flex;flex-direction:column;gap:4px}
-figcaption .en{font-family:var(--font-en);color:var(--en)}
-.labels{font-size:.8rem;color:var(--muted)}
+.points{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.point .k{font-size:.8rem;font-weight:700;color:var(--accent);display:block}
+.point ul{margin:2px 0 0;padding-left:1.2em}
+.compare p{margin:0 0 6px;font-size:.95rem}
+.vocab{margin:8px 0 0;padding:0;list-style:none}
+.word{display:flex;flex-wrap:wrap;gap:2px 10px;padding:6px 0;border-top:1px solid var(--line)}
+.word:first-child{border-top:0}
+.word .w-en{font-family:var(--font-en);font-weight:600;color:var(--navy)}
+.word .w-ja{font-size:.9rem}
+body.hide-ja .word{cursor:pointer}
+body.hide-ja .word:not(.open) .w-ja{visibility:hidden}
+footer{margin-top:36px;font-size:.8rem;color:var(--muted)}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+<style>
 svg text{font-family:var(--font-ja);font-size:12px;fill:var(--fg)}
 svg .sm{font-size:10.5px} svg .b{font-weight:700} svg .mu{fill:var(--muted)} svg .w{fill:#fff;font-weight:700;font-size:11px}
 svg .tw{fill:var(--warn)} svg .ta{fill:var(--accent)}
@@ -94,186 +153,165 @@ svg .lead-l{stroke:var(--warn);stroke-width:1.2;fill:none}
 svg .move{stroke:var(--accent);stroke-width:3.5;fill:none;stroke-linecap:round}
 svg .mk-a{fill:var(--accent)}
 
-/* bilingual sentences */
-.pairs{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
-.pair{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
-.pair.sub{margin-left:18px}
-.pair .en{font-family:var(--font-en);color:var(--en);font-size:1.02rem;line-height:1.6}
-.pair .en b{color:var(--fg);font-weight:600;border-bottom:1px dotted var(--muted)}
-.pair .ja{font-size:.95rem}
-.pair.warn{border-color:var(--warn);background:var(--warn-soft)}
-.tag{font-family:var(--font-mono);font-size:.7rem;color:var(--warn);letter-spacing:.06em}
-.tap{display:none;font-size:.75rem;color:var(--muted)}
-
-/* hide Japanese: tap an item to reveal */
-body.hide-ja .pair,body.hide-ja .word,body.hide-ja figure.photo{cursor:pointer}
-body.hide-ja .pair:not(.open) .ja,body.hide-ja figure.photo:not(.open) figcaption .ja,
-body.hide-ja .word:not(.open) .ja,body.hide-ja .word:not(.open) .note{display:none}
-body.hide-ja .pair:not(.open) .tap,body.hide-ja .word:not(.open) .tap,body.hide-ja figure.photo:not(.open) .tap{display:block}
-
-.vocab{margin:0;padding:0;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:8px}
-.word{display:flex;flex-direction:column;padding:8px 12px;border-top:1px solid var(--line)}
-.word:first-child{border-top:0}
-.word .en{font-family:var(--font-en);font-weight:600;color:var(--en)}
-.word .ja{font-size:.9rem}
-.word .note{font-size:.8rem;color:var(--muted)}
-
-.points{background:var(--accent-soft);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
-.point .k{font-size:.8rem;font-weight:700;color:var(--accent);display:block}
-.point ul{margin:2px 0 0;padding-left:1.2em}
-.compare{border-left:3px solid var(--accent);padding:2px 0 2px 12px;font-size:.95rem}
-.compare p{margin:0 0 8px}
-footer{margin-top:48px;font-size:.8rem;color:var(--muted)}
-html{scroll-behavior:smooth}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
 
 <div class="wrap">
-  <h1>ASSET対訳ノート</h1>
-  <p class="lead">Exposure Techniques When Time Matters ／ 英語と日本語を並べて読む個人用ノート</p>
-
   <div class="bar">
     <div class="tools">
-      <button class="btn" id="hide-ja" aria-pressed="false">日本語を隠す</button>
-      <span class="hint" id="hide-hint">隠すと、タップした文だけ日本語が出ます</span>
+      <button class="btn" id="hide-ja" aria-pressed="false">文の訳を隠す</button>
+      <button class="btn" id="all-gloss" aria-pressed="false">語の意味をすべて表示</button>
     </div>
-    <nav class="chips" id="toc" aria-label="章"></nav>
+    <nav class="chips" aria-label="目次">
+      <a href="#pretest">プレテスト</a><a href="#s-cons">Considerations</a><a href="#s-op">Operative Exposure</a>
+      <a href="#s-aorta">Distal Aorta</a><a href="#s-iliac">Iliac Vessels</a><a href="#memo">まとめ</a>
+    </nav>
   </div>
 
-  <main id="chapters"></main>
+  <section class="panel" id="pretest">
+    <div class="panel-head"><h2>プレテスト（○×）</h2><span class="score"></span></div>
+    <div class="levels" role="group" aria-label="レベル">
+      <button class="btn" data-lv="1" aria-pressed="false">Lv1 やさしい</button>
+      <button class="btn" data-lv="2" aria-pressed="false">Lv2 ふつう</button>
+      <button class="btn" data-lv="3" aria-pressed="false">Lv3 むずかしい</button>
+    </div>
+    <ol class="qlist"></ol>
+    <div class="quiz-foot"><button class="btn" id="retry">このレベルをやり直す</button></div>
+  </section>
+
+  <article class="page" id="page"></article>
+
+  <section class="panel" id="memo">
+    <h2>まとめ：3つのポイント</h2>
+    <div class="points" id="points"></div>
+    <h2 style="margin-top:16px">普段の手技との比較</h2>
+    <div class="compare" id="compare"></div>
+    <h2 style="margin-top:16px">単語一覧 <span class="score" id="vcount"></span></h2>
+    <ul class="vocab" id="vocab"></ul>
+  </section>
 
   <footer>
-    <p>各章のはじめのプレテストは、読む前に解いて、読んだあとにもう一度解くのがおすすめです。英語の太字は単語リストにある語です。</p>
+    <p>本文の点線の語をタップすると、その横に日本語が出ます。プレテストは読む前と読んだあとに解くのがおすすめです。「図解」は学習用に描いた簡略図で、教科書の図ではありません。</p>
     <p>教科書の内容と写真を含むため、他の人には共有しないでください。</p>
   </footer>
 </div>
-
 <script>
-/* ===== ここに章を追加していく ===== */
-const CHAPTERS = [
-{
-  id:"ch15", no:"Chapter 15", ja:"腹部外傷：外傷開腹", en:"Operative Exposure in Abdominal Trauma: Trauma Laparotomy",
-  pages:"p123〜132 のうち Cattell-Braasch法の部分",
-  sections:[
-    {ja:"大動脈の遮断（図6・7）", en:"Aortic clamping", figures:[
-      {src:"img/ch15-fig6-7.jpg", en:"Figure 6. The aorta is clamped at the hiatus, using the paraspinal muscles and the vertebral bodies as the landmarks for the tips of the clamp. / Figure 7. Clamping of the supraceliac aorta above the right crus of the diaphragm, as seen in this cadaveric specimen. The esophagus (sling) is retracted to the patient's left.",
-       ja:"図6：食道裂孔の高さで大動脈を遮断する。鉗子の先端は傍脊柱筋と椎体を目印に当てる。／図7：カダバー標本で、横隔膜右脚の上から腹腔動脈より上の大動脈を遮断している。食道はテープで患者の左へ牽引。"}
-    ]},
-    {ja:"Cattell-Braasch法：留意点", en:"Right-to-Left Medial Visceral Rotation — Considerations", items:[
-      {en:"Right-to-left <b>medial visceral rotation</b> provides excellent exposure of injuries to the structures of the right <b>retroperitoneum</b>, including the <b>duodenum</b>, head of the pancreas, right kidney and its vessels, ureter, inferior vena cava (IVC), and right iliac vessels.",
-       ja:"右から左への内側臓器翻転を行うと、右後腹膜の構造の損傷がとてもよく見える。対象は十二指腸、膵頭部、右腎とその血管、尿管、下大静脈（IVC）、右腸骨血管。"}
-    ]},
-    {ja:"Cattell-Braasch法：手技", en:"Technique", diagrams:["cb"], items:[
-      {step:"STEP 1", en:"The first step is to <b>incise</b> the <b>parietal peritoneum</b> at the <b>white line of Toldt</b>, from the base of the <b>cecum</b> to the <b>hepatic flexure</b> (Figure 8). The <b>dissection plane</b> between the right colon and the abdominal wall is <b>avascular</b> and, once entered, can be extended rapidly with <b>blunt dissection</b>.",
-       ja:"第1段階：盲腸の付け根から肝弯曲まで、Toldtの白線で壁側腹膜を切開する（図8）。右結腸と腹壁のあいだの剥離層は無血管で、一度入れば鈍的剥離で素早く広げられる。"},
-      {warn:true, en:"If there is an IVC injury, performing a medial visceral rotation may <b>unroof</b> a <b>contained hematoma</b> with significant bleeding. One must plan for this possibility and <b>be prepared to</b> obtain rapid control of the IVC.",
-       ja:"IVC損傷がある場合、内側臓器翻転で閉じ込められていた血腫の天井が開き、大出血することがある。これを想定し、IVCをすぐ制御できるよう準備しておくこと。"},
-      {step:"STEP 2", en:"The second step is to <b>mobilize</b> the hepatic flexure of the colon and perform a <b>Kocher maneuver</b> to fully visualize the <b>sweep of the duodenum</b> and the head of the pancreas.",
-       ja:"第2段階：結腸の肝弯曲を授動し、Kocher法を行って十二指腸のC字ループ全体と膵頭部が見えるようにする。"},
-      {step:"STEP 3", en:"The final step is to rotate the cecum and small bowel up and out of the pelvis in a right-to-left, <b>inferior-to-superior</b> fashion. Completion of the maneuver should enable the <b>displacement</b> of the patient's cecum to near the patient's left shoulder.",
-       ja:"最終段階：盲腸と小腸を、右から左へ・下から上へ回転させて骨盤から持ち上げる。完成すると盲腸は患者の左肩の近くまで移動できる。"},
-      {en:"The completed Cattell-Braasch maneuver (Figure 9) provides excellent visualization of the retroperitoneal structures in the right abdomen and pelvis.",
-       ja:"完成したCattell-Braasch法（図9）では、右側の腹部と骨盤の後腹膜構造がとてもよく見える。"}
-    ], figures:[
-      {src:"img/ch15-fig8-9.jpg", en:"Figure 8. The Cattell-Braasch maneuver involves mobilization of the right colon (1), exposure of the duodenum and head of pancreas by an extended Kocher maneuver (2), and retraction of the colon and small bowel superior and medial (3). / Figure 9. The completed maneuver provides excellent exposure of the head of the pancreas, the IVC, the right kidney and ureter, the renal veins, and the right iliac vessels into the pelvis.",
-       ja:"図8：(1) 右結腸の授動 → (2) 拡大Kocher法で十二指腸・膵頭部を展開 → (3) 結腸と小腸を上方・内側へ牽引。／図9：完成図。膵頭部、IVC、右腎と尿管、腎静脈、骨盤までの右腸骨血管が見える。",
-       labels:"写真の向き：頭側が右（HEAD TO RIGHT）／ Right Ureter 右尿管・IVC・Left Renal Vein 左腎静脈・Right Kidney 右腎・Head of Pancreas 膵頭部・Gallbladder 胆嚢・Liver 肝臓"}
-    ]}
-  ],
-  vocab:[
-    ["clamp","遮断する（鉗子で挟む）"],["hiatus","裂孔（大動脈・食道の通り道）"],["paraspinal muscles","傍脊柱筋"],["vertebral body","椎体"],
-    ["supraceliac aorta","腹腔動脈より上の大動脈","celiac = 腹腔動脈"],["crus of the diaphragm","横隔膜脚"],["sling","牽引用のテープ"],
-    ["medial visceral rotation","内側臓器翻転","medial 内側 / visceral 内臓の / rotation 回転"],["retroperitoneum","後腹膜"],["duodenum","十二指腸"],
-    ["incise","切開する","名詞は incision"],["parietal peritoneum","壁側腹膜"],["white line of Toldt","Toldtの白線"],["cecum","盲腸"],["hepatic flexure","肝弯曲"],
-    ["dissection plane","剥離層"],["avascular","無血管の","a- = 〜がない"],["blunt dissection","鈍的剥離","反対は sharp dissection 鋭的剥離"],
-    ["unroof","天井を開ける"],["contained hematoma","被包化された血腫"],["be prepared to","〜する準備をしておく"],["mobilize","授動する"],
-    ["Kocher maneuver","Kocher法（十二指腸の授動）"],["sweep of the duodenum","十二指腸のC字ループ"],["inferior-to-superior","下から上へ"],["displacement","移動"]
-  ],
-  points:{cut:["Toldtの白線（盲腸の付け根〜肝弯曲）"],land:["右結腸と腹壁のあいだの無血管層","十二指腸のC字ループ","IVC"],protect:["IVC：血腫の天井を開ける前に制御の準備","右尿管・右腎・腎静脈"]},
-  compare:["最初の2段階（Toldt線切開→右結腸授動→Kocher）は、経腹膜で右腎・IVCへ行くときの操作とほぼ同じ。","違いは最終段階：盲腸と小腸を左肩まで丸ごと持ち上げ、骨盤の腸骨血管まで一気に出す。","外傷なので、無血管層に入ったら手で一気に広げる。"]
-},
-{
-  id:"ch19", no:"Chapter 19", ja:"腹部外傷：遠位大動脈と腸骨血管", en:"Operative Exposure in Abdominal Trauma: Exposure of the Distal Aorta and Iliac Vessels",
-  pages:"p161〜166",
-  sections:[
-    {ja:"学習目標", en:"Learning Objectives", items:[
-      {en:"Describe and demonstrate the steps to obtain <b>vascular control</b> of the <b>distal</b> aorta.", ja:"遠位大動脈の血管制御を得る手順を説明し、実際にやってみせる。"},
-      {en:"Describe and demonstrate the steps to obtain exposure of the right and left <b>iliac</b> arteries and veins.", ja:"左右の腸骨動脈・腸骨静脈を展開する手順を説明し、実際にやってみせる。"}
-    ]},
-    {ja:"留意点", en:"Considerations", diagrams:["zones"], items:[
-      {en:"The distal aorta and the iliac vessels are located in <b>retroperitoneal</b> Zones 1 and 3, <b>respectively</b>. When injured, they can present <b>life-threatening</b> <b>hemorrhage</b>, with an associated high <b>mortality rate</b>.",
-       ja:"遠位大動脈は後腹膜Zone 1、腸骨血管はZone 3にある。損傷すると命に関わる出血を起こし、死亡率が高い。"},
-      {en:"<b>Penetrating wounds</b> to the pelvis are the most common causes of distal aorta and iliac vessel injuries.",
-       ja:"原因でいちばん多いのは骨盤の穿通性外傷。"},
-      {en:"Iliac vein injuries result in significant blood loss, and operative exposure is difficult. These veins may be <b>ligated</b> if necessary. Ligation of the external iliac vein distal to the bifurcation will place the patient at risk of developing lower extremity <b>edema</b> and/or <b>deep venous thrombosis</b>.",
-       ja:"腸骨静脈損傷は出血が多く、展開も難しい。必要なら結紮してよい。ただし外腸骨静脈を分岐部より末梢で結紮すると、下肢の浮腫やDVTのリスクがある。"},
-      {en:"The first priority is hemorrhage control.", ja:"最優先は出血のコントロール。"},
-      {warn:true, en:"<b>Ureteral</b> injuries are commonly <b>associated with</b> iliac vessel injuries, and therefore the ureter should be <b>evaluated</b> after the vascular injuries have been <b>addressed</b>.",
-       ja:"尿管損傷は腸骨血管損傷によく合併する。血管の処置が済んだあとで尿管を評価すること。"}
-    ]},
-    {ja:"手術展開", en:"Operative Exposure", diagrams:["bif","xsec"], items:[
-      {en:"Distal aorta and iliac vessel injuries are typically exposed through a <b>midline incision</b> as part of a trauma laparotomy.",
-       ja:"通常は外傷開腹の一部として、正中切開から展開する。"},
-      {en:"Remember that the iliac arteries are <b>anterior</b> to their <b>corresponding</b> veins.",
-       ja:"腸骨動脈は、対応する静脈より前にある。"},
-      {en:"Right-to-left medial visceral rotation (Cattell-Braasch maneuver) can be performed rapidly and allows for the colon and small bowel to be mobilized up and off the distal aorta, inferior vena cava, and iliac vessels.",
-       ja:"Cattell-Braasch法は素早く行え、結腸と小腸を遠位大動脈・IVC・腸骨血管の上からよけられる（15章参照）。"},
-      {warn:true, en:"The common iliac veins are <b>intimately adherent</b> to the back wall of the common iliac arteries. If not careful, mobilization of the artery may result in venous injury and <b>profuse</b> bleeding. The right common iliac vein and bifurcation are particularly difficult to expose.",
-       ja:"総腸骨静脈は総腸骨動脈の後壁に密着している。不用意に動脈を授動すると静脈を損傷して大出血する。特に右総腸骨静脈と分岐部は展開が難しい。"},
-      {en:"Occasionally, it may be necessary to <b>transect</b> the right common iliac artery to gain <b>adequate</b> exposure of the right common iliac vein. Transection and ligation of the internal iliac artery can also improve exposure of the <b>ipsilateral</b> common iliac vein.",
-       ja:"右総腸骨静脈を出すために、右総腸骨動脈を離断することもある。内腸骨動脈を離断・結紮しても、同側の総腸骨静脈が見やすくなる。"},
-      {sub:true, en:"<b>Excessive</b> <b>retraction</b> of the external iliac artery to obtain better exposure of this vein may damage the artery.",
-       ja:"静脈をよく見ようとして外腸骨動脈を引っぱりすぎると、動脈を傷める。"}
-    ]},
-    {ja:"遠位大動脈の血管制御", en:"Vascular Control of the Distal Aorta", items:[
-      {en:"Injuries to the distal aorta and bifurcation may be temporarily controlled by <b>local manual compression</b> with a <b>laparotomy pad</b>, <b>sponge stick</b>, or fingers until proximal and distal vessel control can be achieved.",
-       ja:"近位・遠位の制御ができるまで、開腹用ガーゼ・スポンジスティック・指で直接圧迫して一時的に抑える。"},
-      {en:"REBOA, as described in chapter 22, can also provide temporary hemorrhage control.", ja:"22章のREBOAでも一時的に出血を抑えられる。"},
-      {warn:true, en:"The aorta proximal to the injury should be <b>isolated</b> with <b>vessel loops</b> and clamped, taking care to avoid injury to <b>lumbar vessels</b>. Additionally, both common iliac vessels distal to the injury need to be isolated.",
-       ja:"損傷部より近位の大動脈をベッセルループで確保して遮断する。腰動静脈を傷つけないよう注意。さらに損傷部より遠位で、左右の総腸骨動静脈も確保する。"},
-      {en:"Exposure can also be accomplished by entering the midline retroperitoneum at the <b>root of the mesentery</b> below the renal vessels, with the small bowel retracted upward to the right and the colon to the left (Figure 5).",
-       ja:"腎血管より下の腸間膜根部から正中の後腹膜に入る方法もある。小腸は右上へ、結腸は左へよける（図5）。"}
-    ], figures:[
-      {src:"img/ch19-fig5.jpg", en:"Figure 5. Exposure of the distal aorta and bifurcation can be accomplished by entering the midline retroperitoneum below the renal vessels, moving the small bowel up and to the right, and moving the colon to the left. The ureters should be identified and preserved.",
-       ja:"図5：腎血管より下で正中の後腹膜に入り、小腸を右上・結腸を左へよけて、遠位大動脈と分岐部を出す。尿管は同定して温存する。",
-       labels:"写真の向き：頭側が上（HEAD TO TOP）／ Left Renal Vein 左腎静脈・IVC・Aorta 大動脈・Inferior Mesenteric Artery 下腸間膜動脈・Ureters 尿管"}
-    ]},
-    {ja:"腸骨血管の血管制御", en:"Vascular Control of the Iliac Vessels", items:[
-      {en:"Injury to the iliac artery or vein that results in an <b>expanding hematoma</b> or significant bleeding may <b>necessitate</b> manual compression until proximal and distal control can be obtained. Again, sponge sticks can be very helpful.",
-       ja:"血腫が広がる・出血が多いときは、近位・遠位の制御ができるまで手で圧迫する。ここでもスポンジスティックが役立つ。"},
-      {en:"Vessel loops can be passed around the common iliac artery for proximal control and around the external and internal iliac arteries (Figure 6).",
-       ja:"近位制御のため総腸骨動脈に、さらに外腸骨・内腸骨動脈にもベッセルループをかける（図6）。"},
-      {en:"<b>Bilateral</b> iliac injury may be exposed using <b>total pelvic vascular isolation</b>, which consists of <b>cross-clamping</b> the distal abdominal aorta and inferior vena cava, as well as clamping both external iliac arteries and veins.",
-       ja:"両側損傷では骨盤血管の完全遮断を行う。遠位腹部大動脈とIVC、さらに左右の外腸骨動静脈を遮断する。"},
-      {en:"A temporary arterial or venous <b>shunt</b> may be used to control hemorrhage and provide temporary <b>restoration</b> of distal blood flow in <b>damage control</b> situations.",
-       ja:"ダメージコントロールでは、一時的な動脈・静脈シャントで出血を抑えつつ末梢の血流を戻す。"}
-    ], figures:[
-      {src:"img/ch19-fig6.jpg", en:"Figure 6. Further distal dissection allows for identification and control of the retroperitoneal vessels in the lower abdomen and pelvis.",
-       ja:"図6：さらに遠位へ剥離すると、下腹部・骨盤の後腹膜血管を同定して制御できる。",
-       labels:"IVC・Aorta 大動脈・R./L. Iliac vessels 左右の腸骨血管・Ureter 尿管・Ext. Iliac 外腸骨・Int. Iliac 内腸骨・Sigmoid Colon S状結腸"}
-    ]}
-  ],
-  vocab:[
-    ["distal","遠位の","反対は proximal 近位の"],["iliac","腸骨の"],["vascular control","血管制御（出血を止められる状態）"],
-    ["retroperitoneal","後腹膜の"],["respectively","それぞれ"],["life-threatening","命に関わる"],["hemorrhage","出血"],["mortality rate","死亡率"],
-    ["penetrating wound","穿通性外傷","反対は blunt 鈍的"],["ligate","結紮する","名詞は ligation"],["edema","浮腫"],["deep venous thrombosis","深部静脈血栓症（DVT）"],
-    ["ureteral","尿管の"],["associated with","〜に合併する"],["evaluate","評価する"],["address","（問題に）対処する"],
-    ["midline incision","正中切開"],["anterior","前方の","反対は posterior 後方の"],["corresponding","対応する"],
-    ["intimately adherent","密に癒着している"],["profuse","大量の"],["transect","離断する"],["adequate","十分な"],
-    ["ipsilateral","同側の","反対は contralateral 対側の"],["excessive","過度の"],["retraction","牽引"],
-    ["local manual compression","手で直接圧迫すること"],["laparotomy pad","開腹用ガーゼ"],["sponge stick","スポンジスティック"],
-    ["isolate","（テープで）確保する"],["vessel loop","ベッセルループ（血管テープ）"],["lumbar vessels","腰動静脈"],["root of the mesentery","腸間膜根部"],
-    ["expanding hematoma","拡大する血腫"],["necessitate","必要とする"],["bilateral","両側の"],["total pelvic vascular isolation","骨盤血管の完全遮断"],
-    ["cross-clamp","（血管を）遮断する"],["shunt","シャント"],["restoration","回復"],["damage control","ダメージコントロール"]
-  ],
-  points:{cut:["正中切開（外傷開腹）","Cattell-Braasch法、または腎血管より下で腸間膜根部から正中の後腹膜へ"],
-    land:["腸骨動脈は静脈の前","左腎静脈（正中アプローチの上の境界）","下腸間膜動脈、大動脈分岐部"],
-    protect:["総腸骨静脈：動脈の後壁に密着","腰動静脈：大動脈にテープを回すとき","尿管：腸骨血管の前を横切る。血管処置のあとで評価","外腸骨動脈：引っぱりすぎ"]},
-  compare:["Cattell-Braasch法＝外側から右結腸を授動して右後腹膜を広く出す。","正中アプローチ＝腸間膜根部から真ん中に直接入る。遠位大動脈・分岐部に早く届く。","尿管が分岐部の前を横切るのはどちらも同じ。泌尿器科医にはなじみのある目印。"]
-}
-];
+/* 書式： {英語|日本語} はタップで意味が出る語。**太字** は教科書の太字。 */
+const PAGE = {
+runhead:"Operative Exposure in Abdominal Trauma: Exposure of the Distal Aorta and Iliac Vessels",
+title:{en:"{Operative Exposure|手術展開} in {Abdominal Trauma|腹部外傷}: Exposure of the {Distal Aorta|遠位大動脈} and {Iliac Vessels|腸骨血管}", ja:"腹部外傷における手術展開：遠位大動脈と腸骨血管の展開（19章 p161〜166）"},
+blocks:[
+ {t:"p", en:"This chapter will discuss the key {vascular exposures|血管の展開} that will be {potentially lifesaving|救命につながりうる} for patients with injury to or {rupture|破裂} of their distal aorta or iliac artery or vein.",
+  ja:"この章では、遠位大動脈や腸骨動脈・腸骨静脈の損傷・破裂がある患者で、救命につながりうる主要な血管の展開法を扱う。"},
 
+ {t:"h", id:"s-obj", en:"{Learning Objectives|学習目標}", ja:"学習目標"},
+ {t:"p", en:"By the end of the ASSET course, {participants|受講者} should be able to do the following:", ja:"ASSETコースを終えるまでに、受講者は次のことができるようになる。"},
+ {t:"ol", items:[
+  {en:"{Describe|説明する} and {demonstrate|実際にやってみせる} the steps to obtain {vascular control|血管制御（出血を止められる状態）} of the {distal|遠位の} aorta.", ja:"遠位大動脈の血管制御を得る手順を説明し、実際にやってみせる。"},
+  {en:"Describe and demonstrate the steps to obtain exposure of the right and left {iliac|腸骨の} arteries and veins.", ja:"左右の腸骨動脈・腸骨静脈を展開する手順を説明し、実際にやってみせる。"}
+ ]},
 
+ {t:"h", id:"s-cons", en:"{Considerations|留意点}", ja:"留意点"},
+ {t:"ul", items:[
+  {en:"The distal aorta and the iliac vessels are located in {retroperitoneal|後腹膜の} Zones 1 and 3 (chapter 15), {respectively|それぞれ}. When injured, they can {present|呈する} {life-threatening|命に関わる} {hemorrhage|出血}, with an associated high {mortality rate|死亡率}.",
+   ja:"遠位大動脈は後腹膜Zone 1、腸骨血管はZone 3にある（15章）。損傷すると命に関わる出血を起こし、死亡率が高い。"},
+  {en:"{Penetrating wounds|穿通性外傷} to the pelvis are the most common causes of distal aorta and iliac vessel injuries.",
+   ja:"遠位大動脈・腸骨血管損傷の原因でいちばん多いのは、骨盤の穿通性外傷である。"},
+  {en:"Iliac vein injuries result in significant {blood loss|出血量}, and operative exposure is difficult. These veins may be {ligated|結紮される} if necessary. {Ligation|結紮} of the external iliac vein {distal to the bifurcation|分岐部より末梢で} will {place the patient at risk of|〜のリスクにさらす} developing lower extremity {edema|浮腫} and/or {deep venous thrombosis|深部静脈血栓症（DVT）}.",
+   ja:"腸骨静脈損傷は出血量が多く、展開も難しい。必要ならこれらの静脈は結紮してよい。ただし外腸骨静脈を分岐部より末梢で結紮すると、下肢の浮腫やDVTが起こりうる。"},
+  {en:"The first {priority|優先事項} is hemorrhage control.", ja:"最優先は出血のコントロールである。"},
+  {warn:true, en:"{Ureteral|尿管の} injuries are commonly {associated with|〜に合併する} iliac vessel injuries, and therefore the ureter should be {evaluated|評価される} after the vascular injuries have been {addressed|対処される}.",
+   ja:"尿管損傷は腸骨血管損傷によく合併する。したがって、血管損傷に対処したあとで尿管を評価すること。"}
+ ]},
+ {t:"dg", key:"zones"},
+
+ {t:"h", id:"s-op", en:"{Operative Exposure|手術展開}", ja:"手術展開"},
+ {t:"ul", items:[
+  {en:"Distal aorta and iliac vessel injuries are {typically|通常は} exposed through a {midline incision|正中切開} as part of a {trauma laparotomy|外傷開腹}.",
+   ja:"遠位大動脈・腸骨血管の損傷は、通常は外傷開腹の一部として正中切開から展開する。"},
+  {en:"Understanding the {anatomic relationships|解剖学的な位置関係} of the distal aorta and iliac vessels is {critical|極めて重要} to obtaining safe and rapid control. Remember that the iliac arteries are **{anterior|前方に}** to their {corresponding|対応する} veins.",
+   ja:"安全かつ迅速に制御するには、遠位大動脈と腸骨血管の位置関係を理解しておくことが極めて重要である。腸骨動脈は、対応する静脈より前にあることを覚えておく。"},
+  {en:"As {outlined|述べた} in chapter 15, right-to-left {medial visceral rotation|内側臓器翻転} (Cattell-Braasch maneuver) can be performed rapidly and allows for the colon and small bowel to be {mobilized|授動される} up and off the distal aorta, {inferior vena cava|下大静脈（IVC）}, and iliac vessels (Figures 1 and 2).",
+   ja:"15章で述べたとおり、右から左への内側臓器翻転（Cattell-Braasch法）は素早く行え、結腸と小腸を遠位大動脈・IVC・腸骨血管の上からよけられる（図1・2）。",
+   supp:true},
+  {warn:true, en:"The common iliac veins are {intimately adherent|密に癒着している} to the {back wall|後壁} of the common iliac arteries. If not careful, mobilization of the artery may result in venous injury and {profuse bleeding|大量出血}. The right common iliac vein and bifurcation are particularly difficult to expose.",
+   ja:"総腸骨静脈は総腸骨動脈の後壁に密着している。不用意に動脈を授動すると、静脈を損傷して大出血になることがある。特に右総腸骨静脈と分岐部は展開が難しい。"},
+  {en:"{Occasionally|ときに}, it may be necessary to {transect|離断する} the right common iliac artery to gain {adequate|十分な} exposure of the right common iliac vein, as {depicted|示された} in Figures 3 and 4. Transection and ligation of the {internal iliac artery|内腸骨動脈} can also improve exposure of the {ipsilateral|同側の} common iliac vein.",
+   ja:"右総腸骨静脈を十分に展開するため、右総腸骨動脈を離断しなければならないこともある（図3・4）。内腸骨動脈を離断・結紮しても、同側の総腸骨静脈が見やすくなる。"},
+  {sub:true, en:"{Excessive|過度の} {retraction|牽引} of the {external iliac artery|外腸骨動脈} to obtain better exposure of this vein may damage the artery.",
+   ja:"この静脈をよく見ようとして外腸骨動脈を引っぱりすぎると、動脈を傷めることがある。"}
+ ]},
+ {t:"dg", key:"bif"},
+ {t:"dg", key:"xsec"},
+ {t:"missing", text:"教科書の図1〜4（p163〜164）はまだ撮影されていません。写真を送ってもらえればここに入れます。"},
+
+ {t:"h", id:"s-aorta", en:"{Vascular Control|血管制御} of the {Distal Aorta|遠位大動脈}", ja:"遠位大動脈の血管制御"},
+ {t:"ul", items:[
+  {en:"Injuries to the distal aorta and bifurcation may be {temporarily|一時的に} controlled by {local manual compression|手での局所圧迫} with a {laparotomy pad|開腹用ガーゼ}, {sponge stick|スポンジスティック}, or fingers until {proximal|近位の} and distal vessel control can be {achieved|達成される}.",
+   ja:"遠位大動脈や分岐部の損傷は、近位と遠位の制御ができるまで、開腹用ガーゼ・スポンジスティック・指で直接圧迫して一時的に抑えられる。"},
+  {en:"REBOA, as described in chapter 22, can also provide temporary hemorrhage control.",
+   ja:"22章で説明するREBOAでも、一時的に出血を抑えられる。"},
+  {warn:true, en:"It is important to remember that the aorta proximal to the injury should be {isolated|（テープで）確保される} with {vessel loops|ベッセルループ} and clamped, {taking care to avoid|〜しないよう注意して} injury to {lumbar vessels|腰動静脈}. Additionally, both common iliac vessels distal to the injury need to be isolated.",
+   ja:"損傷部より近位の大動脈をベッセルループで確保して遮断することが重要である。その際、腰動静脈を傷つけないよう注意する。さらに損傷部より遠位で、左右の総腸骨動静脈も確保する必要がある。"},
+  {en:"For {suspected|疑われる} injuries to the distal aorta and its bifurcation, exposure can also be {accomplished|成し遂げられる} by entering the midline retroperitoneum at the {root of the mesentery|腸間膜根部} below the renal vessels, with the small bowel {retracted|牽引される} upward to the right and the colon to the left (Figure 5).",
+   ja:"遠位大動脈や分岐部の損傷が疑われるときは、腎血管より下の腸間膜根部から正中の後腹膜に入って展開することもできる。小腸は右上へ、結腸は左へ牽引する（図5）。"}
+ ]},
+ {t:"fig", src:"img/ch19-fig5.jpg", lab:"Figure 5.", en:"Exposure of the distal aorta and bifurcation can be accomplished by entering the midline retroperitoneum below the renal vessels, moving the small bowel up and to the right, and moving the colon to the left. The ureters should be {identified|同定される} and {preserved|温存される}.",
+  ja:"腎血管より下で正中の後腹膜に入り、小腸を右上へ・結腸を左へよけると、遠位大動脈と分岐部を展開できる。尿管は同定して温存すること。",
+  labels:"HEAD TO TOP＝頭側が上 ／ Left Renal Vein 左腎静脈・IVC 下大静脈・Aorta 大動脈・Inferior Mesenteric Artery 下腸間膜動脈・Ureters 尿管"},
+
+ {t:"h", id:"s-iliac", en:"Vascular Control of the {Iliac Vessels|腸骨血管}", ja:"腸骨血管の血管制御"},
+ {t:"ul", items:[
+  {en:"Injury to the iliac artery or vein that results in an {expanding hematoma|拡大する血腫} or significant bleeding may {necessitate|必要とする} manual compression until proximal and distal control can be obtained. Again, sponge sticks can be very helpful.",
+   ja:"腸骨動静脈の損傷で血腫が広がる・出血が多い場合は、近位と遠位を制御できるまで手で圧迫する必要がありうる。ここでもスポンジスティックがとても役に立つ。"},
+  {en:"Vessel loops can be {passed around|周りに回す} the common iliac artery for proximal control and around the external and internal iliac arteries (Figure 6).",
+   ja:"近位の制御には総腸骨動脈に、さらに外腸骨・内腸骨動脈にもベッセルループをかけられる（図6）。"},
+  {en:"{Bilateral|両側の} iliac injury may be exposed using {total pelvic vascular isolation|骨盤血管の完全遮断}, which {consists of|〜から成る} {cross-clamping|遮断すること} the distal abdominal aorta and inferior vena cava, as well as clamping both external iliac arteries and veins.",
+   ja:"両側の腸骨血管損傷では、骨盤血管の完全遮断で展開できる。遠位腹部大動脈とIVCを遮断し、さらに左右の外腸骨動静脈も遮断する方法である。"},
+  {en:"A temporary arterial or venous {shunt|シャント} may be used to control hemorrhage and provide temporary {restoration|回復} of distal blood flow in {damage control|ダメージコントロール} situations.",
+   ja:"ダメージコントロールの場面では、一時的な動脈・静脈シャントで出血を抑えつつ、末梢の血流を一時的に戻すことがある。"}
+ ]},
+ {t:"fig", src:"img/ch19-fig6.jpg", lab:"Figure 6.", en:"Further distal {dissection|剥離} allows for {identification|同定} and control of the retroperitoneal vessels in the lower abdomen and pelvis.",
+  ja:"さらに遠位へ剥離を進めると、下腹部と骨盤の後腹膜血管を同定し、制御できる。",
+  labels:"R./L. Iliac vessels 左右の腸骨血管・Ureter 尿管・Ext. Iliac 外腸骨・Int. Iliac 内腸骨・Sigmoid Colon S状結腸"}
+]};
+
+/* 15章からの補足（Cattell-Braasch法）。19章の該当箇所の下に入る */
+const SUPP = {
+tag:"補足｜15章 Trauma Laparotomy より",
+title:{en:"Right-to-Left {Medial Visceral Rotation|内側臓器翻転} (Cattell-Braasch Maneuver)", ja:"右から左への内側臓器翻転（Cattell-Braasch法）"},
+blocks:[
+ {t:"h3", en:"Considerations"},
+ {t:"ul", items:[
+  {en:"Right-to-left medial visceral rotation provides excellent exposure of injuries to the structures of the right {retroperitoneum|後腹膜}, including the {duodenum|十二指腸}, {head of the pancreas|膵頭部}, right kidney and its vessels, ureter, inferior vena cava (IVC), and right iliac vessels.",
+   ja:"右から左への内側臓器翻転を行うと、右後腹膜の構造の損傷がとてもよく見える。対象は十二指腸、膵頭部、右腎とその血管、尿管、IVC、右腸骨血管。"}
+ ]},
+ {t:"h3", en:"Technique"},
+ {t:"ul", items:[
+  {step:"STEP 1", en:"The first step of right-to-left medial visceral rotation (Cattell-Braasch maneuver) is to {incise|切開する} the {parietal peritoneum|壁側腹膜} at the {white line of Toldt|Toldtの白線}, from the base of the {cecum|盲腸} to the {hepatic flexure|肝弯曲} (Figure 8). The {dissection plane|剥離層} between the right colon and the abdominal wall is {avascular|無血管の} and, once entered, can be extended rapidly with {blunt dissection|鈍的剥離}.",
+   ja:"第1段階：盲腸の付け根から肝弯曲まで、Toldtの白線で壁側腹膜を切開する（図8）。右結腸と腹壁のあいだの剥離層は無血管で、一度入れば鈍的剥離で素早く広げられる。"},
+  {warn:true, en:"If there is an IVC injury, performing a medial visceral rotation may {unroof|天井を開ける} a {contained hematoma|被包化された血腫} with significant bleeding. One must plan for this possibility and {be prepared to|〜する準備をしておく} obtain rapid control of the IVC.",
+   ja:"IVC損傷がある場合、内側臓器翻転によって閉じ込められていた血腫の天井が開き、大出血することがある。これを想定し、IVCをすぐ制御できるよう準備しておかなければならない。"},
+  {step:"STEP 2", en:"The second step of the Cattell-Braasch maneuver is to mobilize the hepatic flexure of the colon and perform a {Kocher maneuver|Kocher法（十二指腸の授動）} to fully visualize the {sweep of the duodenum|十二指腸のC字ループ} and the head of the pancreas.",
+   ja:"第2段階：結腸の肝弯曲を授動し、Kocher法を行って十二指腸のループ全体と膵頭部が見えるようにする。"},
+  {step:"STEP 3", en:"The final step of the maneuver is to rotate the cecum and small bowel up and out of the pelvis in a right-to-left, {inferior-to-superior|下から上へ} fashion. Completion of the maneuver should enable the {displacement|移動} of the patient's cecum to near the patient's left shoulder.",
+   ja:"最終段階：盲腸と小腸を、右から左へ・下から上へと回転させて骨盤から持ち上げる。完成すると、盲腸は患者の左肩の近くまで移動できる。"},
+  {en:"The completed Cattell-Braasch maneuver (Figure 9) provides excellent visualization of the retroperitoneal structures in the right abdomen and pelvis.",
+   ja:"完成したCattell-Braasch法（図9）では、右側の腹部と骨盤の後腹膜構造がとてもよく見える。"}
+ ]},
+ {t:"dg", key:"cb"},
+ {t:"fig", src:"img/ch15-fig8-9.jpg", lab:"Figures 8, 9.", en:"Figure 8. The Cattell-Braasch maneuver involves mobilization of the right colon (1), exposure of the duodenum and head of pancreas by an extended Kocher maneuver (2), and retraction of the colon and small bowel superior and medial (3). Figure 9. The completed maneuver provides excellent exposure of the head of the pancreas, the IVC, the right kidney and ureter, the renal veins, and the right iliac vessels into the pelvis.",
+  ja:"図8：(1) 右結腸の授動 → (2) 拡大Kocher法で十二指腸・膵頭部を展開 → (3) 結腸と小腸を上方・内側へ牽引。／図9：完成図。膵頭部、IVC、右腎と尿管、腎静脈、骨盤までの右腸骨血管が見える。",
+  labels:"HEAD TO RIGHT＝頭側が右 ／ Right Ureter 右尿管・Left Renal Vein 左腎静脈・Right Kidney 右腎・Head of Pancreas 膵頭部・Gallbladder 胆嚢・Liver 肝臓"}
+]};
+
+const MEMO = {
+ points:{cut:["正中切開（外傷開腹）","Cattell-Braasch法（Toldtの白線を切開）、または腎血管より下で腸間膜根部から正中の後腹膜へ"],
+   land:["腸骨動脈は静脈の前","左腎静脈（正中アプローチの上の境界）","下腸間膜動脈、大動脈分岐部","十二指腸のC字ループ（Cattell-Braasch法）"],
+   protect:["総腸骨静脈：動脈の後壁に密着","IVC：翻転で血腫が開く前に制御の準備","腰動静脈：大動脈にテープを回すとき","尿管：腸骨血管の前を横切る。血管処置のあとで評価","外腸骨動脈：引っぱりすぎ"]},
+ compare:["Cattell-Braasch法の最初の2段階（Toldt線切開→右結腸授動→Kocher）は、経腹膜で右腎・IVCへ行くときの操作とほぼ同じ。違いは最終段階で、盲腸と小腸を左肩まで丸ごと持ち上げ、骨盤の腸骨血管まで一気に出すこと。",
+   "正中アプローチ（図5）は、腸間膜根部から真ん中に直接入る。遠位大動脈・分岐部に早く届く。",
+   "尿管が腸骨動脈の分岐部の前を横切るのはどちらも同じ。泌尿器科医にはなじみのある目印。"]
+};
 /* ===== 図解（自作の模式図） ===== */
 const DIAGRAMS = {
 zones:{tag:"図解A", caption:"後腹膜の3つのゾーン。19章の遠位大動脈はZone 1（中央）、腸骨血管はZone 3（骨盤）にある。",
@@ -368,116 +406,113 @@ svg:`<svg viewBox="0 0 360 370" role="img" aria-label="Cattell-Braasch法の3段
 </svg>`}
 };
 
+
 /* ===== プレテスト（○×） a:true=○ ===== */
-const QUIZ = {
-ch15:[
- {lv:1,q:"Cattell-Braasch法は「右から左への」内側臓器翻転（right-to-left medial visceral rotation）である。",a:true,e:"右結腸を内側（患者の左）へ倒す方法。左から右へ倒すのはMattox法。"},
- {lv:1,q:"最初に切開するのはToldtの白線（white line of Toldt）である。",a:true,e:"盲腸の付け根から肝弯曲まで、壁側腹膜を切る。"},
- {lv:1,q:"Cattell-Braasch法で主に見えるのは、脾臓や左腎など左後腹膜の構造である。",a:false,e:"見えるのは右後腹膜（十二指腸・膵頭部・右腎・IVC・右腸骨血管）。左はMattox法。"},
- {lv:1,q:"右結腸と腹壁のあいだの層は血管が多いので、鋭的に少しずつ剥がす。",a:false,e:"この層は無血管（avascular）。一度入れば鈍的剥離（blunt dissection）で素早く広げられる。"},
- {lv:2,q:"第1段階の切開範囲は、盲腸の付け根から脾弯曲までである。",a:false,e:"肝弯曲（hepatic flexure）まで。脾弯曲は左側。"},
- {lv:2,q:"Kocher法は、十二指腸と膵頭部を見えるようにするための操作である。",a:true,e:"第2段階で肝弯曲を授動し、Kocher法で十二指腸のC字ループと膵頭部を出す。"},
- {lv:2,q:"最終段階では、盲腸と小腸を「上から下へ」回転させる。",a:false,e:"下から上へ（inferior-to-superior）。骨盤から持ち上げて出す。"},
- {lv:2,q:"手技が完成すると、盲腸は患者の左肩の近くまで動かせる。",a:true,e:"これが完成の目安。図解Dの③。"},
- {lv:3,q:"IVC損傷が疑われるときは、翻転で血腫の天井が開いて大出血しうるので、IVCを制御する準備をしてから行う。",a:true,e:"contained hematoma を unroof すると出血する。準備してから開ける。"},
- {lv:3,q:"Cattell-Braasch法を完成させれば、右尿管と右腸骨血管は骨盤まで追える。",a:true,e:"図9：膵頭部・IVC・右腎と尿管・腎静脈・骨盤までの右腸骨血管が見える。"},
- {lv:3,q:"腹腔動脈より上で大動脈を遮断するとき、食道は患者の右へ牽引する。",a:false,e:"患者の左へ牽引する（図7）。"},
- {lv:3,q:"裂孔の高さで大動脈を遮断するとき、鉗子先端の目印は傍脊柱筋と椎体である。",a:true,e:"図6。鉗子を椎体に当たるまで入れるイメージ。"}
-],
-ch19:[
+const QUIZ = [
  {lv:1,q:"腸骨動脈は、対応する静脈より前（anterior）にある。",a:true,e:"動脈が前、静脈が後ろ。図解B・C。"},
  {lv:1,q:"遠位大動脈・腸骨血管損傷の原因で最も多いのは、鈍的外傷である。",a:false,e:"最も多いのは骨盤の穿通性外傷（penetrating wounds）。"},
  {lv:1,q:"最優先は出血のコントロールである。",a:true,e:"The first priority is hemorrhage control."},
  {lv:1,q:"通常は正中切開（外傷開腹）から展開する。",a:true,e:"midline incision as part of a trauma laparotomy."},
+ {lv:1,q:"Cattell-Braasch法は「右から左への」内側臓器翻転である。",a:true,e:"右結腸を患者の左へ倒す方法。左から右へ倒すのはMattox法。"},
+ {lv:1,q:"Cattell-Braasch法で最初に切開するのはToldtの白線である。",a:true,e:"盲腸の付け根から肝弯曲まで、壁側腹膜を切る。"},
  {lv:2,q:"総腸骨静脈は、総腸骨動脈の「前壁」に密着している。",a:false,e:"後壁（back wall）に密着している。だから動脈の裏を剥がすと静脈が裂ける。"},
  {lv:2,q:"遠位大動脈は後腹膜Zone 1、腸骨血管はZone 3にある。",a:true,e:"図解A。Zone 1が中央、Zone 3が骨盤。"},
  {lv:2,q:"腸骨静脈は、どんな場合でも結紮してはいけない。",a:false,e:"必要なら結紮してよい。外腸骨静脈の結紮では下肢の浮腫やDVTのリスクがある。"},
  {lv:2,q:"尿管は、血管損傷の処置より先に評価する。",a:false,e:"血管の処置のあとで評価する。まず出血のコントロール。"},
- {lv:3,q:"右総腸骨静脈を出すために、右総腸骨動脈を離断することがある。",a:true,e:"図解Bのとおり、右総腸骨動脈が静脈の前をふさいでいるため。内腸骨動脈の離断・結紮でも視野が良くなる。"},
+ {lv:2,q:"Kocher法は、十二指腸と膵頭部を見えるようにするための操作である。",a:true,e:"Cattell-Braasch法の第2段階。"},
+ {lv:2,q:"Cattell-Braasch法が完成すると、盲腸は患者の左肩の近くまで動かせる。",a:true,e:"これが完成の目安。図解Dの③。"},
+ {lv:3,q:"右総腸骨静脈を出すために、右総腸骨動脈を離断することがある。",a:true,e:"右総腸骨動脈が静脈の前をふさいでいるため（図解B）。内腸骨動脈の離断・結紮でも視野が良くなる。"},
  {lv:3,q:"正中アプローチでは、腎血管より「上」で腸間膜根部から後腹膜に入る。",a:false,e:"腎血管より下（below the renal vessels）。左腎静脈が上の境界。"},
  {lv:3,q:"骨盤血管の完全遮断では、遠位大動脈・IVCに加えて左右の「内腸骨」動静脈を遮断する。",a:false,e:"左右の外腸骨（external iliac）動静脈を遮断する。"},
- {lv:3,q:"大動脈にベッセルループを回すときは、腰動静脈（lumbar vessels）を傷つけないよう注意する。",a:true,e:"大動脈の後ろから腰動静脈が出ているため。"}
-]
-};
-const LV_NAME={1:"Lv1 やさしい",2:"Lv2 ふつう",3:"Lv3 むずかしい"};
+ {lv:3,q:"大動脈にベッセルループを回すときは、腰動静脈（lumbar vessels）を傷つけないよう注意する。",a:true,e:"大動脈の後ろから腰動静脈が出ているため。"},
+ {lv:3,q:"IVC損傷が疑われるときは、Cattell-Braasch法で血腫の天井が開いて大出血しうるので、IVCを制御する準備をしてから行う。",a:true,e:"contained hematoma を unroof すると出血する。準備してから開ける。"},
+ {lv:3,q:"Cattell-Braasch法の最終段階では、盲腸と小腸を「上から下へ」回転させる。",a:false,e:"下から上へ（inferior-to-superior）。骨盤から持ち上げて出す。"}
+];
 
 /* ===== 描画 ===== */
 const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-const TAP='<span class="tap">タップで日本語</span>';
-const toc=document.getElementById("toc"), root=document.getElementById("chapters");
-let html="", chips="";
-for(const c of CHAPTERS){
-  chips+=`<a href="#${c.id}">${c.no.replace("Chapter ","")}章 ${esc(c.ja.replace(/^腹部外傷：/,""))}</a>`;
-  html+=`<section class="chapter" id="${c.id}"><div class="chno">${c.no}</div><h2>${esc(c.ja)}</h2><p class="en-title">${esc(c.en)}</p><p class="meta">${esc(c.pages)}</p>`;
-  if(QUIZ[c.id]) html+=`<div class="quiz" data-ch="${c.id}"><div class="quiz-head"><strong>プレテスト（○×）</strong><span class="score"></span></div>
-    <div class="levels" role="group" aria-label="レベル">${[1,2,3].map(l=>`<button class="btn" data-lv="${l}" aria-pressed="false">${LV_NAME[l]}</button>`).join("")}</div>
-    <ol class="qlist"></ol><div class="quiz-foot"><button class="btn retry">このレベルをやり直す</button></div></div>`;
-  for(const s of c.sections){
-    html+=`<h3><span>${esc(s.ja)}</span><span class="en">${esc(s.en)}</span></h3>`;
-    if(s.items){html+=`<ul class="pairs">`;for(const it of s.items){
-      const cls=["pair",it.warn?"warn":"",it.sub?"sub":""].join(" ");
-      const tag=it.step?`<span class="tag">${it.step}</span>`:it.warn?`<span class="tag">注意</span>`:"";
-      html+=`<li class="${cls}" tabindex="0">${tag}<span class="en">${it.en}</span><span class="ja">${esc(it.ja)}</span>${TAP}</li>`;}
-      html+=`</ul>`;}
-    for(const k of s.diagrams||[]){const d=DIAGRAMS[k];
-      html+=`<figure class="dg"><span class="dg-tag">${d.tag}　模式図</span>${d.svg}<figcaption>${esc(d.caption)}</figcaption></figure>`;}
-    for(const f of s.figures||[]){
-      html+=`<figure class="photo" tabindex="0"><img src="${f.src}" alt="${esc(f.ja)}" loading="lazy"><figcaption><span class="en">${esc(f.en)}</span><span class="ja">${esc(f.ja)}</span>${TAP}${f.labels?`<span class="labels">${esc(f.labels)}</span>`:""}</figcaption></figure>`;}
+const VOCAB=new Map();
+function rich(s){
+  return esc(s).replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>").replace(/\{([^|{}]+)\|([^{}]+)\}/g,(m,en,ja)=>{
+    const k=en.toLowerCase(); if(!VOCAB.has(k)) VOCAB.set(k,[en,ja]);
+    return `<button class="term" type="button" aria-expanded="false">${en}</button><span class="gloss">${ja}</span>`;});
+}
+const sentence=(en,ja,extra="")=>`<div class="blk">${extra}<p class="en-p">${rich(en)}</p><div class="ja">${esc(ja)}</div><button class="ja-btn" type="button">訳を見る</button></div>`;
+function blocks(list){
+  let h="";
+  for(const b of list){
+    if(b.t==="p") h+=sentence(b.en,b.ja);
+    else if(b.t==="h") h+=`<h2 class="sec"${b.id?` id="${b.id}"`:""}>${rich(b.en)}<span class="hja">${esc(b.ja)}</span></h2>`;
+    else if(b.t==="h3") h+=`<h3 class="sub">${rich(b.en)}</h3>`;
+    else if(b.t==="ul"||b.t==="ol"){
+      h+=`<ul class="items ${b.t==="ol"?"num":"bul"}">`;
+      for(const it of b.items){
+        const cls=[it.warn?"warn":"",it.sub?"sub":""].join(" ").trim();
+        h+=`<li${cls?` class="${cls}"`:""}>${sentence(it.en,it.ja,it.step?`<span class="step">${it.step}</span>`:"")}${it.supp?supp():""}</li>`;
+      }
+      h+=`</ul>`;
+    }
+    else if(b.t==="dg"){const d=DIAGRAMS[b.key];h+=`<figure class="dg"><span class="dg-tag">${d.tag}　学習用の模式図</span>${d.svg}<figcaption>${esc(d.caption)}</figcaption></figure>`;}
+    else if(b.t==="fig") h+=`<figure class="photo"><img src="${b.src}" alt="${esc(b.ja)}" loading="lazy"><figcaption>${sentence(`**${b.lab}** `+b.en,b.ja)}<span class="labels">${esc(b.labels)}</span></figcaption></figure>`;
+    else if(b.t==="missing") h+=`<p class="missing">${esc(b.text)}</p>`;
   }
-  html+=`<h4>単語 VOCABULARY（${c.vocab.length}語）</h4><ul class="vocab">`;
-  for(const [en,ja,note] of c.vocab) html+=`<li class="word" tabindex="0"><span class="en">${esc(en)}</span><span class="ja">${esc(ja)}</span>${note?`<span class="note">${esc(note)}</span>`:""}${TAP}</li>`;
-  html+=`</ul><h4>3つのポイント</h4><div class="points">`;
-  for(const [k,label] of [["cut","切開線"],["land","ランドマーク"],["protect","守るべき構造"]])
-    html+=`<div class="point"><span class="k">${label}</span><ul>${c.points[k].map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`;
-  html+=`</div>`;
-  if(c.compare) html+=`<h4>普段の手技との比較</h4><div class="compare">${c.compare.map(x=>`<p>${esc(x)}</p>`).join("")}</div>`;
-  html+=`</section>`;
+  return h;
 }
-toc.innerHTML=chips; root.innerHTML=html;
+function supp(){return `<aside class="supp"><div class="supp-tag">${esc(SUPP.tag)}</div><h2 class="sec">${rich(SUPP.title.en)}<span class="hja">${esc(SUPP.title.ja)}</span></h2>${blocks(SUPP.blocks)}</aside>`;}
+document.getElementById("page").innerHTML=
+  `<p class="runhead">${esc(PAGE.runhead)}</p><h1 class="title">${rich(PAGE.title.en)}<span class="hja">${esc(PAGE.title.ja)}</span></h1>`+
+  blocks(PAGE.blocks)+`<p class="runfoot">Exposure Techniques <i>When Time Matters</i></p>`;
+document.getElementById("points").innerHTML=[["cut","切開線"],["land","ランドマーク"],["protect","守るべき構造"]]
+  .map(([k,l])=>`<div class="point"><span class="k">${l}</span><ul>${MEMO.points[k].map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`).join("");
+document.getElementById("compare").innerHTML=MEMO.compare.map(x=>`<p>${esc(x)}</p>`).join("");
+document.getElementById("vocab").innerHTML=[...VOCAB.values()].map(([en,ja])=>`<li class="word" tabindex="0"><span class="w-en">${en}</span><span class="w-ja">${ja}</span></li>`).join("");
+document.getElementById("vcount").textContent=`${VOCAB.size}語`;
 
-/* ===== プレテストの動作 ===== */
+/* ===== タップで語の意味 / 文の訳 ===== */
 const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
-function renderQuiz(box,lv){
-  const ch=box.dataset.ch, qs=QUIZ[ch].filter(q=>q.lv===lv);
-  box.dataset.lv=lv; store.set("lv-"+ch,lv);
-  box.querySelectorAll("[data-lv]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.lv===lv)));
-  box.querySelector(".qlist").innerHTML=qs.map((q,i)=>`<li class="q" data-i="${QUIZ[ch].indexOf(q)}"><div class="q-row"><span class="q-text">Q${i+1}. ${esc(q.q)}</span>
+document.addEventListener("click",e=>{
+  const t=e.target.closest(".term");
+  if(t){t.classList.toggle("on");t.setAttribute("aria-expanded",String(t.classList.contains("on")));return;}
+  const jb=e.target.closest(".ja-btn"); if(jb){jb.closest(".blk").classList.add("open");return;}
+  const w=e.target.closest(".word"); if(w&&document.body.classList.contains("hide-ja")) w.classList.toggle("open");
+});
+const hideBtn=document.getElementById("hide-ja"), glossBtn=document.getElementById("all-gloss");
+let hide=store.get("hide-ja")==="1", allGloss=store.get("all-gloss")==="1";
+function applyToggles(){
+  document.body.classList.toggle("hide-ja",hide); document.body.classList.toggle("all-gloss",allGloss);
+  hideBtn.setAttribute("aria-pressed",String(hide)); hideBtn.textContent=hide?"文の訳を表示":"文の訳を隠す";
+  glossBtn.setAttribute("aria-pressed",String(allGloss));
+  document.querySelectorAll(".open").forEach(x=>x.classList.remove("open"));
+  store.set("hide-ja",hide?"1":"0"); store.set("all-gloss",allGloss?"1":"0");
+}
+hideBtn.addEventListener("click",()=>{hide=!hide;applyToggles();});
+glossBtn.addEventListener("click",()=>{allGloss=!allGloss;applyToggles();});
+applyToggles();
+
+/* ===== プレテスト ===== */
+const quiz=document.getElementById("pretest");
+let curLv=+(store.get("lv-ch19")||1);
+function renderQuiz(lv){
+  curLv=lv; store.set("lv-ch19",lv);
+  quiz.querySelectorAll("button[data-lv]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.lv===lv)));
+  const qs=QUIZ.filter(q=>q.lv===lv);
+  quiz.querySelector(".qlist").innerHTML=qs.map((q,i)=>`<li class="q" data-i="${QUIZ.indexOf(q)}"><div class="q-row"><span class="q-text">Q${i+1}. ${esc(q.q)}</span>
     <span class="ox"><button data-ans="1" aria-label="○ 正しい">○</button><button data-ans="0" aria-label="× 誤り">×</button></span></div></li>`).join("");
-  updateScore(box);
+  score();
 }
-function updateScore(box){
-  const items=[...box.querySelectorAll(".q")], done=items.filter(q=>q.dataset.done), ok=done.filter(q=>q.dataset.done==="ok");
-  box.querySelector(".score").textContent=`${ok.length}/${items.length} 正解`+(done.length<items.length?`（残り${items.length-done.length}問）`:"");
+function score(){
+  const items=[...quiz.querySelectorAll(".q")],done=items.filter(q=>q.dataset.done),ok=done.filter(q=>q.dataset.done==="ok");
+  quiz.querySelector(".score").textContent=`${ok.length}/${items.length} 正解`+(done.length<items.length?`（残り${items.length-done.length}問）`:"");
 }
-root.addEventListener("click",e=>{
-  const box=e.target.closest(".quiz"); if(!box) return;
-  const lvb=e.target.closest("button[data-lv]"); if(lvb){renderQuiz(box,+lvb.dataset.lv);return;}
-  if(e.target.closest(".retry")){renderQuiz(box,+box.dataset.lv);return;}
+quiz.addEventListener("click",e=>{
+  const lvb=e.target.closest("button[data-lv]"); if(lvb){renderQuiz(+lvb.dataset.lv);return;}
+  if(e.target.closest("#retry")){renderQuiz(curLv);return;}
   const ab=e.target.closest("[data-ans]"); if(!ab) return;
   const li=ab.closest(".q"); if(li.dataset.done) return;
-  const q=QUIZ[box.dataset.ch][+li.dataset.i], right=(ab.dataset.ans==="1")===q.a;
-  li.dataset.done=right?"ok":"ng";
-  li.querySelectorAll("[data-ans]").forEach(b=>b.disabled=true); ab.classList.add("picked");
+  const q=QUIZ[+li.dataset.i], right=(ab.dataset.ans==="1")===q.a;
+  li.dataset.done=right?"ok":"ng"; li.querySelectorAll("[data-ans]").forEach(b=>b.disabled=true); ab.classList.add("picked");
   li.insertAdjacentHTML("beforeend",`<div class="result"><b class="${right?"ok":"ng"}">${right?"正解":"不正解"}</b>　答えは ${q.a?"○":"×"}。${esc(q.e)}</div>`);
-  updateScore(box);
+  score();
 });
-document.querySelectorAll(".quiz").forEach(b=>renderQuiz(b,+(store.get("lv-"+b.dataset.ch)||1)));
-
-/* ===== 日本語を隠す ===== */
-const hideBtn=document.getElementById("hide-ja"), hint=document.getElementById("hide-hint");
-let hide=store.get("hide-ja")==="1";
-function applyHide(){
-  document.body.classList.toggle("hide-ja",hide);
-  hideBtn.setAttribute("aria-pressed",String(hide));
-  hideBtn.textContent=hide?"日本語を表示する":"日本語を隠す";
-  hint.textContent=hide?"文や単語をタップすると日本語が出ます":"隠すと、タップしたところだけ日本語が出ます";
-  document.querySelectorAll(".open").forEach(e=>e.classList.remove("open"));
-  store.set("hide-ja",hide?"1":"0");
-}
-hideBtn.addEventListener("click",()=>{hide=!hide;applyHide();});
-function reveal(e){ if(!hide||e.target.closest(".quiz")) return;
-  const el=e.target.closest(".pair,.word,figure.photo"); if(el) el.classList.toggle("open"); }
-root.addEventListener("click",reveal);
-root.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches(".pair,.word,figure.photo")){e.preventDefault();reveal(e);}});
-applyHide();
+renderQuiz(curLv);
 </script>
