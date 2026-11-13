@@ -1,0 +1,280 @@
+<title>ASSET対訳ノート</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Layout: one narrow reading column; each chapter = figure → bilingual sentences → vocab → 3 points */
+:root{
+  --bg:#f6f7f5; --surface:#ffffff; --fg:#1d2321; --muted:#5f6b67; --line:#dde3e0;
+  --accent:#0f6b5c; --accent-soft:#e2f0ec; --en:#1f3a5f; --warn:#a14a1c; --warn-soft:#fbeee6;
+  --font-ja:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;
+  --font-en:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121615; --surface:#1a201e; --fg:#e4ebe8; --muted:#9aa8a3; --line:#2c3532;
+  --accent:#5cc4ae; --accent-soft:#1d2f2b; --en:#a9c4ec; --warn:#f0a272; --warn-soft:#33241b; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121615; --surface:#1a201e; --fg:#e4ebe8; --muted:#9aa8a3; --line:#2c3532;
+  --accent:#5cc4ae; --accent-soft:#1d2f2b; --en:#a9c4ec; --warn:#f0a272; --warn-soft:#33241b; color-scheme:dark}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-ja);font-size:16px;line-height:1.75;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:680px;margin:0 auto;padding-block:20px 64px}
+h1{font-size:1.5rem;margin:0 0 4px;text-wrap:balance}
+.lead{color:var(--muted);font-size:.9rem;margin:0}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;
+  border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.modes{display:flex;gap:6px;flex-wrap:wrap}
+.modes button,.chips a{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--fg);
+  border-radius:999px;padding:4px 12px;cursor:pointer;text-decoration:none}
+.modes button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.hint{font-size:.8rem;color:var(--muted);margin:0}
+button:focus-visible,a:focus-visible,.pair:focus-visible,.word:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.chapter{margin-top:36px;scroll-margin-top:120px}
+.chno{font-family:var(--font-mono);font-size:.75rem;letter-spacing:.08em;color:var(--accent);text-transform:uppercase}
+.chapter h2{font-size:1.3rem;margin:2px 0 0;line-height:1.4;text-wrap:balance}
+.chapter .en-title{font-family:var(--font-en);color:var(--en);font-size:1rem;margin:2px 0 0}
+.meta{font-size:.8rem;color:var(--muted);margin:4px 0 0}
+h3{font-size:1.05rem;margin:28px 0 8px;padding-bottom:4px;border-bottom:2px solid var(--accent-soft);display:flex;flex-direction:column}
+h3 .en{font-family:var(--font-en);font-weight:600;color:var(--en);font-size:.95rem}
+h4{font-size:.8rem;letter-spacing:.06em;color:var(--muted);margin:20px 0 6px;font-weight:700}
+
+figure{margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+figure img{display:block;width:100%;height:auto}
+figcaption{padding:10px 12px;font-size:.85rem;display:flex;flex-direction:column;gap:4px}
+figcaption .en{font-family:var(--font-en);color:var(--en)}
+.labels{font-size:.8rem;color:var(--muted)}
+
+.pairs{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
+.pair{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.pair.sub{margin-left:18px}
+.pair .en{font-family:var(--font-en);color:var(--en);font-size:1.02rem;line-height:1.6}
+.pair .en b{color:var(--fg);font-weight:600;border-bottom:1px dotted var(--muted)}
+.pair .ja{font-size:.95rem}
+.pair.warn{border-color:var(--warn);background:var(--warn-soft)}
+.tag{font-family:var(--font-mono);font-size:.7rem;color:var(--warn);letter-spacing:.06em}
+
+body.mode-en .pair .ja{display:none}
+body.mode-en .pair{cursor:pointer}
+body.mode-en .pair.open .ja{display:block}
+body.mode-en .pair:not(.open)::after{content:"タップで日本語";font-size:.75rem;color:var(--muted)}
+body.mode-ja .pair .en{display:none}
+body.mode-ja figcaption .en{display:none}
+
+.vocab{display:grid;grid-template-columns:1fr;gap:0;margin:0;padding:0;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.word{display:flex;flex-direction:column;padding:8px 12px;border-top:1px solid var(--line)}
+.word:first-child{border-top:0}
+.word .en{font-family:var(--font-en);font-weight:600;color:var(--en)}
+.word .ja{font-size:.9rem;color:var(--fg)}
+.word .note{font-size:.8rem;color:var(--muted)}
+body.quiz .word{cursor:pointer}
+body.quiz .word .ja,body.quiz .word .note{visibility:hidden}
+body.quiz .word.open .ja,body.quiz .word.open .note{visibility:visible}
+
+.points{background:var(--accent-soft);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.point .k{font-size:.8rem;font-weight:700;color:var(--accent);display:block}
+.point ul{margin:2px 0 0;padding-left:1.2em}
+.compare{border-left:3px solid var(--accent);padding:2px 0 2px 12px;font-size:.95rem}
+.compare p{margin:0 0 8px}
+footer{margin-top:48px;font-size:.8rem;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+html{scroll-behavior:smooth}
+</style>
+
+<div class="wrap">
+  <h1>ASSET対訳ノート</h1>
+  <p class="lead">Exposure Techniques When Time Matters ／ 英語と日本語を並べて読む個人用ノート</p>
+
+  <div class="bar">
+    <div class="modes" role="group" aria-label="表示の切り替え">
+      <button id="m-both" data-mode="both" aria-pressed="true">英日ならべて</button>
+      <button id="m-en" data-mode="en" aria-pressed="false">英語だけ</button>
+      <button id="m-ja" data-mode="ja" aria-pressed="false">日本語だけ</button>
+      <button id="m-quiz" data-quiz="1" aria-pressed="false">単語テスト</button>
+    </div>
+    <nav class="chips" id="toc" aria-label="章"></nav>
+  </div>
+
+  <main id="chapters"></main>
+
+  <footer>
+    <p>英語の太字は単語リストにある語です。「英語だけ」では文をタップすると日本語が出ます。「単語テスト」では単語をタップすると意味が出ます。</p>
+    <p>教科書の内容と写真を含むため、他の人には共有しないでください。</p>
+  </footer>
+</div>
+
+<script>
+/* ===== ここに章を追加していく ===== */
+const CHAPTERS = [
+{
+  id:"ch15", no:"Chapter 15", ja:"腹部外傷：外傷開腹", en:"Operative Exposure in Abdominal Trauma: Trauma Laparotomy",
+  pages:"p123〜132 のうち Cattell-Braasch法の部分",
+  sections:[
+    {ja:"大動脈の遮断（図6・7）", en:"Aortic clamping", figures:[
+      {src:"img/ch15-fig6-7.jpg", en:"Figure 6. The aorta is clamped at the hiatus, using the paraspinal muscles and the vertebral bodies as the landmarks for the tips of the clamp. / Figure 7. Clamping of the supraceliac aorta above the right crus of the diaphragm, as seen in this cadaveric specimen. The esophagus (sling) is retracted to the patient's left.",
+       ja:"図6：食道裂孔の高さで大動脈を遮断する。鉗子の先端は傍脊柱筋と椎体を目印に当てる。／図7：カダバー標本で、横隔膜右脚の上から腹腔動脈より上の大動脈を遮断している。食道はテープで患者の左へ牽引。"}
+    ]},
+    {ja:"Cattell-Braasch法：留意点", en:"Right-to-Left Medial Visceral Rotation — Considerations", items:[
+      {en:"Right-to-left <b>medial visceral rotation</b> provides excellent exposure of injuries to the structures of the right <b>retroperitoneum</b>, including the <b>duodenum</b>, head of the pancreas, right kidney and its vessels, ureter, inferior vena cava (IVC), and right iliac vessels.",
+       ja:"右から左への内側臓器翻転を行うと、右後腹膜の構造の損傷がとてもよく見える。対象は十二指腸、膵頭部、右腎とその血管、尿管、下大静脈（IVC）、右腸骨血管。"}
+    ]},
+    {ja:"Cattell-Braasch法：手技", en:"Technique", items:[
+      {step:"STEP 1", en:"The first step is to <b>incise</b> the <b>parietal peritoneum</b> at the <b>white line of Toldt</b>, from the base of the <b>cecum</b> to the <b>hepatic flexure</b> (Figure 8). The <b>dissection plane</b> between the right colon and the abdominal wall is <b>avascular</b> and, once entered, can be extended rapidly with <b>blunt dissection</b>.",
+       ja:"第1段階：盲腸の付け根から肝弯曲まで、Toldtの白線で壁側腹膜を切開する（図8）。右結腸と腹壁のあいだの剥離層は無血管で、一度入れば鈍的剥離で素早く広げられる。"},
+      {warn:true, en:"If there is an IVC injury, performing a medial visceral rotation may <b>unroof</b> a <b>contained hematoma</b> with significant bleeding. One must plan for this possibility and <b>be prepared to</b> obtain rapid control of the IVC.",
+       ja:"IVC損傷がある場合、内側臓器翻転で閉じ込められていた血腫の天井が開き、大出血することがある。これを想定し、IVCをすぐ制御できるよう準備しておくこと。"},
+      {step:"STEP 2", en:"The second step is to <b>mobilize</b> the hepatic flexure of the colon and perform a <b>Kocher maneuver</b> to fully visualize the <b>sweep of the duodenum</b> and the head of the pancreas.",
+       ja:"第2段階：結腸の肝弯曲を授動し、Kocher法を行って十二指腸のC字ループ全体と膵頭部が見えるようにする。"},
+      {step:"STEP 3", en:"The final step is to rotate the cecum and small bowel up and out of the pelvis in a right-to-left, <b>inferior-to-superior</b> fashion. Completion of the maneuver should enable the <b>displacement</b> of the patient's cecum to near the patient's left shoulder.",
+       ja:"最終段階：盲腸と小腸を、右から左へ・下から上へ回転させて骨盤から持ち上げる。完成すると盲腸は患者の左肩の近くまで移動できる。"},
+      {en:"The completed Cattell-Braasch maneuver (Figure 9) provides excellent visualization of the retroperitoneal structures in the right abdomen and pelvis.",
+       ja:"完成したCattell-Braasch法（図9）では、右側の腹部と骨盤の後腹膜構造がとてもよく見える。"}
+    ], figures:[
+      {src:"img/ch15-fig8-9.jpg", en:"Figure 8. The Cattell-Braasch maneuver involves mobilization of the right colon (1), exposure of the duodenum and head of pancreas by an extended Kocher maneuver (2), and retraction of the colon and small bowel superior and medial (3). / Figure 9. The completed maneuver provides excellent exposure of the head of the pancreas, the IVC, the right kidney and ureter, the renal veins, and the right iliac vessels into the pelvis.",
+       ja:"図8：(1) 右結腸の授動 → (2) 拡大Kocher法で十二指腸・膵頭部を展開 → (3) 結腸と小腸を上方・内側へ牽引。／図9：完成図。膵頭部、IVC、右腎と尿管、腎静脈、骨盤までの右腸骨血管が見える。",
+       labels:"写真の向き：頭側が右（HEAD TO RIGHT）／ Right Ureter 右尿管・IVC・Left Renal Vein 左腎静脈・Right Kidney 右腎・Head of Pancreas 膵頭部・Gallbladder 胆嚢・Liver 肝臓"}
+    ]}
+  ],
+  vocab:[
+    ["clamp","遮断する（鉗子で挟む）"],["hiatus","裂孔（大動脈・食道の通り道）"],["paraspinal muscles","傍脊柱筋"],["vertebral body","椎体"],
+    ["supraceliac aorta","腹腔動脈より上の大動脈","celiac = 腹腔動脈"],["crus of the diaphragm","横隔膜脚"],["sling","牽引用のテープ"],
+    ["medial visceral rotation","内側臓器翻転","medial 内側 / visceral 内臓の / rotation 回転"],["retroperitoneum","後腹膜"],["duodenum","十二指腸"],
+    ["incise","切開する","名詞は incision"],["parietal peritoneum","壁側腹膜"],["white line of Toldt","Toldtの白線"],["cecum","盲腸"],["hepatic flexure","肝弯曲"],
+    ["dissection plane","剥離層"],["avascular","無血管の","a- = 〜がない"],["blunt dissection","鈍的剥離","反対は sharp dissection 鋭的剥離"],
+    ["unroof","天井を開ける"],["contained hematoma","被包化された血腫"],["be prepared to","〜する準備をしておく"],["mobilize","授動する"],
+    ["Kocher maneuver","Kocher法（十二指腸の授動）"],["sweep of the duodenum","十二指腸のC字ループ"],["inferior-to-superior","下から上へ"],["displacement","移動"]
+  ],
+  points:{cut:["Toldtの白線（盲腸の付け根〜肝弯曲）"],land:["右結腸と腹壁のあいだの無血管層","十二指腸のC字ループ","IVC"],protect:["IVC：血腫の天井を開ける前に制御の準備","右尿管・右腎・腎静脈"]},
+  compare:["最初の2段階（Toldt線切開→右結腸授動→Kocher）は、経腹膜で右腎・IVCへ行くときの操作とほぼ同じ。","違いは最終段階：盲腸と小腸を左肩まで丸ごと持ち上げ、骨盤の腸骨血管まで一気に出す。","外傷なので、無血管層に入ったら手で一気に広げる。"]
+},
+{
+  id:"ch19", no:"Chapter 19", ja:"腹部外傷：遠位大動脈と腸骨血管", en:"Operative Exposure in Abdominal Trauma: Exposure of the Distal Aorta and Iliac Vessels",
+  pages:"p161〜166",
+  sections:[
+    {ja:"学習目標", en:"Learning Objectives", items:[
+      {en:"Describe and demonstrate the steps to obtain <b>vascular control</b> of the <b>distal</b> aorta.", ja:"遠位大動脈の血管制御を得る手順を説明し、実際にやってみせる。"},
+      {en:"Describe and demonstrate the steps to obtain exposure of the right and left <b>iliac</b> arteries and veins.", ja:"左右の腸骨動脈・腸骨静脈を展開する手順を説明し、実際にやってみせる。"}
+    ]},
+    {ja:"留意点", en:"Considerations", items:[
+      {en:"The distal aorta and the iliac vessels are located in <b>retroperitoneal</b> Zones 1 and 3, <b>respectively</b>. When injured, they can present <b>life-threatening</b> <b>hemorrhage</b>, with an associated high <b>mortality rate</b>.",
+       ja:"遠位大動脈は後腹膜Zone 1、腸骨血管はZone 3にある。損傷すると命に関わる出血を起こし、死亡率が高い。"},
+      {en:"<b>Penetrating wounds</b> to the pelvis are the most common causes of distal aorta and iliac vessel injuries.",
+       ja:"原因でいちばん多いのは骨盤の穿通性外傷。"},
+      {en:"Iliac vein injuries result in significant blood loss, and operative exposure is difficult. These veins may be <b>ligated</b> if necessary. Ligation of the external iliac vein distal to the bifurcation will place the patient at risk of developing lower extremity <b>edema</b> and/or <b>deep venous thrombosis</b>.",
+       ja:"腸骨静脈損傷は出血が多く、展開も難しい。必要なら結紮してよい。ただし外腸骨静脈を分岐部より末梢で結紮すると、下肢の浮腫やDVTのリスクがある。"},
+      {en:"The first priority is hemorrhage control.", ja:"最優先は出血のコントロール。"},
+      {warn:true, en:"<b>Ureteral</b> injuries are commonly <b>associated with</b> iliac vessel injuries, and therefore the ureter should be <b>evaluated</b> after the vascular injuries have been <b>addressed</b>.",
+       ja:"尿管損傷は腸骨血管損傷によく合併する。血管の処置が済んだあとで尿管を評価すること。"}
+    ]},
+    {ja:"手術展開", en:"Operative Exposure", items:[
+      {en:"Distal aorta and iliac vessel injuries are typically exposed through a <b>midline incision</b> as part of a trauma laparotomy.",
+       ja:"通常は外傷開腹の一部として、正中切開から展開する。"},
+      {en:"Remember that the iliac arteries are <b>anterior</b> to their <b>corresponding</b> veins.",
+       ja:"腸骨動脈は、対応する静脈より前にある。"},
+      {en:"Right-to-left medial visceral rotation (Cattell-Braasch maneuver) can be performed rapidly and allows for the colon and small bowel to be mobilized up and off the distal aorta, inferior vena cava, and iliac vessels.",
+       ja:"Cattell-Braasch法は素早く行え、結腸と小腸を遠位大動脈・IVC・腸骨血管の上からよけられる（15章参照）。"},
+      {warn:true, en:"The common iliac veins are <b>intimately adherent</b> to the back wall of the common iliac arteries. If not careful, mobilization of the artery may result in venous injury and <b>profuse</b> bleeding. The right common iliac vein and bifurcation are particularly difficult to expose.",
+       ja:"総腸骨静脈は総腸骨動脈の後壁に密着している。不用意に動脈を授動すると静脈を損傷して大出血する。特に右総腸骨静脈と分岐部は展開が難しい。"},
+      {en:"Occasionally, it may be necessary to <b>transect</b> the right common iliac artery to gain <b>adequate</b> exposure of the right common iliac vein. Transection and ligation of the internal iliac artery can also improve exposure of the <b>ipsilateral</b> common iliac vein.",
+       ja:"右総腸骨静脈を出すために、右総腸骨動脈を離断することもある。内腸骨動脈を離断・結紮しても、同側の総腸骨静脈が見やすくなる。"},
+      {sub:true, en:"<b>Excessive</b> <b>retraction</b> of the external iliac artery to obtain better exposure of this vein may damage the artery.",
+       ja:"静脈をよく見ようとして外腸骨動脈を引っぱりすぎると、動脈を傷める。"}
+    ]},
+    {ja:"遠位大動脈の血管制御", en:"Vascular Control of the Distal Aorta", items:[
+      {en:"Injuries to the distal aorta and bifurcation may be temporarily controlled by <b>local manual compression</b> with a <b>laparotomy pad</b>, <b>sponge stick</b>, or fingers until proximal and distal vessel control can be achieved.",
+       ja:"近位・遠位の制御ができるまで、開腹用ガーゼ・スポンジスティック・指で直接圧迫して一時的に抑える。"},
+      {en:"REBOA, as described in chapter 22, can also provide temporary hemorrhage control.", ja:"22章のREBOAでも一時的に出血を抑えられる。"},
+      {warn:true, en:"The aorta proximal to the injury should be <b>isolated</b> with <b>vessel loops</b> and clamped, taking care to avoid injury to <b>lumbar vessels</b>. Additionally, both common iliac vessels distal to the injury need to be isolated.",
+       ja:"損傷部より近位の大動脈をベッセルループで確保して遮断する。腰動静脈を傷つけないよう注意。さらに損傷部より遠位で、左右の総腸骨動静脈も確保する。"},
+      {en:"Exposure can also be accomplished by entering the midline retroperitoneum at the <b>root of the mesentery</b> below the renal vessels, with the small bowel retracted upward to the right and the colon to the left (Figure 5).",
+       ja:"腎血管より下の腸間膜根部から正中の後腹膜に入る方法もある。小腸は右上へ、結腸は左へよける（図5）。"}
+    ], figures:[
+      {src:"img/ch19-fig5.jpg", en:"Figure 5. Exposure of the distal aorta and bifurcation can be accomplished by entering the midline retroperitoneum below the renal vessels, moving the small bowel up and to the right, and moving the colon to the left. The ureters should be identified and preserved.",
+       ja:"図5：腎血管より下で正中の後腹膜に入り、小腸を右上・結腸を左へよけて、遠位大動脈と分岐部を出す。尿管は同定して温存する。",
+       labels:"写真の向き：頭側が上（HEAD TO TOP）／ Left Renal Vein 左腎静脈・IVC・Aorta 大動脈・Inferior Mesenteric Artery 下腸間膜動脈・Ureters 尿管"}
+    ]},
+    {ja:"腸骨血管の血管制御", en:"Vascular Control of the Iliac Vessels", items:[
+      {en:"Injury to the iliac artery or vein that results in an <b>expanding hematoma</b> or significant bleeding may <b>necessitate</b> manual compression until proximal and distal control can be obtained. Again, sponge sticks can be very helpful.",
+       ja:"血腫が広がる・出血が多いときは、近位・遠位の制御ができるまで手で圧迫する。ここでもスポンジスティックが役立つ。"},
+      {en:"Vessel loops can be passed around the common iliac artery for proximal control and around the external and internal iliac arteries (Figure 6).",
+       ja:"近位制御のため総腸骨動脈に、さらに外腸骨・内腸骨動脈にもベッセルループをかける（図6）。"},
+      {en:"<b>Bilateral</b> iliac injury may be exposed using <b>total pelvic vascular isolation</b>, which consists of <b>cross-clamping</b> the distal abdominal aorta and inferior vena cava, as well as clamping both external iliac arteries and veins.",
+       ja:"両側損傷では骨盤血管の完全遮断を行う。遠位腹部大動脈とIVC、さらに左右の外腸骨動静脈を遮断する。"},
+      {en:"A temporary arterial or venous <b>shunt</b> may be used to control hemorrhage and provide temporary <b>restoration</b> of distal blood flow in <b>damage control</b> situations.",
+       ja:"ダメージコントロールでは、一時的な動脈・静脈シャントで出血を抑えつつ末梢の血流を戻す。"}
+    ], figures:[
+      {src:"img/ch19-fig6.jpg", en:"Figure 6. Further distal dissection allows for identification and control of the retroperitoneal vessels in the lower abdomen and pelvis.",
+       ja:"図6：さらに遠位へ剥離すると、下腹部・骨盤の後腹膜血管を同定して制御できる。",
+       labels:"IVC・Aorta 大動脈・R./L. Iliac vessels 左右の腸骨血管・Ureter 尿管・Ext. Iliac 外腸骨・Int. Iliac 内腸骨・Sigmoid Colon S状結腸"}
+    ]}
+  ],
+  vocab:[
+    ["distal","遠位の","反対は proximal 近位の"],["iliac","腸骨の"],["vascular control","血管制御（出血を止められる状態）"],
+    ["retroperitoneal","後腹膜の"],["respectively","それぞれ"],["life-threatening","命に関わる"],["hemorrhage","出血"],["mortality rate","死亡率"],
+    ["penetrating wound","穿通性外傷","反対は blunt 鈍的"],["ligate","結紮する","名詞は ligation"],["edema","浮腫"],["deep venous thrombosis","深部静脈血栓症（DVT）"],
+    ["ureteral","尿管の"],["associated with","〜に合併する"],["evaluate","評価する"],["address","（問題に）対処する"],
+    ["midline incision","正中切開"],["anterior","前方の","反対は posterior 後方の"],["corresponding","対応する"],
+    ["intimately adherent","密に癒着している"],["profuse","大量の"],["transect","離断する"],["adequate","十分な"],
+    ["ipsilateral","同側の","反対は contralateral 対側の"],["excessive","過度の"],["retraction","牽引"],
+    ["local manual compression","手で直接圧迫すること"],["laparotomy pad","開腹用ガーゼ"],["sponge stick","スポンジスティック"],
+    ["isolate","（テープで）確保する"],["vessel loop","ベッセルループ（血管テープ）"],["lumbar vessels","腰動静脈"],["root of the mesentery","腸間膜根部"],
+    ["expanding hematoma","拡大する血腫"],["necessitate","必要とする"],["bilateral","両側の"],["total pelvic vascular isolation","骨盤血管の完全遮断"],
+    ["cross-clamp","（血管を）遮断する"],["shunt","シャント"],["restoration","回復"],["damage control","ダメージコントロール"]
+  ],
+  points:{cut:["正中切開（外傷開腹）","Cattell-Braasch法、または腎血管より下で腸間膜根部から正中の後腹膜へ"],
+    land:["腸骨動脈は静脈の前","左腎静脈（正中アプローチの上の境界）","下腸間膜動脈、大動脈分岐部"],
+    protect:["総腸骨静脈：動脈の後壁に密着","腰動静脈：大動脈にテープを回すとき","尿管：腸骨血管の前を横切る。血管処置のあとで評価","外腸骨動脈：引っぱりすぎ"]},
+  compare:["Cattell-Braasch法＝外側から右結腸を授動して右後腹膜を広く出す。","正中アプローチ＝腸間膜根部から真ん中に直接入る。遠位大動脈・分岐部に早く届く。","尿管が分岐部の前を横切るのはどちらも同じ。泌尿器科医にはなじみのある目印。"]
+}
+];
+
+/* ===== 描画 ===== */
+const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const toc=document.getElementById("toc"), root=document.getElementById("chapters");
+let html="", chips="";
+for(const c of CHAPTERS){
+  chips+=`<a href="#${c.id}">${c.no.replace("Chapter ","")}章 ${esc(c.ja.replace(/^腹部外傷：/,""))}</a>`;
+  html+=`<section class="chapter" id="${c.id}"><div class="chno">${c.no}</div><h2>${esc(c.ja)}</h2><p class="en-title">${esc(c.en)}</p><p class="meta">${esc(c.pages)}</p>`;
+  for(const s of c.sections){
+    html+=`<h3><span>${esc(s.ja)}</span><span class="en">${esc(s.en)}</span></h3>`;
+    if(s.items){html+=`<ul class="pairs">`;for(const it of s.items){
+      const cls=["pair",it.warn?"warn":"",it.sub?"sub":""].join(" ");
+      const tag=it.step?`<span class="tag">${it.step}</span>`:it.warn?`<span class="tag">注意</span>`:"";
+      html+=`<li class="${cls}" tabindex="0">${tag}<span class="en">${it.en}</span><span class="ja">${esc(it.ja)}</span></li>`;}
+      html+=`</ul>`;}
+    for(const f of s.figures||[]){
+      html+=`<figure><img src="${f.src}" alt="${esc(f.ja)}" loading="lazy"><figcaption><span class="en">${esc(f.en)}</span><span class="ja">${esc(f.ja)}</span>${f.labels?`<span class="labels">${esc(f.labels)}</span>`:""}</figcaption></figure>`;}
+  }
+  html+=`<h4>単語 VOCABULARY（${c.vocab.length}語）</h4><ul class="vocab">`;
+  for(const [en,ja,note] of c.vocab) html+=`<li class="word" tabindex="0"><span class="en">${esc(en)}</span><span class="ja">${esc(ja)}</span>${note?`<span class="note">${esc(note)}</span>`:""}</li>`;
+  html+=`</ul><h4>3つのポイント</h4><div class="points">`;
+  for(const [k,label] of [["cut","切開線"],["land","ランドマーク"],["protect","守るべき構造"]])
+    html+=`<div class="point"><span class="k">${label}</span><ul>${c.points[k].map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`;
+  html+=`</div>`;
+  if(c.compare) html+=`<h4>普段の手技との比較</h4><div class="compare">${c.compare.map(x=>`<p>${esc(x)}</p>`).join("")}</div>`;
+  html+=`</section>`;
+}
+toc.innerHTML=chips; root.innerHTML=html;
+
+/* ===== 表示モード ===== */
+const body=document.body, btns=[...document.querySelectorAll(".modes button")];
+let mode="both", quiz=false;
+try{mode=localStorage.getItem("mode")||"both";quiz=localStorage.getItem("quiz")==="1";}catch(e){}
+function apply(){
+  body.classList.toggle("mode-en",mode==="en");body.classList.toggle("mode-ja",mode==="ja");body.classList.toggle("quiz",quiz);
+  for(const b of btns) b.setAttribute("aria-pressed", b.dataset.quiz? String(quiz) : String(b.dataset.mode===mode));
+  document.querySelectorAll(".open").forEach(e=>e.classList.remove("open"));
+  try{localStorage.setItem("mode",mode);localStorage.setItem("quiz",quiz?"1":"0");}catch(e){}
+}
+btns.forEach(b=>b.addEventListener("click",()=>{ if(b.dataset.quiz) quiz=!quiz; else mode=b.dataset.mode; apply(); }));
+function toggleOpen(e){const el=e.target.closest(".pair,.word"); if(!el) return;
+  if(el.classList.contains("pair")&&mode!=="en") return;
+  if(el.classList.contains("word")&&!quiz) return;
+  el.classList.toggle("open");}
+root.addEventListener("click",toggleOpen);
+root.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleOpen(e);}});
+apply();
+</script>
