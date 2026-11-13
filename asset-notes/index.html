@@ -3,20 +3,26 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=IBM+Plex+Mono:wght@500&display=swap">
 <style>
-/* Layout: one narrow reading column; each chapter = figure → bilingual sentences → vocab → 3 points */
+/* Layout: one narrow reading column; each chapter = pretest → bilingual sentences + diagrams/figures → vocab → 3 points */
 :root{
   --bg:#f6f7f5; --surface:#ffffff; --fg:#1d2321; --muted:#5f6b67; --line:#dde3e0;
   --accent:#0f6b5c; --accent-soft:#e2f0ec; --en:#1f3a5f; --warn:#a14a1c; --warn-soft:#fbeee6;
+  --ok:#1e7a3c; --ng:#b3261e;
+  --art:#c0392b; --vein:#2f5fb3; --ure:#c08a00; --organ:#ead7cb; --organ-2:#c9a593; --zone:#e9ecea;
   --font-ja:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;
   --font-en:"Source Serif 4",Georgia,"Times New Roman",serif;
   --font-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#121615; --surface:#1a201e; --fg:#e4ebe8; --muted:#9aa8a3; --line:#2c3532;
-  --accent:#5cc4ae; --accent-soft:#1d2f2b; --en:#a9c4ec; --warn:#f0a272; --warn-soft:#33241b; color-scheme:dark}}
+  --accent:#5cc4ae; --accent-soft:#1d2f2b; --en:#a9c4ec; --warn:#f0a272; --warn-soft:#33241b;
+  --ok:#6fd08f; --ng:#ff8a80;
+  --art:#e5675a; --vein:#6f9be8; --ure:#f0c440; --organ:#4a3a33; --organ-2:#7a5c4f; --zone:#232a28; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#121615; --surface:#1a201e; --fg:#e4ebe8; --muted:#9aa8a3; --line:#2c3532;
-  --accent:#5cc4ae; --accent-soft:#1d2f2b; --en:#a9c4ec; --warn:#f0a272; --warn-soft:#33241b; color-scheme:dark}
+  --accent:#5cc4ae; --accent-soft:#1d2f2b; --en:#a9c4ec; --warn:#f0a272; --warn-soft:#33241b;
+  --ok:#6fd08f; --ng:#ff8a80;
+  --art:#e5675a; --vein:#6f9be8; --ure:#f0c440; --organ:#4a3a33; --organ-2:#7a5c4f; --zone:#232a28; color-scheme:dark}
 body{background:var(--bg);color:var(--fg);font-family:var(--font-ja);font-size:16px;line-height:1.75;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
@@ -25,13 +31,13 @@ h1{font-size:1.5rem;margin:0 0 4px;text-wrap:balance}
 .lead{color:var(--muted);font-size:.9rem;margin:0}
 .bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:10px;
   border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px;margin-top:16px}
-.modes{display:flex;gap:6px;flex-wrap:wrap}
-.modes button,.chips a{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--fg);
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.btn,.chips a{font:inherit;font-size:.85rem;border:1px solid var(--line);background:var(--surface);color:var(--fg);
   border-radius:999px;padding:4px 12px;cursor:pointer;text-decoration:none}
-.modes button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
+.btn[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--bg)}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
-.hint{font-size:.8rem;color:var(--muted);margin:0}
-button:focus-visible,a:focus-visible,.pair:focus-visible,.word:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.hint{font-size:.8rem;color:var(--muted)}
+button:focus-visible,a:focus-visible,.pair:focus-visible,.word:focus-visible,figure:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 .chapter{margin-top:36px;scroll-margin-top:120px}
 .chno{font-family:var(--font-mono);font-size:.75rem;letter-spacing:.08em;color:var(--accent);text-transform:uppercase}
@@ -42,12 +48,53 @@ h3{font-size:1.05rem;margin:28px 0 8px;padding-bottom:4px;border-bottom:2px soli
 h3 .en{font-family:var(--font-en);font-weight:600;color:var(--en);font-size:.95rem}
 h4{font-size:.8rem;letter-spacing:.06em;color:var(--muted);margin:20px 0 6px;font-weight:700}
 
+/* pretest */
+.quiz{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-top:16px}
+.quiz-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap}
+.quiz-head strong{font-size:.95rem}
+.score{font-family:var(--font-mono);font-size:.8rem;color:var(--muted)}
+.levels{display:flex;gap:6px;margin:8px 0 4px;flex-wrap:wrap}
+.qlist{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+.q{border-top:1px solid var(--line);padding-top:10px;display:flex;flex-direction:column;gap:6px}
+.q:first-child{border-top:0;padding-top:0}
+.q-row{display:flex;gap:10px;align-items:flex-start}
+.q-text{flex:1;min-width:0}
+.ox{display:flex;gap:6px;flex-shrink:0}
+.ox button{font:inherit;font-size:1.05rem;font-weight:700;width:44px;height:40px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--fg);cursor:pointer}
+.ox button[disabled]{cursor:default;opacity:.55}
+.ox button.picked{opacity:1;border-width:2px;border-color:var(--fg)}
+.result{font-size:.88rem;border-radius:6px;padding:6px 10px;background:var(--bg)}
+.result b.ok{color:var(--ok)} .result b.ng{color:var(--ng)}
+.quiz-foot{display:flex;justify-content:flex-end;margin-top:10px}
+
+/* figures & diagrams */
 figure{margin:16px 0;background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
 figure img{display:block;width:100%;height:auto}
+figure.dg{padding:12px 8px 0}
+figure.dg svg{display:block;width:100%;max-width:440px;height:auto;margin:0 auto}
+.dg-tag{font-family:var(--font-mono);font-size:.7rem;letter-spacing:.06em;color:var(--accent);padding:0 4px}
 figcaption{padding:10px 12px;font-size:.85rem;display:flex;flex-direction:column;gap:4px}
 figcaption .en{font-family:var(--font-en);color:var(--en)}
 .labels{font-size:.8rem;color:var(--muted)}
+svg text{font-family:var(--font-ja);font-size:12px;fill:var(--fg)}
+svg .sm{font-size:10.5px} svg .b{font-weight:700} svg .mu{fill:var(--muted)} svg .w{fill:#fff;font-weight:700;font-size:11px}
+svg .tw{fill:var(--warn)} svg .ta{fill:var(--accent)}
+svg .art-f{fill:var(--art)} svg .vein-f{fill:var(--vein)}
+svg .art-s{stroke:var(--art);fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .vein-s{stroke:var(--vein);fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .ure-s{stroke:var(--ure);fill:none;stroke-linecap:round}
+svg .organ-f{fill:var(--organ)} svg .organ2-f{fill:var(--organ-2)}
+svg .organ-s{stroke:var(--organ-2);fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg .frame{fill:none;stroke:var(--line);stroke-width:2}
+svg .zone{fill:var(--zone);stroke:var(--line);stroke-width:1.5}
+svg .zone-hl{fill:var(--accent-soft);stroke:var(--accent);stroke-width:2.5}
+svg .cut{stroke:var(--warn);stroke-width:3;stroke-dasharray:7 5;fill:none}
+svg .warn-ring{stroke:var(--warn);stroke-width:2;stroke-dasharray:4 3;fill:none}
+svg .lead-l{stroke:var(--warn);stroke-width:1.2;fill:none}
+svg .move{stroke:var(--accent);stroke-width:3.5;fill:none;stroke-linecap:round}
+svg .mk-a{fill:var(--accent)}
 
+/* bilingual sentences */
 .pairs{display:flex;flex-direction:column;gap:10px;margin:0;padding:0;list-style:none}
 .pair{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:6px}
 .pair.sub{margin-left:18px}
@@ -56,23 +103,20 @@ figcaption .en{font-family:var(--font-en);color:var(--en)}
 .pair .ja{font-size:.95rem}
 .pair.warn{border-color:var(--warn);background:var(--warn-soft)}
 .tag{font-family:var(--font-mono);font-size:.7rem;color:var(--warn);letter-spacing:.06em}
+.tap{display:none;font-size:.75rem;color:var(--muted)}
 
-body.mode-en .pair .ja{display:none}
-body.mode-en .pair{cursor:pointer}
-body.mode-en .pair.open .ja{display:block}
-body.mode-en .pair:not(.open)::after{content:"タップで日本語";font-size:.75rem;color:var(--muted)}
-body.mode-ja .pair .en{display:none}
-body.mode-ja figcaption .en{display:none}
+/* hide Japanese: tap an item to reveal */
+body.hide-ja .pair,body.hide-ja .word,body.hide-ja figure.photo{cursor:pointer}
+body.hide-ja .pair:not(.open) .ja,body.hide-ja figure.photo:not(.open) figcaption .ja,
+body.hide-ja .word:not(.open) .ja,body.hide-ja .word:not(.open) .note{display:none}
+body.hide-ja .pair:not(.open) .tap,body.hide-ja .word:not(.open) .tap,body.hide-ja figure.photo:not(.open) .tap{display:block}
 
-.vocab{display:grid;grid-template-columns:1fr;gap:0;margin:0;padding:0;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.vocab{margin:0;padding:0;list-style:none;background:var(--surface);border:1px solid var(--line);border-radius:8px}
 .word{display:flex;flex-direction:column;padding:8px 12px;border-top:1px solid var(--line)}
 .word:first-child{border-top:0}
 .word .en{font-family:var(--font-en);font-weight:600;color:var(--en)}
-.word .ja{font-size:.9rem;color:var(--fg)}
+.word .ja{font-size:.9rem}
 .word .note{font-size:.8rem;color:var(--muted)}
-body.quiz .word{cursor:pointer}
-body.quiz .word .ja,body.quiz .word .note{visibility:hidden}
-body.quiz .word.open .ja,body.quiz .word.open .note{visibility:visible}
 
 .points{background:var(--accent-soft);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
 .point .k{font-size:.8rem;font-weight:700;color:var(--accent);display:block}
@@ -80,8 +124,8 @@ body.quiz .word.open .ja,body.quiz .word.open .note{visibility:visible}
 .compare{border-left:3px solid var(--accent);padding:2px 0 2px 12px;font-size:.95rem}
 .compare p{margin:0 0 8px}
 footer{margin-top:48px;font-size:.8rem;color:var(--muted)}
-@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 </style>
 
 <div class="wrap">
@@ -89,11 +133,9 @@ html{scroll-behavior:smooth}
   <p class="lead">Exposure Techniques When Time Matters ／ 英語と日本語を並べて読む個人用ノート</p>
 
   <div class="bar">
-    <div class="modes" role="group" aria-label="表示の切り替え">
-      <button id="m-both" data-mode="both" aria-pressed="true">英日ならべて</button>
-      <button id="m-en" data-mode="en" aria-pressed="false">英語だけ</button>
-      <button id="m-ja" data-mode="ja" aria-pressed="false">日本語だけ</button>
-      <button id="m-quiz" data-quiz="1" aria-pressed="false">単語テスト</button>
+    <div class="tools">
+      <button class="btn" id="hide-ja" aria-pressed="false">日本語を隠す</button>
+      <span class="hint" id="hide-hint">隠すと、タップした文だけ日本語が出ます</span>
     </div>
     <nav class="chips" id="toc" aria-label="章"></nav>
   </div>
@@ -101,7 +143,7 @@ html{scroll-behavior:smooth}
   <main id="chapters"></main>
 
   <footer>
-    <p>英語の太字は単語リストにある語です。「英語だけ」では文をタップすると日本語が出ます。「単語テスト」では単語をタップすると意味が出ます。</p>
+    <p>各章のはじめのプレテストは、読む前に解いて、読んだあとにもう一度解くのがおすすめです。英語の太字は単語リストにある語です。</p>
     <p>教科書の内容と写真を含むため、他の人には共有しないでください。</p>
   </footer>
 </div>
@@ -121,7 +163,7 @@ const CHAPTERS = [
       {en:"Right-to-left <b>medial visceral rotation</b> provides excellent exposure of injuries to the structures of the right <b>retroperitoneum</b>, including the <b>duodenum</b>, head of the pancreas, right kidney and its vessels, ureter, inferior vena cava (IVC), and right iliac vessels.",
        ja:"右から左への内側臓器翻転を行うと、右後腹膜の構造の損傷がとてもよく見える。対象は十二指腸、膵頭部、右腎とその血管、尿管、下大静脈（IVC）、右腸骨血管。"}
     ]},
-    {ja:"Cattell-Braasch法：手技", en:"Technique", items:[
+    {ja:"Cattell-Braasch法：手技", en:"Technique", diagrams:["cb"], items:[
       {step:"STEP 1", en:"The first step is to <b>incise</b> the <b>parietal peritoneum</b> at the <b>white line of Toldt</b>, from the base of the <b>cecum</b> to the <b>hepatic flexure</b> (Figure 8). The <b>dissection plane</b> between the right colon and the abdominal wall is <b>avascular</b> and, once entered, can be extended rapidly with <b>blunt dissection</b>.",
        ja:"第1段階：盲腸の付け根から肝弯曲まで、Toldtの白線で壁側腹膜を切開する（図8）。右結腸と腹壁のあいだの剥離層は無血管で、一度入れば鈍的剥離で素早く広げられる。"},
       {warn:true, en:"If there is an IVC injury, performing a medial visceral rotation may <b>unroof</b> a <b>contained hematoma</b> with significant bleeding. One must plan for this possibility and <b>be prepared to</b> obtain rapid control of the IVC.",
@@ -158,7 +200,7 @@ const CHAPTERS = [
       {en:"Describe and demonstrate the steps to obtain <b>vascular control</b> of the <b>distal</b> aorta.", ja:"遠位大動脈の血管制御を得る手順を説明し、実際にやってみせる。"},
       {en:"Describe and demonstrate the steps to obtain exposure of the right and left <b>iliac</b> arteries and veins.", ja:"左右の腸骨動脈・腸骨静脈を展開する手順を説明し、実際にやってみせる。"}
     ]},
-    {ja:"留意点", en:"Considerations", items:[
+    {ja:"留意点", en:"Considerations", diagrams:["zones"], items:[
       {en:"The distal aorta and the iliac vessels are located in <b>retroperitoneal</b> Zones 1 and 3, <b>respectively</b>. When injured, they can present <b>life-threatening</b> <b>hemorrhage</b>, with an associated high <b>mortality rate</b>.",
        ja:"遠位大動脈は後腹膜Zone 1、腸骨血管はZone 3にある。損傷すると命に関わる出血を起こし、死亡率が高い。"},
       {en:"<b>Penetrating wounds</b> to the pelvis are the most common causes of distal aorta and iliac vessel injuries.",
@@ -169,7 +211,7 @@ const CHAPTERS = [
       {warn:true, en:"<b>Ureteral</b> injuries are commonly <b>associated with</b> iliac vessel injuries, and therefore the ureter should be <b>evaluated</b> after the vascular injuries have been <b>addressed</b>.",
        ja:"尿管損傷は腸骨血管損傷によく合併する。血管の処置が済んだあとで尿管を評価すること。"}
     ]},
-    {ja:"手術展開", en:"Operative Exposure", items:[
+    {ja:"手術展開", en:"Operative Exposure", diagrams:["bif","xsec"], items:[
       {en:"Distal aorta and iliac vessel injuries are typically exposed through a <b>midline incision</b> as part of a trauma laparotomy.",
        ja:"通常は外傷開腹の一部として、正中切開から展開する。"},
       {en:"Remember that the iliac arteries are <b>anterior</b> to their <b>corresponding</b> veins.",
@@ -231,25 +273,159 @@ const CHAPTERS = [
 }
 ];
 
+
+/* ===== 図解（自作の模式図） ===== */
+const DIAGRAMS = {
+zones:{tag:"図解A", caption:"後腹膜の3つのゾーン。19章の遠位大動脈はZone 1（中央）、腸骨血管はZone 3（骨盤）にある。",
+svg:`<svg viewBox="0 0 360 300" role="img" aria-label="後腹膜のゾーン：Zone 1は中央で大動脈・IVC・膵・十二指腸、Zone 2は左右の側方で腎、Zone 3は骨盤で腸骨血管">
+<text x="20" y="14" class="sm mu">患者の右</text><text x="340" y="14" class="sm mu" text-anchor="end">患者の左</text><text x="180" y="14" class="sm mu" text-anchor="middle">頭側 ↑</text>
+<rect x="30" y="24" width="300" height="262" rx="40" class="frame"/>
+<rect x="48" y="44" width="92" height="150" rx="16" class="zone"/>
+<rect x="220" y="44" width="92" height="150" rx="16" class="zone"/>
+<rect x="146" y="40" width="68" height="156" rx="10" class="zone-hl"/>
+<path d="M76 208 L284 208 L244 272 L116 272 Z" class="zone-hl"/>
+<text x="94" y="100" text-anchor="middle" class="b">Zone 2</text><text x="94" y="118" text-anchor="middle" class="sm mu">側方</text><text x="94" y="136" text-anchor="middle" class="sm">腎・副腎</text>
+<text x="266" y="100" text-anchor="middle" class="b">Zone 2</text><text x="266" y="118" text-anchor="middle" class="sm mu">側方</text><text x="266" y="136" text-anchor="middle" class="sm">腎・副腎</text>
+<text x="180" y="84" text-anchor="middle" class="b ta">Zone 1</text><text x="180" y="102" text-anchor="middle" class="sm mu">中央</text>
+<text x="180" y="128" text-anchor="middle" class="sm">大動脈</text><text x="180" y="144" text-anchor="middle" class="sm">IVC</text><text x="180" y="160" text-anchor="middle" class="sm">膵・十二指腸</text>
+<text x="180" y="234" text-anchor="middle" class="b ta">Zone 3　骨盤</text><text x="180" y="254" text-anchor="middle" class="sm">腸骨動静脈</text>
+</svg>`},
+
+bif:{tag:"図解B", caption:"前から見た大動脈分岐部（患者の右が図の左）。動脈（赤）は静脈（青）の前を走る。右総腸骨動脈は、IVCの合流部と左総腸骨静脈の前を横切る。ここが「右総腸骨静脈と分岐部は展開が難しい」場所。尿管（黄）は腸骨動脈の分岐部の前を横切る。",
+svg:`<svg viewBox="0 0 360 440" role="img" aria-label="大動脈分岐部の前面図：腸骨動脈は静脈の前、右総腸骨動脈がIVC合流部の前を横切り、尿管は腸骨分岐部の前を横切る">
+<text x="20" y="14" class="sm mu">患者の右</text><text x="340" y="14" class="sm mu" text-anchor="end">患者の左</text><text x="180" y="14" class="sm mu" text-anchor="middle">頭側 ↑</text>
+<rect x="140" y="44" width="26" height="198" rx="9" class="vein-f"/>
+<path d="M153 236 L112 322 L80 412" class="vein-s" stroke-width="20"/>
+<path d="M153 236 L256 326 L292 412" class="vein-s" stroke-width="20"/>
+<rect x="190" y="44" width="22" height="186" rx="9" class="art-f"/>
+<path d="M201 224 L118 318 L88 412" class="art-s" stroke-width="13"/>
+<path d="M118 318 L142 404" class="art-s" stroke-width="9"/>
+<path d="M201 224 L262 318 L298 412" class="art-s" stroke-width="13"/>
+<path d="M262 318 L236 404" class="art-s" stroke-width="9"/>
+<path d="M150 82 L304 74" class="vein-s" stroke-width="11"/>
+<path d="M212 168 Q240 176 262 204" class="art-s" stroke-width="4"/>
+<path d="M100 96 C104 190 110 262 120 318 C126 352 146 384 164 418" class="ure-s" stroke-width="5"/>
+<path d="M292 96 C284 190 270 262 262 318 C254 352 232 384 214 418" class="ure-s" stroke-width="5"/>
+<text x="153" y="160" text-anchor="middle" class="w">IVC</text>
+<text x="201" y="130" text-anchor="middle" class="w">Ao</text>
+<text x="304" y="34" text-anchor="end" class="sm">左腎静脈（大動脈の前を横切る）</text>
+<text x="224" y="158" class="sm">IMA 下腸間膜A</text>
+<text x="94" y="140" text-anchor="end" class="sm">右尿管</text>
+<text x="298" y="140" class="sm">左尿管</text>
+<circle cx="172" cy="256" r="28" class="warn-ring"/>
+<path d="M66 236 L146 252" class="lead-l"/>
+<text x="8" y="196" class="sm tw b">動脈の後ろに</text>
+<text x="8" y="211" class="sm tw b">静脈が密着</text>
+<text x="8" y="228" class="sm tw">剥がすと裂ける</text>
+<text x="56" y="300" text-anchor="middle" class="sm">右総腸骨</text>
+<text x="314" y="300" text-anchor="middle" class="sm">左総腸骨</text>
+<text x="80" y="432" text-anchor="middle" class="sm">外腸骨</text>
+<text x="136" y="432" text-anchor="middle" class="sm">内腸骨</text>
+<text x="240" y="432" text-anchor="middle" class="sm">内腸骨</text>
+<text x="298" y="432" text-anchor="middle" class="sm">外腸骨</text>
+</svg>`},
+
+xsec:{tag:"図解C", caption:"総腸骨動静脈を輪切りにした図。静脈は動脈の真後ろに貼りついている。動脈を持ち上げて裏を剥がす操作で、見えない静脈を裂きやすい。",
+svg:`<svg viewBox="0 0 360 160" role="img" aria-label="総腸骨動静脈の断面：動脈が前、静脈が後ろで密着している">
+<text x="70" y="18" text-anchor="middle" class="sm mu">前（お腹側）↑</text>
+<circle cx="70" cy="58" r="26" class="art-f"/><text x="70" y="62" text-anchor="middle" class="w">A</text>
+<circle cx="70" cy="106" r="24" class="vein-f"/><text x="70" y="110" text-anchor="middle" class="w">V</text>
+<text x="70" y="150" text-anchor="middle" class="sm mu">後ろ（背中側）</text>
+<text x="108" y="62" class="sm">総腸骨動脈</text>
+<text x="108" y="86" class="sm tw b">← 密着</text>
+<text x="108" y="110" class="sm">総腸骨静脈</text>
+<text x="208" y="62" class="sm">動脈を持ち上げて</text>
+<text x="208" y="80" class="sm">裏側を剥がすと</text>
+<text x="208" y="98" class="sm tw b">後ろの静脈が裂ける</text>
+<text x="208" y="122" class="sm mu">intimately adherent</text>
+</svg>`},
+
+cb:{tag:"図解D", caption:"Cattell-Braasch法の3段階（患者の右が図の左）。① Toldtの白線を切って右結腸を外す → ② Kocher法で十二指腸と膵頭部を内側へ → ③ 盲腸と小腸を、患者の左肩のほうへまとめて持ち上げる。下からIVC・右腎・右尿管・右腸骨血管が出てくる。",
+svg:`<svg viewBox="0 0 360 370" role="img" aria-label="Cattell-Braasch法の3段階：Toldt線切開、Kocher法、盲腸と小腸を左肩方向へ持ち上げる">
+<defs><marker id="ah-d" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="mk-a"/></marker></defs>
+<text x="20" y="14" class="sm mu">患者の右</text><text x="340" y="14" class="sm mu" text-anchor="end">患者の左</text><text x="180" y="14" class="sm mu" text-anchor="middle">頭側 ↑</text>
+<rect x="20" y="24" width="320" height="320" rx="30" class="frame"/>
+<path d="M28 42 Q120 30 196 48 Q176 82 112 90 Q60 92 28 80 Z" class="organ-f"/>
+<text x="92" y="66" text-anchor="middle" class="sm mu">肝</text>
+<path d="M82 296 L82 126 Q82 104 106 104 L300 104 L300 300" class="organ-s" stroke-width="24"/>
+<circle cx="82" cy="304" r="20" class="organ2-f"/>
+<text x="82" y="340" text-anchor="middle" class="sm">盲腸</text>
+<text x="104" y="250" class="sm mu">上行結腸</text>
+<text x="200" y="96" class="sm mu" text-anchor="middle">横行結腸</text>
+<path d="M56 312 L56 116" class="cut"/>
+<text x="44" y="214" text-anchor="middle" class="sm tw b" transform="rotate(-90 44 214)">① Toldtの白線を切開</text>
+<ellipse cx="226" cy="156" rx="22" ry="18" class="organ2-f"/>
+<text x="226" y="160" text-anchor="middle" class="sm">膵頭</text>
+<path d="M204 122 C168 126 164 188 208 194" class="organ-s" stroke-width="14"/>
+<text x="150" y="214" text-anchor="middle" class="sm">十二指腸</text>
+<path d="M118 158 L158 158" class="move" marker-end="url(#ah-d)"/>
+<text x="138" y="148" text-anchor="middle" class="sm ta b">② Kocher</text>
+<ellipse cx="200" cy="272" rx="72" ry="42" class="organ-f"/>
+<text x="200" y="276" text-anchor="middle" class="sm">小腸</text>
+<path d="M104 300 C190 300 290 230 318 52" class="move" marker-end="url(#ah-d)"/>
+<text x="318" y="40" text-anchor="end" class="sm ta b">左肩</text>
+<text x="200" y="334" text-anchor="middle" class="sm ta b">③ 盲腸と小腸を左肩の方へ</text>
+</svg>`}
+};
+
+/* ===== プレテスト（○×） a:true=○ ===== */
+const QUIZ = {
+ch15:[
+ {lv:1,q:"Cattell-Braasch法は「右から左への」内側臓器翻転（right-to-left medial visceral rotation）である。",a:true,e:"右結腸を内側（患者の左）へ倒す方法。左から右へ倒すのはMattox法。"},
+ {lv:1,q:"最初に切開するのはToldtの白線（white line of Toldt）である。",a:true,e:"盲腸の付け根から肝弯曲まで、壁側腹膜を切る。"},
+ {lv:1,q:"Cattell-Braasch法で主に見えるのは、脾臓や左腎など左後腹膜の構造である。",a:false,e:"見えるのは右後腹膜（十二指腸・膵頭部・右腎・IVC・右腸骨血管）。左はMattox法。"},
+ {lv:1,q:"右結腸と腹壁のあいだの層は血管が多いので、鋭的に少しずつ剥がす。",a:false,e:"この層は無血管（avascular）。一度入れば鈍的剥離（blunt dissection）で素早く広げられる。"},
+ {lv:2,q:"第1段階の切開範囲は、盲腸の付け根から脾弯曲までである。",a:false,e:"肝弯曲（hepatic flexure）まで。脾弯曲は左側。"},
+ {lv:2,q:"Kocher法は、十二指腸と膵頭部を見えるようにするための操作である。",a:true,e:"第2段階で肝弯曲を授動し、Kocher法で十二指腸のC字ループと膵頭部を出す。"},
+ {lv:2,q:"最終段階では、盲腸と小腸を「上から下へ」回転させる。",a:false,e:"下から上へ（inferior-to-superior）。骨盤から持ち上げて出す。"},
+ {lv:2,q:"手技が完成すると、盲腸は患者の左肩の近くまで動かせる。",a:true,e:"これが完成の目安。図解Dの③。"},
+ {lv:3,q:"IVC損傷が疑われるときは、翻転で血腫の天井が開いて大出血しうるので、IVCを制御する準備をしてから行う。",a:true,e:"contained hematoma を unroof すると出血する。準備してから開ける。"},
+ {lv:3,q:"Cattell-Braasch法を完成させれば、右尿管と右腸骨血管は骨盤まで追える。",a:true,e:"図9：膵頭部・IVC・右腎と尿管・腎静脈・骨盤までの右腸骨血管が見える。"},
+ {lv:3,q:"腹腔動脈より上で大動脈を遮断するとき、食道は患者の右へ牽引する。",a:false,e:"患者の左へ牽引する（図7）。"},
+ {lv:3,q:"裂孔の高さで大動脈を遮断するとき、鉗子先端の目印は傍脊柱筋と椎体である。",a:true,e:"図6。鉗子を椎体に当たるまで入れるイメージ。"}
+],
+ch19:[
+ {lv:1,q:"腸骨動脈は、対応する静脈より前（anterior）にある。",a:true,e:"動脈が前、静脈が後ろ。図解B・C。"},
+ {lv:1,q:"遠位大動脈・腸骨血管損傷の原因で最も多いのは、鈍的外傷である。",a:false,e:"最も多いのは骨盤の穿通性外傷（penetrating wounds）。"},
+ {lv:1,q:"最優先は出血のコントロールである。",a:true,e:"The first priority is hemorrhage control."},
+ {lv:1,q:"通常は正中切開（外傷開腹）から展開する。",a:true,e:"midline incision as part of a trauma laparotomy."},
+ {lv:2,q:"総腸骨静脈は、総腸骨動脈の「前壁」に密着している。",a:false,e:"後壁（back wall）に密着している。だから動脈の裏を剥がすと静脈が裂ける。"},
+ {lv:2,q:"遠位大動脈は後腹膜Zone 1、腸骨血管はZone 3にある。",a:true,e:"図解A。Zone 1が中央、Zone 3が骨盤。"},
+ {lv:2,q:"腸骨静脈は、どんな場合でも結紮してはいけない。",a:false,e:"必要なら結紮してよい。外腸骨静脈の結紮では下肢の浮腫やDVTのリスクがある。"},
+ {lv:2,q:"尿管は、血管損傷の処置より先に評価する。",a:false,e:"血管の処置のあとで評価する。まず出血のコントロール。"},
+ {lv:3,q:"右総腸骨静脈を出すために、右総腸骨動脈を離断することがある。",a:true,e:"図解Bのとおり、右総腸骨動脈が静脈の前をふさいでいるため。内腸骨動脈の離断・結紮でも視野が良くなる。"},
+ {lv:3,q:"正中アプローチでは、腎血管より「上」で腸間膜根部から後腹膜に入る。",a:false,e:"腎血管より下（below the renal vessels）。左腎静脈が上の境界。"},
+ {lv:3,q:"骨盤血管の完全遮断では、遠位大動脈・IVCに加えて左右の「内腸骨」動静脈を遮断する。",a:false,e:"左右の外腸骨（external iliac）動静脈を遮断する。"},
+ {lv:3,q:"大動脈にベッセルループを回すときは、腰動静脈（lumbar vessels）を傷つけないよう注意する。",a:true,e:"大動脈の後ろから腰動静脈が出ているため。"}
+]
+};
+const LV_NAME={1:"Lv1 やさしい",2:"Lv2 ふつう",3:"Lv3 むずかしい"};
+
 /* ===== 描画 ===== */
 const esc=s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+const TAP='<span class="tap">タップで日本語</span>';
 const toc=document.getElementById("toc"), root=document.getElementById("chapters");
 let html="", chips="";
 for(const c of CHAPTERS){
   chips+=`<a href="#${c.id}">${c.no.replace("Chapter ","")}章 ${esc(c.ja.replace(/^腹部外傷：/,""))}</a>`;
   html+=`<section class="chapter" id="${c.id}"><div class="chno">${c.no}</div><h2>${esc(c.ja)}</h2><p class="en-title">${esc(c.en)}</p><p class="meta">${esc(c.pages)}</p>`;
+  if(QUIZ[c.id]) html+=`<div class="quiz" data-ch="${c.id}"><div class="quiz-head"><strong>プレテスト（○×）</strong><span class="score"></span></div>
+    <div class="levels" role="group" aria-label="レベル">${[1,2,3].map(l=>`<button class="btn" data-lv="${l}" aria-pressed="false">${LV_NAME[l]}</button>`).join("")}</div>
+    <ol class="qlist"></ol><div class="quiz-foot"><button class="btn retry">このレベルをやり直す</button></div></div>`;
   for(const s of c.sections){
     html+=`<h3><span>${esc(s.ja)}</span><span class="en">${esc(s.en)}</span></h3>`;
     if(s.items){html+=`<ul class="pairs">`;for(const it of s.items){
       const cls=["pair",it.warn?"warn":"",it.sub?"sub":""].join(" ");
       const tag=it.step?`<span class="tag">${it.step}</span>`:it.warn?`<span class="tag">注意</span>`:"";
-      html+=`<li class="${cls}" tabindex="0">${tag}<span class="en">${it.en}</span><span class="ja">${esc(it.ja)}</span></li>`;}
+      html+=`<li class="${cls}" tabindex="0">${tag}<span class="en">${it.en}</span><span class="ja">${esc(it.ja)}</span>${TAP}</li>`;}
       html+=`</ul>`;}
+    for(const k of s.diagrams||[]){const d=DIAGRAMS[k];
+      html+=`<figure class="dg"><span class="dg-tag">${d.tag}　模式図</span>${d.svg}<figcaption>${esc(d.caption)}</figcaption></figure>`;}
     for(const f of s.figures||[]){
-      html+=`<figure><img src="${f.src}" alt="${esc(f.ja)}" loading="lazy"><figcaption><span class="en">${esc(f.en)}</span><span class="ja">${esc(f.ja)}</span>${f.labels?`<span class="labels">${esc(f.labels)}</span>`:""}</figcaption></figure>`;}
+      html+=`<figure class="photo" tabindex="0"><img src="${f.src}" alt="${esc(f.ja)}" loading="lazy"><figcaption><span class="en">${esc(f.en)}</span><span class="ja">${esc(f.ja)}</span>${TAP}${f.labels?`<span class="labels">${esc(f.labels)}</span>`:""}</figcaption></figure>`;}
   }
   html+=`<h4>単語 VOCABULARY（${c.vocab.length}語）</h4><ul class="vocab">`;
-  for(const [en,ja,note] of c.vocab) html+=`<li class="word" tabindex="0"><span class="en">${esc(en)}</span><span class="ja">${esc(ja)}</span>${note?`<span class="note">${esc(note)}</span>`:""}</li>`;
+  for(const [en,ja,note] of c.vocab) html+=`<li class="word" tabindex="0"><span class="en">${esc(en)}</span><span class="ja">${esc(ja)}</span>${note?`<span class="note">${esc(note)}</span>`:""}${TAP}</li>`;
   html+=`</ul><h4>3つのポイント</h4><div class="points">`;
   for(const [k,label] of [["cut","切開線"],["land","ランドマーク"],["protect","守るべき構造"]])
     html+=`<div class="point"><span class="k">${label}</span><ul>${c.points[k].map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`;
@@ -259,22 +435,49 @@ for(const c of CHAPTERS){
 }
 toc.innerHTML=chips; root.innerHTML=html;
 
-/* ===== 表示モード ===== */
-const body=document.body, btns=[...document.querySelectorAll(".modes button")];
-let mode="both", quiz=false;
-try{mode=localStorage.getItem("mode")||"both";quiz=localStorage.getItem("quiz")==="1";}catch(e){}
-function apply(){
-  body.classList.toggle("mode-en",mode==="en");body.classList.toggle("mode-ja",mode==="ja");body.classList.toggle("quiz",quiz);
-  for(const b of btns) b.setAttribute("aria-pressed", b.dataset.quiz? String(quiz) : String(b.dataset.mode===mode));
-  document.querySelectorAll(".open").forEach(e=>e.classList.remove("open"));
-  try{localStorage.setItem("mode",mode);localStorage.setItem("quiz",quiz?"1":"0");}catch(e){}
+/* ===== プレテストの動作 ===== */
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+function renderQuiz(box,lv){
+  const ch=box.dataset.ch, qs=QUIZ[ch].filter(q=>q.lv===lv);
+  box.dataset.lv=lv; store.set("lv-"+ch,lv);
+  box.querySelectorAll("[data-lv]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.lv===lv)));
+  box.querySelector(".qlist").innerHTML=qs.map((q,i)=>`<li class="q" data-i="${QUIZ[ch].indexOf(q)}"><div class="q-row"><span class="q-text">Q${i+1}. ${esc(q.q)}</span>
+    <span class="ox"><button data-ans="1" aria-label="○ 正しい">○</button><button data-ans="0" aria-label="× 誤り">×</button></span></div></li>`).join("");
+  updateScore(box);
 }
-btns.forEach(b=>b.addEventListener("click",()=>{ if(b.dataset.quiz) quiz=!quiz; else mode=b.dataset.mode; apply(); }));
-function toggleOpen(e){const el=e.target.closest(".pair,.word"); if(!el) return;
-  if(el.classList.contains("pair")&&mode!=="en") return;
-  if(el.classList.contains("word")&&!quiz) return;
-  el.classList.toggle("open");}
-root.addEventListener("click",toggleOpen);
-root.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();toggleOpen(e);}});
-apply();
+function updateScore(box){
+  const items=[...box.querySelectorAll(".q")], done=items.filter(q=>q.dataset.done), ok=done.filter(q=>q.dataset.done==="ok");
+  box.querySelector(".score").textContent=`${ok.length}/${items.length} 正解`+(done.length<items.length?`（残り${items.length-done.length}問）`:"");
+}
+root.addEventListener("click",e=>{
+  const box=e.target.closest(".quiz"); if(!box) return;
+  const lvb=e.target.closest("button[data-lv]"); if(lvb){renderQuiz(box,+lvb.dataset.lv);return;}
+  if(e.target.closest(".retry")){renderQuiz(box,+box.dataset.lv);return;}
+  const ab=e.target.closest("[data-ans]"); if(!ab) return;
+  const li=ab.closest(".q"); if(li.dataset.done) return;
+  const q=QUIZ[box.dataset.ch][+li.dataset.i], right=(ab.dataset.ans==="1")===q.a;
+  li.dataset.done=right?"ok":"ng";
+  li.querySelectorAll("[data-ans]").forEach(b=>b.disabled=true); ab.classList.add("picked");
+  li.insertAdjacentHTML("beforeend",`<div class="result"><b class="${right?"ok":"ng"}">${right?"正解":"不正解"}</b>　答えは ${q.a?"○":"×"}。${esc(q.e)}</div>`);
+  updateScore(box);
+});
+document.querySelectorAll(".quiz").forEach(b=>renderQuiz(b,+(store.get("lv-"+b.dataset.ch)||1)));
+
+/* ===== 日本語を隠す ===== */
+const hideBtn=document.getElementById("hide-ja"), hint=document.getElementById("hide-hint");
+let hide=store.get("hide-ja")==="1";
+function applyHide(){
+  document.body.classList.toggle("hide-ja",hide);
+  hideBtn.setAttribute("aria-pressed",String(hide));
+  hideBtn.textContent=hide?"日本語を表示する":"日本語を隠す";
+  hint.textContent=hide?"文や単語をタップすると日本語が出ます":"隠すと、タップしたところだけ日本語が出ます";
+  document.querySelectorAll(".open").forEach(e=>e.classList.remove("open"));
+  store.set("hide-ja",hide?"1":"0");
+}
+hideBtn.addEventListener("click",()=>{hide=!hide;applyHide();});
+function reveal(e){ if(!hide||e.target.closest(".quiz")) return;
+  const el=e.target.closest(".pair,.word,figure.photo"); if(el) el.classList.toggle("open"); }
+root.addEventListener("click",reveal);
+root.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.matches(".pair,.word,figure.photo")){e.preventDefault();reveal(e);}});
+applyHide();
 </script>
